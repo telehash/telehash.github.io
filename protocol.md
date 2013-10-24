@@ -1,4 +1,4 @@
-Telehash v2 draft
+Telehash protocol draft
 =================
 
 # Introduction

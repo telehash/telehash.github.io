@@ -1,4 +1,4 @@
 telehash.org
 ============
 
-Contents of the site
+Contents of [telehash.org](http://telehash.org).
