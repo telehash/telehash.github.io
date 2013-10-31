@@ -91,7 +91,8 @@ would love your help - pull requests to list them here are welcome!
 * Ruby - [ruby-telehash](https://github.com/dwaite/ruby-telehash)
 * Go - [gogotelehash](https://github.com/dizzyd/gogotelehash)
 * Java - [telehash-java](https://github.com/kubes/telehash-java)
-* ObjectiveC [Objective-Telehash](https://github.com/jsmecham/Objective-Telehash)
+* ObjectiveC - [Objective-Telehash](https://github.com/jsmecham/Objective-Telehash)
+* PHP - [SwitchBox](https://github.com/jaytaph/switchbox)
 
 ## Creating Applications
 
