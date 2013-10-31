@@ -596,7 +596,11 @@ When one hashname wants to connect to another hashname, it finds the closest lin
 
 For any hashname to send an open to another it must first have it's hashname, so there is a two step process starting with a peer request. Since new hashnames are discovered only from another (in the `see` values), they are tracked as a "via" so that they can be sent a peer request when a connection is being made to a hashname they sent.
 
-This also serves as a workaround if any NAT exists, so that the two hashnames can send a packet to each other to make sure the path between them is open, this is called "hole punching." A peer request requires a `"peer":[...]` where the value is an array of hashnames the sender is trying to reach. The recipient of the peer request must then send a connect (below) to each of the target hashnames (that it already must have an open line to).
+This also serves as a workaround if any NAT exists, so that the two hashnames can send a packet to each other to make sure the path between them is open, this is called "hole punching." A peer request requires a `"peer":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"` where the value is the hashname the sender is trying to reach. The recipient of the peer request must then send a connect (below) to the target hashname (that it already must have an open line to).
+
+Peer requests may also carry an optional `"local":{"ip":"192.168.1.2","port":34567}` value to express any local network connectivity information if they are behind the same NAT device.
+
+These requests are always sent with a `"end":true` and not ack'd when processed.
 
 <a name="connect" />
 ### `"type":"connect"` - Connect to a hashname
@@ -604,6 +608,8 @@ This also serves as a workaround if any NAT exists, so that the two hashnames ca
 The connect request is an immediate result of a peer request and must also contain an `"ip":"1.2.3.4"` and `"port":5678` with the values being of the peer requestor and a BODY of their public key.
 
 The recipient can use the given IP, port, and public key to send an open request to the target.  If a NAT is suspected to exist, the target should have already sent a packet to ensure their side has a path mapped through the NAT and the open should then make it through.
+
+These requests are also sent with a `"end":true` and not ack'd when processed.
 
 # Switch Behaviors
 
