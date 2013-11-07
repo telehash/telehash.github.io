@@ -109,7 +109,7 @@ of each seed.
 
 ## Hashnames
 Every instance of an application has a unique public id that is called
-it's "hashname". Any application instance can use the DHT to find
+its "hashname". Any application instance can use the DHT to find
 others by knowing their hashname. By default there is a single global
 DHT, but Telehash also supports applications creating their own private
 DHTs if needed.
