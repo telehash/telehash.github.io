@@ -599,8 +599,6 @@ For any hashname to send an open to another it must first have it's hashname, so
 
 This also serves as a workaround if any NAT exists, so that the two hashnames can send a packet to each other to make sure the path between them is open, this is called "hole punching." A peer request requires a `"peer":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"` where the value is the hashname the sender is trying to reach. The recipient of the peer request must then send a connect (below) to the target hashname (that it already must have an open line to).
 
-Peer requests may also carry an optional `"local":{"ip":"192.168.1.2","port":34567}` value to express any local network connectivity information if they are behind the same NAT device.
-
 These requests are always sent with a `"end":true` and not ack'd when processed.
 
 <a name="connect" />
@@ -611,6 +609,32 @@ The connect request is an immediate result of a peer request and must also conta
 The recipient can use the given IP, port, and public key to send an open request to the target.  If a NAT is suspected to exist, the target should have already sent a packet to ensure their side has a path mapped through the NAT and the open should then make it through.
 
 These requests are also sent with a `"end":true` and not ack'd when processed.
+
+## Echo & Ping - Guaranteed Connectivity
+
+There are a number of situations where two different hashnames will be unable to connect directly to each other, and while these are not very common, the protocol must ensure that any two hashnames have the ability to securely exchange information.
+
+The two most common cases are with combinations of certain NATs where at least one dynamically maps external ports such that the sending hashname has no way to detect it (often called symmetric NATs), and the other is when two hashnames are on the same local network and their public ports cannot send data to each other. Typical solutions in other protocols involve using a shared/trusted third party to relay the data via (TURN), and exchanging internal network addresses via a third party. There are additional cases that will become more common in the future as well, when there are diverse networks and two hashnames are on different ones entirely (one is ip based and the other bluetooth).
+
+### Echo - Establishing a Path
+
+The technique to solve this in general involves every switch that is part of the DHT supporting two additional behaviors, one during the handling of a `peer` request and the other a new top-level packet type of `"type":"echo"`.
+
+When a hashname detects that it cannot connect directly with another (there are different detection techniques for the various common cases), when it sends a `peer` it includes a `"echo":true` in the request. Upon receiving this, the hashname assisting the connection process includes an `"echo":"be22ad779a631f63336fe051d5aa2ab2"` in the outgoing `connect` where the value is a random 16 byte value in hex.  It also stores this unique key globally with a mapping to the `peer` sender's IP/Port.  Upon receiving a `connect` that includes an `echo` value, the receiving hashname also sends it's `open` packet as a BODY in a `"type":"echo"` including the `"echo":"..."` value back to the IP/Port of the `connect` sender.
+
+At the network level, when a packet comes in with `"type":"echo"` it must also contain an `"echo":"..."` value that matches one stored, otherwise the packet is dropped.  Upon a match, the BODY is then sent as a raw network packet to the mapped IP/Port.
+
+This enables one side of the hashname connection process to have a reliable method of sending packets back.  Following the `open` exchange, normal `line` packets can be sent via the `echo` path as well.  If both sides know they don't have connectivity, during the connection process the recipient would initiate another `peer` back to the sender with the echo flag set as well so that a reverse echo path would be created.
+
+To prevent abuse, echo paths should only be temporary and only a switch must limit the number of them created by any hashname.
+
+### Ping - Multiple Network Paths
+
+When two hashnames are on the same local network, as well as when any hashname has multiple networks (ipv4 and ipv6 for instance), they need a mechanism to exchange the address information and monitor the multiple paths to each other.
+
+A channel of `"type":"ping"` is used to do this, for each known/discovered network path to another hashname a `ping` is sent over that network interface, and the responding hashname upon receiving any ping must return a packet with `"end":true` and include a `"priority":1` with what priority that network interface is to receive packets via.
+
+The initial `ping` packets should also contain a `"nets":[{"ip":1.2.3.4,"port":5678},...]` array of objects each of which contains one of it's known network paths to it.  This enables two hashnames on the same local network to exchange their internal IP/Port and establish a local connection as the primary one.
 
 # Switch Behaviors
 
