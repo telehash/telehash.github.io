@@ -610,31 +610,29 @@ The recipient can use the given IP, port, and public key to send an open request
 
 These requests are also sent with a `"end":true` and not ack'd when processed.
 
-## Echo & Ping - Guaranteed Connectivity
+### `"type":"relay"` - Backup Connectivity
 
 There are a number of situations where two different hashnames will be unable to connect directly to each other, and while these are not very common, the protocol must ensure that any two hashnames have the ability to securely exchange information.
 
-The two most common cases are with combinations of certain NATs where at least one dynamically maps external ports such that the sending hashname has no way to detect it (often called symmetric NATs), and the other is when two hashnames are on the same local network and their public ports cannot send data to each other. Typical solutions in other protocols involve using a shared/trusted third party to relay the data via (TURN), and exchanging internal network addresses via a third party. There are additional cases that will become more common in the future as well, when there are diverse networks and two hashnames are on different ones entirely (one is ip based and the other bluetooth).
+The two most common cases are with combinations of certain NATs where at least one dynamically maps external ports such that the sending hashname has no way to detect it (often called symmetric NATs), and the other is when two hashnames are on the same local network and their public ports cannot send data to each other. Typical solutions in other protocols involve using a shared/trusted third party to relay the data via (TURN), and exchanging internal network addresses via a third party. There are additional cases that will become more common in the future as well, such as when there are diverse networks and two hashnames are on different ones entirely (one is ip based and the other bluetooth) connected only by a hashname that handles both.
 
-### Echo - Establishing a Path
+When a hashname detects that it cannot connect directly with another (there are different detection techniques for the various cases), when it sends a `peer` it includes a `"relay":true` in the request. The hashname receiving the `peer` and generating the `connect` must include the relay flag in the connect request. Upon receiving a `connect` with the relay flag set in it, that hashname must additionally open a `relay` channel and send the identical `open` packet over the relay as well as sending it to the included ip/port info in the connect.
 
-The technique to solve this in general involves every switch that is part of the DHT supporting two additional behaviors, one during the handling of a `peer` request and the other a new top-level packet type of `"type":"echo"`.
+A `relay` channel is very simple, the initial packet must contain a `"to":"..."` of the hashname to relay to, and that hashname must be one that the receiving switch already has an open line to.  The initial relay packet is then sent as-is over the line to the recipient, and any/all packets sent from either side are then relay'd as-is to the other.
 
-When a hashname detects that it cannot connect directly with another (there are different detection techniques for the various common cases), when it sends a `peer` it includes a `"echo":true` in the request. Upon receiving this, the hashname assisting the connection process includes an `"echo":"be22ad779a631f63336fe051d5aa2ab2"` in the outgoing `connect` where the value is a random 16 byte value in hex.  It also stores this unique key globally with a mapping to the `peer` sender's IP/Port.  Upon receiving a `connect` that includes an `echo` value, the receiving hashname also sends it's `open` packet as a BODY in a `"type":"echo"` including the `"echo":"..."` value back to the IP/Port of the `connect` sender.
+To prevent abuse, all switches must limit the volume of relay packets between any two hashnames to no more than two per second from either sender.  Any packets over that rate must be dropped/discarded. This is a fast enough rate for any two hashnames to negotiate additional connectivity (like using a [bridge][]) and do basic DHT queries.
 
-At the network level, when a packet comes in with `"type":"echo"` it must also contain an `"echo":"..."` value that matches one stored, otherwise the packet is dropped.  Upon a match, the BODY is then sent as a raw network packet to the mapped IP/Port.
+### `"type":"ping"` - Multiple Network Paths
 
-This enables one side of the hashname connection process to have a reliable method of sending packets back.  Following the `open` exchange, normal `line` packets can be sent via the `echo` path as well.  If both sides know they don't have connectivity, during the connection process the recipient would initiate another `peer` back to the sender with the echo flag set as well so that a reverse echo path would be created.
+When two hashnames are on the same local network, as well as when any hashname has multiple networks (ipv4 and ipv6 for instance), they need a mechanism to exchange the address information and monitor the multiple paths to each other. A `ping` should also be sent over a `relay` as a fallback network path.
 
-To prevent abuse, echo paths should only be temporary and only a switch must limit the number of them created by any hashname.
+A channel of `"type":"ping"` is used to do this, for each known/discovered network path to another hashname a `ping` is sent over that network interface, and the responding hashname upon receiving any ping must return a packet with `"end":true` and include an optional `"priority":1` with what priority that network interface is to receive packets via (defaults to 0).
 
-### Ping - Multiple Network Paths
+The initial `ping` packets should also contain a `"nets":[{"ip":1.2.3.4,"port":5678},...]` array of objects each of which contains one of it's known network paths to it.  This enables two hashnames on the same local network to decide to exchange their internal IP/Port and establish a local connection as the primary one.
 
-When two hashnames are on the same local network, as well as when any hashname has multiple networks (ipv4 and ipv6 for instance), they need a mechanism to exchange the address information and monitor the multiple paths to each other.
+A switch only needs to send a ping automatically when it detects more than one (potential) network path between itself and another hashname, such as when the public IP is identical, when line packets come in from different IP/Ports, when it has two network interfaces itself, etc.
 
-A channel of `"type":"ping"` is used to do this, for each known/discovered network path to another hashname a `ping` is sent over that network interface, and the responding hashname upon receiving any ping must return a packet with `"end":true` and include a `"priority":1` with what priority that network interface is to receive packets via.
-
-The initial `ping` packets should also contain a `"nets":[{"ip":1.2.3.4,"port":5678},...]` array of objects each of which contains one of it's known network paths to it.  This enables two hashnames on the same local network to exchange their internal IP/Port and establish a local connection as the primary one.
+When the [bridge][] extension is used, it also becomes an additional network path that can be shared/tested automatically with pings.
 
 # Switch Behaviors
 
@@ -685,4 +683,5 @@ It is also used to optimize the DHT for both resistance to general flooding and 
 
 [sockets]: ext_sockets.md
 [tickets]: ext_tickets.md
+[bridge]: ext_bridge.md
 [kademlia]: https://en.wikipedia.org/wiki/Kademlia
