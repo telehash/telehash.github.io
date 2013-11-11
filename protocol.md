@@ -559,20 +559,24 @@ support them internally easily, these are still experimental:
 <a name="reliable" />
 ### Channel Reliability
 
+(this section needs to be broken out and expanded with examples)
+
 All UDP packets are by their very nature lossy, so channels must
 be able to replicate TCP features such as reliability, retransmission,
 and buffering/backpressure mechanisms. This is done by requiring a
-lightweight `"seq":0` field on every packet. All seq values start at 0
-and increment per packet sent. A buffer of these packets must be kept
+lightweight `"seq":0` field on every content packet. All seq values start at 0
+and increment per packet sent when that packet contains any data. A buffer of these packets must be kept
 keyed by the seq value until the receiving hashname has responded
 confirming them in a `ack` and not in the `miss`. The `ack` is the
 highest known `seq` value received. The `miss` is an array of integers
 and must be sent along with any `ack` if in the process of receiving
 packets there were any missing sequences, containing in any order the
 missing sequence values up to the `ack`.  Upon receipt those missed
-packets should be resent verbatim.
+packets should be resent.
 
-When a channel is started, only one packet may be sent (seq:0) until the recipient has responded and ack'd that initial type packet, only then can additional packets be sent with that same channel id.
+When a channel is started, only one packet may be sent (seq:0) that includes the `"type":"..."` value until the recipient has responded and ack'd that initial type packet, only then can additional packets be sent with that same channel id.
+
+While an `ack` should be accompany every packet on a channel, at any point a switch may send a packet that contains *only* an `ack` (and optionally a `miss`) field to ensure the sender has the most current information. These "ack-only" packets must not have a `seq` value or carry any user content, and are not tracked by the sender or procesed for data by the recipient.
 
 By default a channel should be invalidated if a sequence has been missed
 three or more times, or there's more than 100 missed packets by default
@@ -584,6 +588,13 @@ When reliability isn't required for a channel, either side can send an
 `ack` of the last received `seq` value without tracking any misses,
 while still following the 100-max-outstanding rule to provide for any
 congestion/loss detection.
+
+Here's some more rough notes for implementors:
+
+* send an ack with every outgoing packet, of the highest seq you've received and processed
+* only send a miss if you've discovered missing packets in the incoming seq ordering
+* if an app is receiving packets and hasn't generated response packets, send an ack after 1s
+* if more than 30 packets have been received with no outgoing acks, send an ack
 
 <a name="seek" />
 ### `"type":"seek"` - Finding Hashnames (DHT)
