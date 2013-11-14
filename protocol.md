@@ -560,42 +560,45 @@ support them internally easily, these are still experimental:
 <a name="reliable" />
 ### Channel Reliability
 
-(this section needs to be broken out and expanded with examples)
+Telehash packets are by default only as reliable as UDP itself is, which means they may be dropped or arrive out of order.  Most of the time applications want to transfer content in a reliable way, so "durable" channels replicate TCP features such as ordering, retransmission, and buffering/backpressure mechanisms.
 
-All UDP packets are by their very nature lossy, so channels must
-be able to replicate TCP features such as reliability, retransmission,
-and buffering/backpressure mechanisms. This is done by requiring a
-lightweight `"seq":0` field on every content packet. All seq values start at 0
-and increment per packet sent when that packet contains any data. A buffer of these packets must be kept
-keyed by the seq value until the receiving hashname has responded
-confirming them in a `ack` and not in the `miss`. The `ack` is the
-highest known `seq` value received. The `miss` is an array of integers
-and must be sent along with any `ack` if in the process of receiving
-packets there were any missing sequences, containing in any order the
-missing sequence values up to the `ack`.  Upon receipt those missed
-packets should be resent.
+By default, the first packet sent on any channel (that contains the `type`) and it's answer must be durable as well, but after a channel is setup by both sides, it only requires the `c` channel id and the durability features below are optional.  Only this initial packet may be sent until the recipient responds to it.
 
-When a channel is started, only one packet may be sent (seq:0) that includes the `"type":"..."` value until the recipient has responded and ack'd that initial type packet, only then can additional packets be sent with that same channel id.
+#### `"seq":0` - Sequences
 
-While an `ack` should be accompany every packet on a channel, at any point a switch may send a packet that contains *only* an `ack` (and optionally a `miss`) field to ensure the sender has the most current information. These "ack-only" packets must not have a `seq` value or carry any user content, and are not tracked by the sender or procesed for data by the recipient.
+The first requirement of a durable channel is always including a lightweight `"seq":0` field on every packet that contains any content. All seq values start at 0 and increment per packet sent when that packet contains any data.
 
-By default a channel should be invalidated if a sequence has been missed
-three or more times, or there's more than 100 missed packets by default
-(senders cannot send more than that without a confirming range). When
-there's consistently missing packets, senders should limit the number
-of packets beyond the confirmed range. (needs more examples/definition)
+A buffer of these packets must be kept keyed by the seq value until the receiving hashname has responded
+confirming them in a `ack` (below). The maximum size of this buffer and the number of outgoing packets that can be sent before being acknowledged is currently 100, but this is very much just temporary to ease early implementations and handling it's size will be defined in it's own document.
 
-When reliability isn't required for a channel, either side can send an
-`ack` of the last received `seq` value without tracking any misses,
-while still following the 100-max-outstanding rule to provide for any
-congestion/loss detection.
+Upon receiving sequence values, the switch must only process the packets and their contents in order, so any packets received with a sequence value out of order or with any gaps must either be buffered or dropped.  It is much more efficient to buffer these when a switch has the resources to do so, but if buffering it must have it's own internal maximum to limit it.
+
+#### `"ack":0` - Acknowledgements
+
+The `ack` is the highest known `seq` value confirmed as *processed by the app*, and may be included on any packet at any point. An `ack` may also be sent in it's own packet ad-hoc at any point without any content data, and these ad-hoc acks must not include a `seq` value as they are not part of the content stream.
+
+When receiving an `ack` the switch may then discard any buffered packets up to and including that matching `seq` id, and also confirm to the app that the included content data was received and processed by the other side.
+
+An `ack` must be sent a minimum of once per second after receiving any packet including a `seq` value, either included with response content packets or their own ad-hoc packets.  Allowing up to one second gives the application some time to generate any response content, as well as receive a larger number of content packets before acknowleding them all.
+
+#### `"miss":[1,2,4]` - Misssing Sequences
+
+The `miss` is an array of integers and must be sent along with any `ack` if in the process of receiving
+packets there were any missing sequences, containing in any order the known missing sequence values.  Because the `ack` is confirmed processed packets, all of the `miss` ids will be higher than the accompanying `ack`.
+
+This is only applicable when a receiving switch is buffering incoming sequences and is missing specific packets in the buffer that it requires before it can continue processing the content in them.
+
+A `miss` should be no larger than 100 entries, any array larger than that should be discarded, as well as any included sequence values lower than the accompanying `ack` or higher than any outgoing sent `seq` values.
+
+Upon receiving a `miss` the switch should resend those specific matching `seq` packets in it's buffer, but never more than once per second. So if an id in a `miss` is repeated or shows up in multiple incoming packets quickly, the matching packet is only resent once until at least one second has passed.
+
+#### Durability Notes
 
 Here's some more rough notes for implementors:
 
 * send an ack with every outgoing packet, of the highest seq you've received and processed
 * only send a miss if you've discovered missing packets in the incoming seq ordering
 * if an app is receiving packets and hasn't generated response packets, send an ack after 1s
-* if more than 30 packets have been received with no outgoing acks, send an ack
 
 <a name="seek" />
 ### `"type":"seek"` - Finding Hashnames (DHT)
