@@ -83,16 +83,17 @@ help insure that the security, identity, and networking aspects are
 verified properly. If there isn't one which meets your needs, then we
 would love your help - pull requests to list them here are welcome!
 
-* Node.js - [node-telehash](https://github.com/quartzjer/node-telehash)
+* Node.js - [node-telehash](https://github.com/telehash/node-telehash)
 * D - [telehash.d](https://github.com/temas/telehash.d)
-* Python - [plinth](https://github.com/stpeter/plinth)
-* Javascript (browser) [thjs](http://github.com/quartzjer/thjs)
+* Python - [plinth](https://github.com/telehash/plinth)
+* Javascript (browser) [thjs](http://github.com/telehash/thjs)
 * C [telehash-c](http://github.com/quartzjer/telehash-c)
-* Ruby - [ruby-telehash](https://github.com/dwaite/ruby-telehash)
-* Go - [gogotelehash](https://github.com/dizzyd/gogotelehash)
+* Ruby - [ruby-telehash](https://github.com/telehash/ruby-telehash)
+* Go - [gogotelehash](https://github.com/dtelehash/gogotelehash)
 * Java - [telehash-java](https://github.com/kubes/telehash-java)
 * ObjectiveC - [Objective-Telehash](https://github.com/jsmecham/Objective-Telehash)
 * PHP - [SwitchBox](https://github.com/jaytaph/switchbox)
+* Erlang - [relish](https://github.com/telehash/relish)
 
 ## Creating Applications
 
