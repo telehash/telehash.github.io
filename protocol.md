@@ -526,7 +526,7 @@ A channel may have only one outgoing initial packet, only one response to it, or
 Key parameters channel packets:
 
 * `"type":"value"` - A channel always begins with a `type` in the first outgoing packet to distinguish to the recipient what kind of channel it is. This value must only be set on the first packet, not on any subsequent ones or any responses. Application-defined custom types must always be prefixed with an underscore, such as "_chat".
-* `"end":"true"` - Upon processing a packet with an `end`, the recipient must not send any more content packets or expect anymore to be received and consider the channel closed. An `end` may be sent by either side and is not required to be sent by both.
+* `"end":"true"` - Upon processing a packet with an `end`, the recipient must not send any more content packets (reliability acks/resends may still be happening though) or expect anymore to be received and consider the channel closed. An `end` may be sent by either side and is not required to be sent by both.
 * `"err":"message"` - As soon as any packet on a channel is received with an `err` it must be immediately closed and no more packets can be sent or received at all, any/all buffered content in either direction must be dropped. These packets must contain no content other than optional extra details on the error.
 * `"_":{...}` - For any application-defined channels that have an underscore-prefixed type, any JSON values provided by or for the application are sent in the `_` key value.
 
@@ -534,10 +534,10 @@ Key parameters channel packets:
 <a name="unreliable" />
 #### Unreliable Channels
 
-An unreliable channel has no retransmit or ordering guarantees, and an `end` always signals the last packet for the channel with none in response. Any channel that is unreliable must not include any `seq` value (reliability signal below) in the initial `type` packet, and if one is received it must respond with an `err`.
+An unreliable channel has no retransmit or ordering guarantees, and an `end` always signals the last packet for the channel with none in response. Any channel that is unreliable must not include any `seq` value (reliability signal below) in the initial `type` packet, and if one is received it must respond with an `err`.   Unreliable channels are also often referred to as "lossy" and "raw" as they provide no guarantees and switches may expose them in a very minimal interface.
 
 The following values for `type` are for unreliable channels that are used to locate and communicate with
-application instances on the DHT. They are part of the core spec, and must be implemented by all switches:
+application instances on the DHT. They are part of the core spec, and must be implemented internally by all switches:
 
   * [`seek`](#seek) - return any pointers to other closer hashnames for the given `hash` (DHT), answer contains `see`
   * [`peer`](#peer) - ask the recipient to make an introduction to one of it's peers
@@ -557,7 +557,7 @@ An example unreliable channel start packet JSON for an app:
 <a name="reliable" />
 #### Reliable Channels
 
-Telehash packets are by default only as reliable as UDP itself is, which means they may be dropped or arrive out of order.  Most of the time applications want to transfer content in a durable way, so reliable channels replicate TCP features such as ordering, retransmission, and buffering/backpressure mechanisms.
+Telehash packets are by default only as reliable as UDP itself is, which means they may be dropped or arrive out of order.  Most of the time applications want to transfer content in a durable way, so reliable channels replicate TCP features such as ordering, retransmission, and buffering/backpressure mechanisms. The primary method of any application interfacing with a switch library is going to be through starting or receiving reliable channels.
 
 Reliability is requested on a channel with the very first packet (that contains the `type`) by including a `"seq":0` with it, and a switch must respond with an `err` if it cannot handle reliable channels.  Reliability must not be requested for channel types that are expected to be unreliable (like `seek` and `peer`, etc).
 
@@ -572,7 +572,9 @@ Upon receiving `seq` values, the switch must only process the packets and their 
 
 ##### `ack` - Acknowledgements
 
-The `"ack":0` integer is always included on any outgoing packets as the highest known `seq` value confirmed as *processed by the app*. An `ack` may also be sent in it's own packet ad-hoc at any point without any content data, and these ad-hoc acks must not include a `seq` value as they are not part of the content stream.
+The `"ack":0` integer is always included on any outgoing packets as the highest known `seq` value confirmed as *processed by the app*. What this means is that any switch library must provide a way to send data/packets to the app using it in a serialized way, and be told when the app is done processing one packet so that it can both confirm that `seq` as well as give the app the next one in order. Any outgoing `ack` must represent only the latest app-processed data `seq` so that the sender can confirm that the data was completely received/handled by the recipient app.
+
+An `ack` may also be sent in it's own packet ad-hoc at any point without any content data, and these ad-hoc acks must not include a `seq` value as they are not part of the content stream.
 
 When receiving an `ack` the switch may then discard any buffered packets up to and including that matching `seq` id, and also confirm to the app that the included content data was received and processed by the other side.
 
@@ -595,7 +597,7 @@ A switch MAY opportunistically remove packets from it's outgoing buffer that are
 Here's some summary notes for implementors:
 
 * send an ack with every outgoing packet, of the highest seq you've received and processed
-* only send a miss if you've discovered missing packets in the incoming seq ordering
+* only send a miss if you've discovered missing packets in the incoming seq ordering/buffering
 * if an app is receiving packets and hasn't generated response packets, send an ack after 1s
 * when an `end` is sent, don't close the channel until it's acked
 * when an `end` is received, process it in order like any other content packet, and close only after acking + timeout wait to allow re-acking if needed
