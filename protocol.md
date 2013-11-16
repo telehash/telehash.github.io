@@ -89,7 +89,7 @@ would love your help - pull requests to list them here are welcome!
 * Javascript (browser) [thjs](http://github.com/telehash/thjs)
 * C [telehash-c](http://github.com/quartzjer/telehash-c)
 * Ruby - [ruby-telehash](https://github.com/telehash/ruby-telehash)
-* Go - [gogotelehash](https://github.com/dtelehash/gogotelehash)
+* Go - [gogotelehash](https://github.com/telehash/gogotelehash)
 * Java - [telehash-java](https://github.com/kubes/telehash-java)
 * ObjectiveC - [Objective-Telehash](https://github.com/jsmecham/Objective-Telehash)
 * PHP - [SwitchBox](https://github.com/jaytaph/switchbox)
