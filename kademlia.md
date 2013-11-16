@@ -39,7 +39,7 @@ We XOR the 2 nodes:
 
     010101
     011111
-    ------- &#8891;
+    ------- ⊕
     001010
 
 The next step is to find the first bit that is '1', starting from left to right. In this case, this would be at offset
@@ -51,7 +51,7 @@ The distance between two very close neighbours:
 
     010101
     010100
-    ------- &#8891;
+    ------- ⊕
     000001
 
 Here the first 1 bit is at position 5. And thus this node should be stored in k-bucket (6-5) = 1
