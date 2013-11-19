@@ -3,9 +3,9 @@ Kademlia
 
 # Introduction
 
-Telehash uses the a DHT system based on `kademlia`.
+Telehash uses a DHT system based on [Kademlia][].
 
-Every node inside telehash is a 256bit string based on the sha256 hash of the node's public key.
+Every node inside Telehash is a 256bit value based on the sha256 hash of the node's public key.
 
 Based on this size, there will be 256 buckets (so-called k-buckets) which all have room for a certain amount of nodes.
 This number K, is not yet defined, but somewhere between 8 and 20 will suffice.
@@ -15,8 +15,8 @@ overhead for nodes to update each other and the amount of storage you need just 
 
 Kademlia is based the fact that you know a lot about your neighbours, but less and less about further nodes. This means
 we need a way to calculate a "distance" between nodes. Note that "distance" here isn't geographical distance. It might
-be possible that you are a close neighbour to a node on the other side of the world, while a node running on a computer
-in the same room, would be a far away node.
+be possible that you are a "close" neighbour to a node on the other side of the world, while a node running on a computer
+in the same room, could be a far away.
 
 
 ## Calculating distance
@@ -24,7 +24,7 @@ Distance calculation in kademlia is a 2-step process:
 
 
    - Exclusive or (xor) the 2 node strings.
-   - Find the first bit that is 1, starting from the MSB.
+   - Find the first bit that is 1, starting from the most significant bit.
 
 Using xor has a few properties: first of all, xor(a,a) something with yourself always returns 0. xor(a,b) is the same
 as xor(b,a), meaning that both nodes calculate the same distance to each other.
@@ -74,7 +74,7 @@ figure out which nodes to store). In bucket 250, where the distance of the nodes
 will on average be able to store 0.78% of the nodes. Again, from the 500 incoming nodes this means we would store on
 average around 4 nodes. As 4 nodes could easily fit inside this bucket, we can remember all these nodes.
 
-The following [pastebin](http://pastebin.com/0mBr3D8V) shows you an example on how k-buckets are filled with a 100.000
+The following [pastebin][] shows you an example on how k-buckets are filled with a 100,000
 random generated nodes, as seen from our own node: 736711cf55ff95fa967aa980855a0ee9f7af47d6287374a8cd65e1a36171ef08.
 Even when so many nodes are processed, we still only fill the first 15 buckets.
 
@@ -84,11 +84,11 @@ Most of the time, especially on the buckets with a low distance, those buckets w
 receive a new node for that bucket. At that point, you have to decide what to do with the incoming node.
 
 A node itself could be one of the three following types: a good node, an unknown node, or a bad node. A good node is a
-node with which you have communicated not long ago (say, in the last 30 seconds). Since these nodes are considered good
-and should not be removed from the bucket. Unknown nodes are nodes which had no activity since the last 30 seconds, but
+node with which you have communicated not long ago (in the last 60 seconds). Since these nodes are considered good
+and should not be removed from the bucket. Unknown nodes are nodes which had no activity since the last 60 seconds, but
 they still could be there (you just haven't had a reason to talk to them). Here, you would send out a ping-request, and
 see if they would respond. Since we are using UDP, it might be possible that our packet or the response packet has
-disappeared, so we send out a maximum of 3 packets. When we didn't receive anything after 3 attempts, a node is
+disappeared, so we make a maximum of 3 attemps. When we didn't receive anything a node is
 considered a bad node.
 
 Whenever a new node is available, you should only store them whenever you have bad nodes inside your bucket. If there
@@ -96,3 +96,8 @@ are only good nodes, don't store the node inside the bucket. If there are unknow
 them until you figured out whether or not the unknown node is a good or bad node. From there you could either drop the
 new node or replace it bad node with the new node.
 
+This determination of what nodes are best in each bucket is likely to evolve, particularly to deal with different types of flooding attack possibilities at scale and optimizing for hashname seek/query speed.
+
+
+[pastebin]: http://pastebin.com/0mBr3D8V
+[kademlia]: https://en.wikipedia.org/wiki/Kademlia

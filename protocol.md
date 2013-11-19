@@ -499,8 +499,11 @@ var lineDecryptKey = crypto.createHash("sha256")
 <a name="line" />
 ### `line` - Packet Encryption
 
-A packet with a `"type":"line"` is only sent/valid after an open has
-been exchanged, and is required to have a `line` parameter (such as
+As soon as any two hashnames have both send and received a valid `open` then a line is created between them. Since one part is always the initiator and sent the open as a result of needing to create a channel to the other hashname, immediately upon creating a `line` that initiator will then send line packets.
+
+The encryption key for a line is defined as the SHA 256 digest of the ECDH shared secret (32 bytes) + outgoing line id (16 bytes) + incoming line id (16 bytes).  The decryption key is the same process, but with the outgoing/incoming line ids reversed.
+
+A packet with a `"type":"line"` is required to have a `line` parameter (such as
 `"line":"be22ad779a631f63336fe051d5aa2ab2"`) with the value being the
 same as the one the recipient sent in its `open` packet, and a random
 IV value (such as `"iv":"8b945f90f08940c573c29352d767fee4"`) used for
@@ -508,11 +511,11 @@ the AES encryption.  This ensures that no line packets can be received
 without being invited in an open. Any unknown ones are just ignored.
 
 The BODY is a binary encoded encrypted packet using AES-256-CTR with
-the key that was generated for the line and the 16-byte initialization
-vector decoded from the included "iv" hex value.  Once decrypted, the
+the encryption key that was generated for the line (above) and the 16-byte initialization
+vector decoded from the included "iv" hex value.  Once decrypted (using the twin generated decryption key), the
 recipient then processes it as a normal packet (LENGTH/JSON/BODY) from
 the sending hashname.  All decrypted packets must contain a "c"
-value as defined below to identify the channel they belong to.
+value as defined below to identify the channel they belong to (below).
 
 <a name="channel" />
 ### `channel` - Content Transport
@@ -606,7 +609,7 @@ Here's some summary notes for implementors:
 <a name="seek" />
 ### `"type":"seek"` - Finding Hashnames (DHT)
 
-The core of telehash is a basic Kademlia-based DHT. The bulk of the complexity is in the rules around maintaining a mesh of lines and calculating distance explained [below](#kademlia). The `"seek":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"` value is always another hashname that the app is trying to connect to.
+The core of Telehash is a basic Kademlia-based DHT. The bulk of the complexity is in the rules around maintaining a mesh of lines and calculating distance explained [below](#kademlia). The `"seek":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"` value is always another hashname that the app is trying to connect to.
 
 When one hashname wants to connect to another hashname, it finds the closest lines it knows and sends a `seek` containing the hash value to them.  They return a compact `"see":[...]` array of addresses that are closest to the hash value.  The addresses are a compound comma-delimited string containing the "hash,ip,port" (these are intentionally not JSON as the verbosity is not helpful here), for example "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c,123.45.67.89,10111".
 
@@ -634,28 +637,45 @@ These requests are also sent with a `"end":true` and no response is generated.
 
 # Switch Behaviors
 
-Besides parsing the protocol, decoding the packets and processing the different channel types, in order to fully implement telehash a switch must also internally track and respond with the correct behaviors to support both the DHT and manage the reliability of channels that require it.
+Besides parsing the protocol, decoding the packets and processing the different channel types, in order to fully implement Telehash a switch must also internally track and respond with the correct behaviors to support both the DHT and manage the network quality and availability between itself and other hashnames.
 
 <a name="kademlia" />
-## [Kademlia][]
+## Distributed Hash Table
+
+Every switch must have both a startup/seeding routine and a background line maintenance process in order to properly support the Kademlia-based DHT.
+
+The seeding process involves recursively performing a [seek](#seek) for it's own hashname against the list of seeds (provided by the app). The act of seeking ones own hashname will bootstrap lines to hashnames that are closest to it, and those hashnames then start to fill in the buckets.
+
+The details of how [kademlia][] is implemented for Telehash are broken out into their own document.
+
+## Line Maintenance
 
 (this area in progress...)
 
-Every switch must have both a startup/seeding routine, and a background line maintenance process in order to properly support the Kademlia-based DHT.
+A line may at any point become invalidated if the remote side is disconnected or restarts, so the process of detecting that and deciding to restart a line needs to be defined.
 
-The core data structure to support this within a switch is a list of "buckets", one for each bit of distance between it's own hashname and every other hashname encountered, 160 of them.  These buckets can contain a variable number of hashnames each, but it's recommended for any switch to limit the size of each bucket to a reasonable number more than 1 and less than 10 so as to not consume too much memory or network resources maintaining lines.
+A simple rule to start is invalidating a line after it has been idle for more than 60 seconds or after sending channel packets and not getting any responses for more than 10 seconds (if the switch internally sends seek queries regularly and there's no replies, for instance).
 
-The seeding process involves recursively performing a [seek](#seek) for it's own hashname against the list of seeds (provided by the app).
+If the switch knows that it is behind a NAT, for any lines that it want's to maintain as active it MUST send at least one packet out at least once every 60 seconds.
 
-The maintenance process involves tracking all the hashnames seen (result of any seek) and trying to ensure a line is open to the minimum number of hashnames in each bucket.
+This logic will have to evolve into a more efficient/concise pattern at scale, likely involving regular or triggered `ping` and `seek` requests, as well as differentiating between if an app is using the line versus the switch maintaining it for it's DHT.
 
-A new seek should be sent to every idle/inactive line at least once every 60 seconds if the switch believes it is behind a NAT (to maintain the NAT mapping), or once every hour if it knows it is not.  By seeking it's own hashname, any new hashnames near it will be returned to help maintain the DHT.
-
-## Channel Congestion Control
+## Network Paths
 
 (this area in progress...)
 
-Reliability is optional for channels based on their type, each type must define if it requires it or not, and custom ones from the application must signal if they don't require it.
+Any switch may have multiple network interfaces, such as on a mobile device both cellular and wifi may be available simutaneously or be transitioning between them, and for a local network there may be a public IP via the gateway and an internal LAN IP.
+
+A switch should try to be aware of all of the networks it has available to send on, as well as what network paths exist between it and any other hashname.
+
+TBD:
+
+* handling different incoming IP:port combinations for a single line
+* pinging over different network paths
+* detecting a LAN/internal connection and testing it
+* upgrading to ipv6
+* using alternate networks such as webrtc and bluetooth
+* handling bridging and relaying paths
 
 <a name="family" />
 ## Family Usage
@@ -681,4 +701,4 @@ It is also used to optimize the DHT for both resistance to general flooding and 
 
 [sockets]: ext_sockets.md
 [tickets]: ext_tickets.md
-[kademlia]: https://en.wikipedia.org/wiki/Kademlia
+[kademlia]: kademlia.md
