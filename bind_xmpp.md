@@ -5,11 +5,13 @@ This is a proposal for how to use telehash from existing Jabber/XMPP clients.  I
 
 ## Hashname Discovery
 
-Any client that supports telehash MUST send it's current hashname in all outgoing presence stanzas:
+Any client that supports telehash MUST send it's current hashname using [XEP-0152](http://xmpp.org/extensions/xep-0152.html) in a URI defined by [RFC 6920](https://datatracker.ietf.org/doc/rfc6920/):
 
 ```xml
 <presence from='juliet@capulet.lit/balcony'>
-  <hashname xmlns='urn:xmpp:th:hashname' value='851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6'/>
+  <reach xmlns='urn:xmpp:reach:0'>
+    <addr uri='ni:///sha-256;851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6'/>
+  </reach>
 </presence>
 ```
 
@@ -20,11 +22,15 @@ Since not all interactions between clients require presence to have been exchang
     from='romeo@montague.lit/garden'
     to='juliet@capulet.lit/balcony'>
   <body>V unir avtug'f pybnx gb uvqr zr sebz gurve fvtug</body>
-  <hashname xmlns='urn:xmpp:th:hashname' value='851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6'/>
+  <reach xmlns='urn:xmpp:reach:0'>
+    <addr uri='ni:///sha-256;851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6'/>
+  </reach>
 </message>
 ```
 
 Upon receiving any presence or message stanza that includes a new hashname, that value is then cached associated with the specific JID it came from (including the resource).
+
+If a user has a default or primary/only client that supports telehash, it MAY include that hashname in the `<URL>ni:///sha-256;851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6</URL>` field in the user's stored vcard.
 
 ## Private Messaging
 
