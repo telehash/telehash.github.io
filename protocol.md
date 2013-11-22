@@ -545,6 +545,8 @@ application instances on the DHT. They are part of the core spec, and must be im
   * [`seek`](#seek) - return any pointers to other closer hashnames for the given `hash` (DHT), answer contains `see`
   * [`peer`](#peer) - ask the recipient to make an introduction to one of it's peers
   * [`connect`](#connect) - a request asking to try to open a connection to a given hashname (result of a `peer`)
+  * [`relay`](#relay) - the capability for a switch to help two peers exchange connectivity information
+  * [`ping`](#ping) - how a switch tests different network paths to check availability
 
 An example unreliable channel start packet JSON for an app:
 
@@ -637,19 +639,19 @@ These requests are also sent with a `"end":true` and no response is generated.
 
 There are a number of situations where two different hashnames will be unable to connect directly to each other, and while these are not very common, the protocol must ensure that any two hashnames have the ability to securely exchange information.
 
-The two most common cases are with combinations of certain NATs where at least one dynamically maps external ports such that the sending hashname has no way to detect it (often called symmetric NATs), and the other is when two hashnames are on the same local network and their public ports cannot send data to each other. Typical solutions in other protocols involve using a shared/trusted third party to relay the data via (TURN), and exchanging internal network addresses via a third party. There are additional cases that will become more common in the future as well, such as when there are diverse networks and two hashnames are on different ones entirely (one is ip based and the other bluetooth) connected only by a hashname that handles both.
+The two most common cases are with combinations of certain NATs where at least one dynamically maps external ports such that the sending hashname has no way to detect it (often called symmetric NATs), and the other is when two hashnames are on the same local network and their shared NAT doesn't allow them to send public data to each other. Typical solutions in other protocols involve using a shared/trusted third party to relay the data via (TURN), and exchanging internal network addresses via a third party. There are additional cases that will become more common in the future as well, such as when there are diverse networks and two hashnames are on different ones entirely (one is ip based and the other bluetooth) connected only by a hashname that handles both.
 
-When a hashname detects that it cannot connect directly with another (there are different detection techniques for the various cases), when it sends a `peer` it includes a `"relay":true` in the request. The hashname receiving the `peer` and generating the `connect` must include the relay flag in the connect request. Upon receiving a `connect` with the relay flag set in it, that hashname must additionally open a `relay` channel and send the identical `open` packet over the relay as well as sending it to the included ip/port info in the connect.
+When a hashname detects that it cannot connect directly with another (there are different detection techniques for the various cases), it sends a `peer` that also includes a `"relay":true` in the request. The hashname receiving the `peer` and generating the `connect` must include the relay flag in the connect request. Upon receiving a `connect` with the relay flag set in it, that hashname must additionally open a `relay` channel and send the identical `open` packet over the relay as well as sending it to the included ip/port info in the connect. If the relay is the only connectivity established, the subsequent `line` packets may be sent over it.
 
-A `relay` channel is very simple, the initial packet must contain a `"to":"..."` of the hashname to relay to, and that hashname must be one that the receiving switch already has an open line to.  The initial relay packet is then sent as-is over the line to the recipient, and any/all packets sent from either side are then relay'd as-is to the other.
+A `relay` channel is very simple, the initial packet must contain a `"to":"..."` of the hashname to relay to, and that hashname must be one that the receiving switch already has an open line to.  The initial relay packet is then sent as-is over the line to the recipient, and any/all packets sent from either side are then relay'd as-is to the other. The channel is unreliable and the relayed packets MUST NOT contain any reliability information.
 
-To prevent abuse, all switches must limit the volume of relay packets between any two hashnames to no more than two per second from either sender.  Any packets over that rate must be dropped/discarded. This is a fast enough rate for any two hashnames to negotiate additional connectivity (like using a [bridge][]) and do basic DHT queries.
+To prevent abuse, all switches must limit the volume of relay packets between any two hashnames to no more than five per second from either sender.  Any packets over that rate MUST be dropped/discarded. This is a fast enough rate for any two hashnames to negotiate additional connectivity (like using a [bridge][]) and do basic DHT queries.
 
 ### `"type":"ping"` - Multiple Network Paths
 
 When two hashnames are on the same local network, as well as when any hashname has multiple networks (ipv4 and ipv6 for instance), they need a mechanism to exchange the address information and monitor the multiple paths to each other. A `ping` should also be sent over a `relay` as a fallback network path.
 
-A channel of `"type":"ping"` is used to do this, for each known/discovered network path to another hashname a `ping` is sent over that network interface, and the responding hashname upon receiving any ping must return a packet with `"end":true` and include an optional `"priority":1` with what priority that network interface is to receive packets via (defaults to 0).
+An unreliable channel of `"type":"ping"` is used to do this.  For each known/discovered network path to another hashname a `ping` is sent over that network interface, and the responding hashname upon receiving any ping must return a packet with `"end":true` and include an optional `"priority":1` with what priority that network interface is to receive packets via (defaults to 0).
 
 The initial `ping` packets should also contain a `"nets":[{"ip":1.2.3.4,"port":5678},...]` array of objects each of which contains one of it's known network paths to it.  This enables two hashnames on the same local network to decide to exchange their internal IP/Port and establish a local connection as the primary one.
 
