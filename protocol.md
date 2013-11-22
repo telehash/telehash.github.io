@@ -83,16 +83,17 @@ help insure that the security, identity, and networking aspects are
 verified properly. If there isn't one which meets your needs, then we
 would love your help - pull requests to list them here are welcome!
 
-* Node.js - [node-telehash](https://github.com/quartzjer/node-telehash)
+* Node.js - [node-telehash](https://github.com/telehash/node-telehash)
 * D - [telehash.d](https://github.com/temas/telehash.d)
-* Python - [plinth](https://github.com/stpeter/plinth)
-* Javascript (browser) [thjs](http://github.com/quartzjer/thjs)
+* Python - [plinth](https://github.com/telehash/plinth)
+* Javascript (browser) [thjs](http://github.com/telehash/thjs)
 * C [telehash-c](http://github.com/quartzjer/telehash-c)
-* Ruby - [ruby-telehash](https://github.com/dwaite/ruby-telehash)
-* Go - [gogotelehash](https://github.com/dizzyd/gogotelehash)
+* Ruby - [ruby-telehash](https://github.com/telehash/ruby-telehash)
+* Go - [gogotelehash](https://github.com/telehash/gogotelehash)
 * Java - [telehash-java](https://github.com/kubes/telehash-java)
 * ObjectiveC - [Objective-Telehash](https://github.com/jsmecham/Objective-Telehash)
 * PHP - [SwitchBox](https://github.com/jaytaph/switchbox)
+* Erlang - [relish](https://github.com/telehash/relish)
 
 ## Creating Applications
 
@@ -498,8 +499,11 @@ var lineDecryptKey = crypto.createHash("sha256")
 <a name="line" />
 ### `line` - Packet Encryption
 
-A packet with a `"type":"line"` is only sent/valid after an open has
-been exchanged, and is required to have a `line` parameter (such as
+As soon as any two hashnames have both send and received a valid `open` then a line is created between them. Since one part is always the initiator and sent the open as a result of needing to create a channel to the other hashname, immediately upon creating a `line` that initiator will then send line packets.
+
+The encryption key for a line is defined as the SHA 256 digest of the ECDH shared secret (32 bytes) + outgoing line id (16 bytes) + incoming line id (16 bytes).  The decryption key is the same process, but with the outgoing/incoming line ids reversed.
+
+A packet with a `"type":"line"` is required to have a `line` parameter (such as
 `"line":"be22ad779a631f63336fe051d5aa2ab2"`) with the value being the
 same as the one the recipient sent in its `open` packet, and a random
 IV value (such as `"iv":"8b945f90f08940c573c29352d767fee4"`) used for
@@ -507,11 +511,11 @@ the AES encryption.  This ensures that no line packets can be received
 without being invited in an open. Any unknown ones are just ignored.
 
 The BODY is a binary encoded encrypted packet using AES-256-CTR with
-the key that was generated for the line and the 16-byte initialization
-vector decoded from the included "iv" hex value.  Once decrypted, the
+the encryption key that was generated for the line (above) and the 16-byte initialization
+vector decoded from the included "iv" hex value.  Once decrypted (using the twin generated decryption key), the
 recipient then processes it as a normal packet (LENGTH/JSON/BODY) from
 the sending hashname.  All decrypted packets must contain a "c"
-value as defined below to identify the channel they belong to.
+value as defined below to identify the channel they belong to (below).
 
 <a name="channel" />
 ### `channel` - Content Transport
@@ -520,26 +524,29 @@ All data sent between any two hashnames (inside a line packet) must
 contain a `c` parameter with a unique value (16 random bytes hex
 encoded) determined by the sender for each channel.
 
-A channel always begins with `type` parameter in the first packet, to distinguish to the
-recipient what kind of channel it is. A channel may have only one response,
-or it may be long-lived with many packets exchanged using the same
-"c" identifier (depending on the type of channel). At any point a
-channel can be closed by sending an `"end":true`, and if a channel is
-being closed due to an error, a string message can be included as the
-value of the `"err":"message"`.
+A channel may have only one outgoing initial packet, only one response to it, or it may be long-lived with many packets exchanged using the same "c" identifier (depending on the type of channel).
 
-The following values for `type` are used to locate and communicate with
-application instances on the DHT. They are part of the core spec, and
-must be implemented by all switches:
+Key parameters channel packets:
 
-  * [`seek`](#seek) - return any pointers to other closer hashnames for
-    the given `hash` (DHT), answer contains `see`
-  * [`peer`](#peer) - ask the recipient to make an introduction to one
-    of it's peers
-  * [`connect`](#connect) - a request asking to try to open a
-    connection to a given hashname (result of a `peer`)
+* `"type":"value"` - A channel always begins with a `type` in the first outgoing packet to distinguish to the recipient what kind of channel it is. This value must only be set on the first packet, not on any subsequent ones or any responses. Application-defined custom types must always be prefixed with an underscore, such as "_chat".
+* `"end":"true"` - Upon processing a packet with an `end`, the recipient must not send any more content packets (reliability acks/resends may still be happening though) or expect anymore to be received and consider the channel closed. An `end` may be sent by either side and is not required to be sent by both.
+* `"err":"message"` - As soon as any packet on a channel is received with an `err` it must be immediately closed and no more packets can be sent or received at all, any/all buffered content in either direction must be dropped. These packets must contain no content other than optional extra details on the error.
+* `"_":{...}` - For any application-defined channels that have an underscore-prefixed type, any JSON values provided by or for the application are sent in the `_` key value.
 
-Additional `type` values can be defined by any application as long as they begin with an underscore like `"type":"_custom"` and all custom values in the JSON are in an underscore key and object value like:
+
+<a name="unreliable" />
+#### Unreliable Channels
+
+An unreliable channel has no retransmit or ordering guarantees, and an `end` always signals the last packet for the channel with none in response. Any channel that is unreliable must not include any `seq` value (reliability signal below) in the initial `type` packet, and if one is received it must respond with an `err`.   Unreliable channels are also often referred to as "lossy" and "raw" as they provide no guarantees and switches may expose them in a very minimal interface.
+
+The following values for `type` are for unreliable channels that are used to locate and communicate with
+application instances on the DHT. They are part of the core spec, and must be implemented internally by all switches:
+
+  * [`seek`](#seek) - return any pointers to other closer hashnames for the given `hash` (DHT), answer contains `see`
+  * [`peer`](#peer) - ask the recipient to make an introduction to one of it's peers
+  * [`connect`](#connect) - a request asking to try to open a connection to a given hashname (result of a `peer`)
+
+An example unreliable channel start packet JSON for an app:
 
 ```json
 {
@@ -549,48 +556,64 @@ Additional `type` values can be defined by any application as long as they begin
 }
 ```
 
-Common usage patterns are also being defined as extensions, such that switches can start to
-support them internally easily, these are still experimental:
-
-  * `[sockets][]` - raw socket proxy/transport
-  * `[tickets][]` - a way to create portable data containers that are signed by 
-    a hashname
 
 <a name="reliable" />
-### Channel Reliability
+#### Reliable Channels
 
-All UDP packets are by their very nature lossy, so channels must
-be able to replicate TCP features such as reliability, retransmission,
-and buffering/backpressure mechanisms. This is done by requiring a
-lightweight `"seq":0` field on every packet. All seq values start at 0
-and increment per packet sent. A buffer of these packets must be kept
-keyed by the seq value until the receiving hashname has responded
-confirming them in a `ack` and not in the `miss`. The `ack` is the
-highest known `seq` value received. The `miss` is an array of integers
-and must be sent along with any `ack` if in the process of receiving
-packets there were any missing sequences, containing in any order the
-missing sequence values up to the `ack`.  Upon receipt those missed
-packets should be resent verbatim.
+Telehash packets are by default only as reliable as UDP itself is, which means they may be dropped or arrive out of order.  Most of the time applications want to transfer content in a durable way, so reliable channels replicate TCP features such as ordering, retransmission, and buffering/backpressure mechanisms. The primary method of any application interfacing with a switch library is going to be through starting or receiving reliable channels.
 
-When a channel is started, only one packet may be sent (seq:0) until the recipient has responded and ack'd that initial type packet, only then can additional packets be sent with that same channel id.
+Reliability is requested on a channel with the very first packet (that contains the `type`) by including a `"seq":0` with it, and a switch must respond with an `err` if it cannot handle reliable channels.  Reliability must not be requested for channel types that are expected to be unreliable (like `seek` and `peer`, etc).
 
-By default a channel should be invalidated if a sequence has been missed
-three or more times, or there's more than 100 missed packets by default
-(senders cannot send more than that without a confirming range). When
-there's consistently missing packets, senders should limit the number
-of packets beyond the confirmed range. (needs more examples/definition)
+##### `seq` - Sequenced Data
 
-When reliability isn't required for a channel, either side can send an
-`ack` of the last received `seq` value without tracking any misses,
-while still following the 100-max-outstanding rule to provide for any
-congestion/loss detection.
+The principle requirement of a reliable channel is always including a simple `"seq":0` integer value on every packet that contains any content (including the `end`). All `seq` values start at 0 and increment per packet sent when that packet contains any data to be processed.
+
+A buffer of these packets must be kept keyed by the seq value until the receiving switch has responded
+confirming them in a `ack` (below). The maximum size of this buffer and the number of outgoing packets that can be sent before being acknowledged is currently 100, but this is very much just temporary to ease early implementations and handling it's size will be defined in it's own document.
+
+Upon receiving `seq` values, the switch must only process the packets and their contents in order, so any packets received with a sequence value out of order or with any gaps must either be buffered or dropped.  It is much more efficient to buffer these when a switch has the resources to do so, but if buffering it must have it's own internal maximum to limit it.
+
+##### `ack` - Acknowledgements
+
+The `"ack":0` integer is always included on any outgoing packets as the highest known `seq` value confirmed as *processed by the app*. What this means is that any switch library must provide a way to send data/packets to the app using it in a serialized way, and be told when the app is done processing one packet so that it can both confirm that `seq` as well as give the app the next one in order. Any outgoing `ack` must represent only the latest app-processed data `seq` so that the sender can confirm that the data was completely received/handled by the recipient app.
+
+An `ack` may also be sent in it's own packet ad-hoc at any point without any content data, and these ad-hoc acks must not include a `seq` value as they are not part of the content stream.
+
+When receiving an `ack` the switch may then discard any buffered packets up to and including that matching `seq` id, and also confirm to the app that the included content data was received and processed by the other side.
+
+An `ack` must be sent a minimum of once per second after receiving any packet including a `seq` value, either included with response content packets or their own ad-hoc packets.  Allowing up to one second gives a safe default for the application to generate any response content, as well as receive a larger number of content packets before acknowleding them all.
+
+##### `miss` - Misssing Sequences
+
+The `"miss":[1,2,4]` is an array of integers and must be sent along with any `ack` if in the process of receiving packets there were any missing sequences, containing in any order the known missing sequence values.  Because the `ack` is confirmed processed packets, all of the `miss` ids will be higher than the accompanying `ack`.
+
+This is only applicable when a receiving switch is buffering incoming sequences and is missing specific packets in the buffer that it requires before it can continue processing the content in them.
+
+A `miss` should be no larger than 100 entries, any array larger than that should be discarded, as well as any included sequence values lower than the accompanying `ack` or higher than any outgoing sent `seq` values.
+
+Upon receiving a `miss` the switch should resend those specific matching `seq` packets in it's buffer, but never more than once per second. So if an id in a `miss` is repeated or shows up in multiple incoming packets quickly (happens often), the matching packet is only resent once until at least one second has passed.
+
+A switch MAY opportunistically remove packets from it's outgoing buffer that are higher than the `ack` and lower than the highest value in a `miss` array, and are not included in the array as that's a signal that they've been received.
+
+##### Reliability Notes
+
+Here's some summary notes for implementors:
+
+* send an ack with every outgoing packet, of the highest seq you've received and processed
+* only send a miss if you've discovered missing packets in the incoming seq ordering/buffering
+* if an app is receiving packets and hasn't generated response packets, send an ack after 1s
+* when an `end` is sent, don't close the channel until it's acked
+* when an `end` is received, process it in order like any other content packet, and close only after acking + timeout wait to allow re-acking if needed
+* automatically resend the last-sent un-acked sequence packet every 2 seconds until the channel timeout
 
 <a name="seek" />
 ### `"type":"seek"` - Finding Hashnames (DHT)
 
-The core of telehash is a basic Kademlia-based DHT. The bulk of the complexity is in the rules around maintaining a mesh of lines and calculating distance explained [below](#kademlia). The `"seek":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"` value is always another hashname that the app is trying to connect to.
+The core of Telehash is a basic Kademlia-based DHT. The bulk of the complexity is in the rules around maintaining a mesh of lines and calculating distance explained [below](#kademlia). The `"seek":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"` value is always another hashname that the app is trying to connect to.
 
-When one hashname wants to connect to another hashname, it finds the closest lines it knows and sends a `seek` containing the hash value to them.  They return a compact `"see":[...]` array of addresses that are closest to the hash value.  The addresses are a compound comma-delimited string containing the "hash,ip,port" (these are intentionally not JSON as the verbosity is not helpful here), for example "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c,123.45.67.89,10111". 
+When one hashname wants to connect to another hashname, it finds the closest lines it knows and sends a `seek` containing the hash value to them.  They return a compact `"see":[...]` array of addresses that are closest to the hash value.  The addresses are a compound comma-delimited string containing the "hash,ip,port" (these are intentionally not JSON as the verbosity is not helpful here), for example "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c,123.45.67.89,10111".
+
+The response `see` packet must always include an `"end":true`.
 
 <a name="peer" />
 ### `"type":"peer"` - Introductions to new hashnames
@@ -599,7 +622,7 @@ For any hashname to send an open to another it must first have it's hashname, so
 
 This also serves as a workaround if any NAT exists, so that the two hashnames can send a packet to each other to make sure the path between them is open, this is called "hole punching." A peer request requires a `"peer":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"` where the value is the hashname the sender is trying to reach. The recipient of the peer request must then send a connect (below) to the target hashname (that it already must have an open line to).
 
-These requests are always sent with a `"end":true` and not ack'd when processed.
+These requests are always sent with a `"end":true` and no response is generated.
 
 <a name="connect" />
 ### `"type":"connect"` - Connect to a hashname
@@ -608,7 +631,7 @@ The connect request is an immediate result of a peer request and must also conta
 
 The recipient can use the given IP, port, and public key to send an open request to the target.  If a NAT is suspected to exist, the target should have already sent a packet to ensure their side has a path mapped through the NAT and the open should then make it through.
 
-These requests are also sent with a `"end":true` and not ack'd when processed.
+These requests are also sent with a `"end":true` and no response is generated.
 
 ### `"type":"relay"` - Backup Connectivity
 
@@ -636,28 +659,45 @@ When the [bridge][] extension is used, it also becomes an additional network pat
 
 # Switch Behaviors
 
-Besides parsing the protocol, decoding the packets and processing the different channel types, in order to fully implement telehash a switch must also internally track and respond with the correct behaviors to support both the DHT and manage the reliability of channels that require it.
+Besides parsing the protocol, decoding the packets and processing the different channel types, in order to fully implement Telehash a switch must also internally track and respond with the correct behaviors to support both the DHT and manage the network quality and availability between itself and other hashnames.
 
 <a name="kademlia" />
-## [Kademlia][]
+## Distributed Hash Table
+
+Every switch must have both a startup/seeding routine and a background line maintenance process in order to properly support the Kademlia-based DHT.
+
+The seeding process involves recursively performing a [seek](#seek) for it's own hashname against the list of seeds (provided by the app). The act of seeking ones own hashname will bootstrap lines to hashnames that are closest to it, and those hashnames then start to fill in the buckets.
+
+The details of how [kademlia][] is implemented for Telehash are broken out into their own document.
+
+## Line Maintenance
 
 (this area in progress...)
 
-Every switch must have both a startup/seeding routine, and a background line maintenance process in order to properly support the Kademlia-based DHT.
+A line may at any point become invalidated if the remote side is disconnected or restarts, so the process of detecting that and deciding to restart a line needs to be defined.
 
-The core data structure to support this within a switch is a list of "buckets", one for each bit of distance between it's own hashname and every other hashname encountered, 160 of them.  These buckets can contain a variable number of hashnames each, but it's recommended for any switch to limit the size of each bucket to a reasonable number more than 1 and less than 10 so as to not consume too much memory or network resources maintaining lines.
+A simple rule to start is invalidating a line after it has been idle for more than 60 seconds or after sending channel packets and not getting any responses for more than 10 seconds (if the switch internally sends seek queries regularly and there's no replies, for instance).
 
-The seeding process involves recursively performing a [seek](#seek) for it's own hashname against the list of seeds (provided by the app).
+If the switch knows that it is behind a NAT, for any lines that it want's to maintain as active it MUST send at least one packet out at least once every 60 seconds.
 
-The maintenance process involves tracking all the hashnames seen (result of any seek) and trying to ensure a line is open to the minimum number of hashnames in each bucket.
+This logic will have to evolve into a more efficient/concise pattern at scale, likely involving regular or triggered `ping` and `seek` requests, as well as differentiating between if an app is using the line versus the switch maintaining it for it's DHT.
 
-A new seek should be sent to every idle/inactive line at least once every 60 seconds if the switch believes it is behind a NAT (to maintain the NAT mapping), or once every hour if it knows it is not.  By seeking it's own hashname, any new hashnames near it will be returned to help maintain the DHT.
-
-## Channel Congestion Control
+## Network Paths
 
 (this area in progress...)
 
-Reliability is optional for channels based on their type, each type must define if it requires it or not, and custom ones from the application must signal if they don't require it.
+Any switch may have multiple network interfaces, such as on a mobile device both cellular and wifi may be available simutaneously or be transitioning between them, and for a local network there may be a public IP via the gateway and an internal LAN IP.
+
+A switch should try to be aware of all of the networks it has available to send on, as well as what network paths exist between it and any other hashname.
+
+TBD:
+
+* handling different incoming IP:port combinations for a single line
+* pinging over different network paths
+* detecting a LAN/internal connection and testing it
+* upgrading to ipv6
+* using alternate networks such as webrtc and bluetooth
+* handling bridging and relaying paths
 
 <a name="family" />
 ## Family Usage
@@ -684,4 +724,4 @@ It is also used to optimize the DHT for both resistance to general flooding and 
 [sockets]: ext_sockets.md
 [tickets]: ext_tickets.md
 [bridge]: ext_bridge.md
-[kademlia]: https://en.wikipedia.org/wiki/Kademlia
+[kademlia]: kademlia.md
