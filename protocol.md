@@ -546,7 +546,7 @@ application instances on the DHT. They are part of the core spec, and must be im
   * [`peer`](#peer) - ask the recipient to make an introduction to one of it's peers
   * [`connect`](#connect) - a request asking to try to open a connection to a given hashname (result of a `peer`)
   * [`relay`](#relay) - the capability for a switch to help two peers exchange connectivity information
-  * [`ping`](#ping) - how a switch tests different network paths to check availability
+  * [`sync`](#sync) - how two switches exchange and monitor network information
 
 An example unreliable channel start packet JSON for an app:
 
@@ -645,19 +645,21 @@ When a hashname detects that it cannot connect directly with another (there are 
 
 A `relay` channel is very simple, the initial packet must contain a `"to":"..."` of the hashname to relay to, and that hashname must be one that the receiving switch already has an open line to.  The initial relay packet is then sent as-is over the line to the recipient, and any/all packets sent from either side are then relay'd as-is to the other. The channel is unreliable and the relayed packets MUST NOT contain any reliability information.
 
-To prevent abuse, all switches must limit the volume of relay packets between any two hashnames to no more than five per second from either sender.  Any packets over that rate MUST be dropped/discarded. This is a fast enough rate for any two hashnames to negotiate additional connectivity (like using a [bridge][]) and do basic DHT queries.
+To prevent abuse, all switches must limit the volume of relay packets between any two hashnames to no more than five per second from either sender.  Any packets over that rate MUST be dropped/discarded. This is a fast enough rate for any two hashnames to negotiate additional connectivity (like using a [bridge][]) and do basic DHT queries. Any relay state may be discarded after seconds of inactivity.
 
-### `"type":"ping"` - Multiple Network Paths
+### `"type":"sync"` - Synchronizing Network Information
 
-When two hashnames are on the same local network, as well as when any hashname has multiple networks (ipv4 and ipv6 for instance), they need a mechanism to exchange the address information and monitor the multiple paths to each other. A `ping` should also be sent over a `relay` as a fallback network path.
+Any switch may have multiple network interfaces, such as on a mobile device both cellular and wifi may be available simutaneously or be transitioning between them, and for a local network there may be a public IP via the gateway/NAT and an internal LAN IP. A switch should always try to be aware of all of the networks it has available to send on (ipv4 and ipv6 for instance), as well as what network paths exist between it and any other hashname. 
+ 
+An unreliable channel of `"type":"sync"` is the mechanism used to exchange and test when there are multiple network paths available.  For each known/discovered network path to another hashname a `sync` is sent over that network interface, and the responding hashname upon receiving any sync must return a packet with `"end":true` and include an optional `"priority":1` with what priority that network interface is to receive packets via (defaults to 0).
 
-An unreliable channel of `"type":"ping"` is used to do this.  For each known/discovered network path to another hashname a `ping` is sent over that network interface, and the responding hashname upon receiving any ping must return a packet with `"end":true` and include an optional `"priority":1` with what priority that network interface is to receive packets via (defaults to 0).
+The initial `sync` packets should also contain a `"nets":[{"ip":1.2.3.4,"port":5678},...]` array of objects each of which contains one of it's known network paths to it.  This enables two hashnames on the same local network to decide to exchange their internal IP/Port and establish a local connection as the primary one.
 
-The initial `ping` packets should also contain a `"nets":[{"ip":1.2.3.4,"port":5678},...]` array of objects each of which contains one of it's known network paths to it.  This enables two hashnames on the same local network to decide to exchange their internal IP/Port and establish a local connection as the primary one.
+A switch only needs to send a sync automatically when it detects more than one (potential) network path between itself and another hashname, such as when the public IP is identical, when line packets come in from different IP/Ports, when it has two network interfaces itself, etc.
 
-A switch only needs to send a ping automatically when it detects more than one (potential) network path between itself and another hashname, such as when the public IP is identical, when line packets come in from different IP/Ports, when it has two network interfaces itself, etc.
+When the [bridge][] extension is used, it also becomes an additional network path that can be shared/tested automatically with sync.
 
-When the [bridge][] extension is used, it also becomes an additional network path that can be shared/tested automatically with pings.
+Sync may also be used to exchange/try alternatives such as webrtc and bluetooth (details/examples to be added). 
 
 # Switch Behaviors
 
@@ -682,24 +684,7 @@ A simple rule to start is invalidating a line after it has been idle for more th
 
 If the switch knows that it is behind a NAT, for any lines that it want's to maintain as active it MUST send at least one packet out at least once every 60 seconds.
 
-This logic will have to evolve into a more efficient/concise pattern at scale, likely involving regular or triggered `ping` and `seek` requests, as well as differentiating between if an app is using the line versus the switch maintaining it for it's DHT.
-
-## Network Paths
-
-(this area in progress...)
-
-Any switch may have multiple network interfaces, such as on a mobile device both cellular and wifi may be available simutaneously or be transitioning between them, and for a local network there may be a public IP via the gateway and an internal LAN IP.
-
-A switch should try to be aware of all of the networks it has available to send on, as well as what network paths exist between it and any other hashname.
-
-TBD:
-
-* handling different incoming IP:port combinations for a single line
-* pinging over different network paths
-* detecting a LAN/internal connection and testing it
-* upgrading to ipv6
-* using alternate networks such as webrtc and bluetooth
-* handling bridging and relaying paths
+This logic will have to evolve into a more efficient/concise pattern at scale, likely involving regular or triggered `sync` and `seek` requests, as well as differentiating between if an app is using the line versus the switch maintaining it for it's DHT.
 
 <a name="family" />
 ## Family Usage
