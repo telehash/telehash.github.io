@@ -546,7 +546,7 @@ application instances on the DHT. They are part of the core spec, and must be im
   * [`peer`](#peer) - ask the recipient to make an introduction to one of it's peers
   * [`connect`](#connect) - a request asking to try to open a connection to a given hashname (result of a `peer`)
   * [`relay`](#relay) - the capability for a switch to help two peers exchange connectivity information
-  * [`sync`](#sync) - how two switches exchange and monitor network information
+  * [`path`](#path) - how two switches prioritize and monitor network path information
 
 An example unreliable channel start packet JSON for an app:
 
@@ -647,19 +647,30 @@ A `relay` channel is very simple, the initial packet must contain a `"to":"..."`
 
 To prevent abuse, all switches must limit the volume of relay packets between any two hashnames to no more than five per second from either sender.  Any packets over that rate MUST be dropped/discarded. This is a fast enough rate for any two hashnames to negotiate additional connectivity (like using a [bridge][]) and do basic DHT queries. Any relay state may be discarded after seconds of inactivity.
 
-### `"type":"sync"` - Synchronizing Network Information
+### `"type":"path"` - Network Path Prioritization
 
 Any switch may have multiple network interfaces, such as on a mobile device both cellular and wifi may be available simutaneously or be transitioning between them, and for a local network there may be a public IP via the gateway/NAT and an internal LAN IP. A switch should always try to be aware of all of the networks it has available to send on (ipv4 and ipv6 for instance), as well as what network paths exist between it and any other hashname. 
  
-An unreliable channel of `"type":"sync"` is the mechanism used to exchange and test when there are multiple network paths available.  For each known/discovered network path to another hashname a `sync` is sent over that network interface, and the responding hashname upon receiving any sync must return a packet with `"end":true` and include an optional `"priority":1` with what priority that network interface is to receive packets via (defaults to 0).
+An unreliable channel of `"type":"path"` is the mechanism used to prioritize and test when there are multiple network paths available.  For each known/discovered network path to another hashname a `path` is sent over that network interface including an optional `"priority":0` (defaults to 0) representing it's preference for that network to be the default.  The responding hashname upon receiving any `path` must return a packet with `"end":true` and include an optional `"priority":1` with it's own priority for that network interface is to receive packets via.
 
-The initial `sync` packets should also contain a `"nets":[{"ip":1.2.3.4,"port":5678},...]` array of objects each of which contains one of it's known network paths to it.  This enables two hashnames on the same local network to decide to exchange their internal IP/Port and establish a local connection as the primary one.
+The sending switch may also time the response speed and use that to break a tie when there are multiple paths with the same priority.
 
-A switch only needs to send a sync automatically when it detects more than one (potential) network path between itself and another hashname, such as when the public IP is identical, when line packets come in from different IP/Ports, when it has two network interfaces itself, etc.
+A switch only needs to send a `path` automatically when it detects more than one (potential) network path between itself and another hashname, such as when it's public IP changes (moving from wifi to cellular), when line packets come in from different IP/Ports, when it has two network interfaces itself, etc.  The sending and return of priority information will help reset which networks are then used by default.
 
-When the [bridge][] extension is used, it also becomes an additional network path that can be shared/tested automatically with sync.
+When the [bridge][] extension is used, it also becomes an additional network path that can be shared/tested automatically.
 
-Sync may also be used to exchange/try alternatives such as webrtc and bluetooth (details/examples to be added). 
+#### `"alts":[...]` - Alternate Network Paths
+
+The any `path` packet may also contain an optional `"alts":[{"type":"ipv4","ip":1.2.3.4,"port":5678},...]` array of objects each of which contains information about an alernate network path to it.  This array is used whenever the sender has additional networks that it would like the recipient to try using.
+
+Each alt object must contain a `"type":"..."` to identify which type of network information it describes. This enables two hashnames on the same local network to decide to exchange their internal IP/Port and establish a local connection as the primary one. Current types of alts defined:
+
+* `ipv4` - contains `ip` and `port` (typically the local/LAN values)
+* `ipv6` - contains `ip` and `port` (to enable the recipient to ugprade if supported)
+* `webrtc` - is empty, to just signal webrtc support (TBD)
+* `bluetooth` - TBD
+
+Upon receiving a path containing an `alts`, the array should be processed to look for new/unknown networks and those should be sent a path in return to validate and send any priority information.
 
 # Switch Behaviors
 
@@ -684,7 +695,7 @@ A simple rule to start is invalidating a line after it has been idle for more th
 
 If the switch knows that it is behind a NAT, for any lines that it want's to maintain as active it MUST send at least one packet out at least once every 60 seconds.
 
-This logic will have to evolve into a more efficient/concise pattern at scale, likely involving regular or triggered `sync` and `seek` requests, as well as differentiating between if an app is using the line versus the switch maintaining it for it's DHT.
+This logic will have to evolve into a more efficient/concise pattern at scale, likely involving regular or triggered `path` and `seek` requests, as well as differentiating between if an app is using the line versus the switch maintaining it for it's DHT.
 
 <a name="family" />
 ## Family Usage
