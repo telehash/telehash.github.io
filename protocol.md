@@ -635,7 +635,7 @@ The recipient can use the given IP, port, and public key to send an open request
 
 These requests are also sent with a `"end":true` and no response is generated.
 
-### `"type":"relay"` - Backup Connectivity
+### `"type":"relay"` - Guaranteed Connectivity
 
 There are a number of situations where two different hashnames will be unable to connect directly to each other, and while these are not very common, the protocol must ensure that any two hashnames have the ability to securely exchange information.
 
@@ -661,11 +661,11 @@ When the [bridge][] extension is used, it also becomes an additional network pat
 
 #### `"alts":[...]` - Alternate Network Paths
 
-The any `path` packet may also contain an optional `"alts":[{"type":"ipv4","ip":1.2.3.4,"port":5678},...]` array of objects each of which contains information about an alernate network path to it.  This array is used whenever the sender has additional networks that it would like the recipient to try using.
+Any `path` packet may also contain an optional `"alts":[{"type":"ipv4","ip":1.2.3.4,"port":5678},...]` array of objects each of which contains information about an alernate network path to it.  This array is used whenever the sender has additional networks that it would like the recipient to try using.
 
 Each alt object must contain a `"type":"..."` to identify which type of network information it describes. This enables two hashnames on the same local network to decide to exchange their internal IP/Port and establish a local connection as the primary one. Current types of alts defined:
 
-* `ipv4` - contains `ip` and `port` (typically the local/LAN values)
+* `ipv4` - contains `ip` and `port` (typically the LAN values)
 * `ipv6` - contains `ip` and `port` (to enable the recipient to ugprade if supported)
 * `webrtc` - is empty, to just signal webrtc support (TBD)
 * `bluetooth` - TBD
