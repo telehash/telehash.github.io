@@ -645,7 +645,7 @@ When a hashname detects that it cannot connect directly with another (there are 
 
 A `relay` channel is very simple, the initial packet must contain a `"to":"..."` of the hashname to relay to, and that hashname must be one that the receiving switch already has an open line to.  The initial relay packet is then sent as-is over the line to the recipient, and any/all packets sent from either side are then relay'd as-is to the other. The channel is unreliable and the relayed packets MUST NOT contain any reliability information.
 
-To prevent abuse, all switches must limit the volume of relay packets between any two hashnames to no more than five per second from either sender.  Any packets over that rate MUST be dropped/discarded. This is a fast enough rate for any two hashnames to negotiate additional connectivity (like using a [bridge][]) and do basic DHT queries. Any relay state may be discarded after seconds of inactivity.
+To prevent abuse, all switches must limit the volume of relay packets between any two hashnames to no more than five per second from either sender.  Any packets over that rate MUST be dropped/discarded. This is a fast enough rate for any two hashnames to negotiate additional connectivity (like using a [bridge][]) and do basic DHT queries. Any relay state may be discarded after 10 seconds of inactivity.
 
 ### `"type":"path"` - Network Path Prioritization
 
