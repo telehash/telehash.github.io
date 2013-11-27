@@ -545,6 +545,8 @@ application instances on the DHT. They are part of the core spec, and must be im
   * [`seek`](#seek) - return any pointers to other closer hashnames for the given `hash` (DHT), answer contains `see`
   * [`peer`](#peer) - ask the recipient to make an introduction to one of it's peers
   * [`connect`](#connect) - a request asking to try to open a connection to a given hashname (result of a `peer`)
+  * [`relay`](#relay) - the capability for a switch to help two peers exchange connectivity information
+  * [`path`](#path) - how two switches prioritize and monitor network path information
 
 An example unreliable channel start packet JSON for an app:
 
@@ -622,8 +624,6 @@ For any hashname to send an open to another it must first have it's hashname, so
 
 This also serves as a workaround if any NAT exists, so that the two hashnames can send a packet to each other to make sure the path between them is open, this is called "hole punching." A peer request requires a `"peer":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"` where the value is the hashname the sender is trying to reach. The recipient of the peer request must then send a connect (below) to the target hashname (that it already must have an open line to).
 
-Peer requests may also carry an optional `"local":{"ip":"192.168.1.2","port":34567}` value to express any local network connectivity information if they are behind the same NAT device.
-
 These requests are always sent with a `"end":true` and no response is generated.
 
 <a name="connect" />
@@ -634,6 +634,43 @@ The connect request is an immediate result of a peer request and must also conta
 The recipient can use the given IP, port, and public key to send an open request to the target.  If a NAT is suspected to exist, the target should have already sent a packet to ensure their side has a path mapped through the NAT and the open should then make it through.
 
 These requests are also sent with a `"end":true` and no response is generated.
+
+### `"type":"relay"` - Guaranteed Connectivity
+
+There are a number of situations where two different hashnames will be unable to connect directly to each other, and while these are not very common, the protocol must ensure that any two hashnames have the ability to securely exchange information.
+
+The two most common cases are with combinations of certain NATs where at least one dynamically maps external ports such that the sending hashname has no way to detect it (often called symmetric NATs), and the other is when two hashnames are on the same local network and their shared NAT doesn't allow them to send public data to each other. Typical solutions in other protocols involve using a shared/trusted third party to relay the data via (TURN), and exchanging internal network addresses via a third party. There are additional cases that will become more common in the future as well, such as when there are diverse networks and two hashnames are on different ones entirely (one is ip based and the other bluetooth) connected only by a hashname that handles both.
+
+When a hashname detects that it cannot connect directly with another (there are different detection techniques for the various cases), it sends a `peer` that also includes a `"relay":true` in the request. The hashname receiving the `peer` and generating the `connect` must include the relay flag in the connect request. Upon receiving a `connect` with the relay flag set in it, that hashname must additionally open a `relay` channel and send the identical `open` packet over the relay as well as sending it to the included ip/port info in the connect. If the relay is the only connectivity established, the subsequent `line` packets may be sent over it.
+
+A `relay` channel is very simple, the initial packet must contain a `"to":"..."` of the hashname to relay to, and that hashname must be one that the receiving switch already has an open line to.  The initial relay packet is then sent as-is over the line to the recipient, and any/all packets sent from either side are then relay'd as-is to the other. The channel is unreliable and the relayed packets MUST NOT contain any reliability information.
+
+To prevent abuse, all switches must limit the volume of relay packets between any two hashnames to no more than five per second from either sender.  Any packets over that rate MUST be dropped/discarded. This is a fast enough rate for any two hashnames to negotiate additional connectivity (like using a [bridge][]) and do basic DHT queries. Any relay state may be discarded after seconds of inactivity.
+
+### `"type":"path"` - Network Path Prioritization
+
+Any switch may have multiple network interfaces, such as on a mobile device both cellular and wifi may be available simutaneously or be transitioning between them, and for a local network there may be a public IP via the gateway/NAT and an internal LAN IP. A switch should always try to be aware of all of the networks it has available to send on (ipv4 and ipv6 for instance), as well as what network paths exist between it and any other hashname. 
+ 
+An unreliable channel of `"type":"path"` is the mechanism used to prioritize and test when there are multiple network paths available.  For each known/discovered network path to another hashname a `path` is sent over that network interface including an optional `"priority":0` (defaults to 0) representing it's preference for that network to be the default.  The responding hashname upon receiving any `path` must return a packet with `"end":true` and include an optional `"priority":1` with it's own priority for that network interface is to receive packets via.
+
+The sending switch may also time the response speed and use that to break a tie when there are multiple paths with the same priority.
+
+A switch only needs to send a `path` automatically when it detects more than one (potential) network path between itself and another hashname, such as when it's public IP changes (moving from wifi to cellular), when line packets come in from different IP/Ports, when it has two network interfaces itself, etc.  The sending and return of priority information will help reset which networks are then used by default.
+
+When the [bridge][] extension is used, it also becomes an additional network path that can be shared/tested automatically.
+
+#### `"alts":[...]` - Alternate Network Paths
+
+Any `path` packet may also contain an optional `"alts":[{"type":"ipv4","ip":1.2.3.4,"port":5678},...]` array of objects each of which contains information about an alernate network path to it.  This array is used whenever the sender has additional networks that it would like the recipient to try using.
+
+Each alt object must contain a `"type":"..."` to identify which type of network information it describes. This enables two hashnames on the same local network to decide to exchange their internal IP/Port and establish a local connection as the primary one. Current types of alts defined:
+
+* `ipv4` - contains `ip` and `port` (typically the LAN values)
+* `ipv6` - contains `ip` and `port` (to enable the recipient to ugprade if supported)
+* `webrtc` - is empty, to just signal webrtc support (TBD)
+* `bluetooth` - TBD
+
+Upon receiving a path containing an `alts`, the array should be processed to look for new/unknown networks and those should be sent a path in return to validate and send any priority information.
 
 # Switch Behaviors
 
@@ -658,24 +695,7 @@ A simple rule to start is invalidating a line after it has been idle for more th
 
 If the switch knows that it is behind a NAT, for any lines that it want's to maintain as active it MUST send at least one packet out at least once every 60 seconds.
 
-This logic will have to evolve into a more efficient/concise pattern at scale, likely involving regular or triggered `ping` and `seek` requests, as well as differentiating between if an app is using the line versus the switch maintaining it for it's DHT.
-
-## Network Paths
-
-(this area in progress...)
-
-Any switch may have multiple network interfaces, such as on a mobile device both cellular and wifi may be available simutaneously or be transitioning between them, and for a local network there may be a public IP via the gateway and an internal LAN IP.
-
-A switch should try to be aware of all of the networks it has available to send on, as well as what network paths exist between it and any other hashname.
-
-TBD:
-
-* handling different incoming IP:port combinations for a single line
-* pinging over different network paths
-* detecting a LAN/internal connection and testing it
-* upgrading to ipv6
-* using alternate networks such as webrtc and bluetooth
-* handling bridging and relaying paths
+This logic will have to evolve into a more efficient/concise pattern at scale, likely involving regular or triggered `path` and `seek` requests, as well as differentiating between if an app is using the line versus the switch maintaining it for it's DHT.
 
 <a name="family" />
 ## Family Usage
@@ -701,4 +721,5 @@ It is also used to optimize the DHT for both resistance to general flooding and 
 
 [sockets]: ext_sockets.md
 [tickets]: ext_tickets.md
+[bridge]: ext_bridge.md
 [kademlia]: kademlia.md
