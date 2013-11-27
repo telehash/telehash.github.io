@@ -6,8 +6,8 @@ The `pool` unreliable channel is a simple signalling channel for any switch to d
 
 ```json
 {
-	"c":"ab945f90f08940c573c29352d767fee4",
-	"type":"pool",
+  "c":"ab945f90f08940c573c29352d767fee4",
+  "type":"pool",
   "pool":["bridge", "buffer", "_namedex"]
 }
 ```
@@ -16,10 +16,10 @@ And a response of one or more packets like:
 
 ```json
 {
-	"c":"ab945f90f08940c573c29352d767fee4",
+  "c":"ab945f90f08940c573c29352d767fee4",
   "pools":{
-    "bridge":['c6db0918a767f00b9841f4366ade7ffc13c86541c40bf0a1612e939988fdefb0,184.96.145.75,59474',
-     '9e5ecd193b14abaef376067f80f442be97f6f3110abb865398c2a6ec83a4ee9b,184.96.145.75,56674'],
+    "bridge":["c6db0918a767f00b9841f4366ade7ffc13c86541c40bf0a1612e939988fdefb0,184.96.145.75,59474",
+     "9e5ecd193b14abaef376067f80f442be97f6f3110abb865398c2a6ec83a4ee9b,184.96.145.75,56674"],
     "buffer":[],
     "_namedex":["8f83606d57ab52161aec9868725d53f2054d9ae16a91274ffcb20a68a15c0855,184.96.145.75,42424"]
   },

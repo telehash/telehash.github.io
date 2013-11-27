@@ -6,8 +6,8 @@ The `verb` reliable channel enables any application to send it's list of minimum
 
 ```json
 {
-	"c":"ab945f90f08940c573c29352d767fee4",
-	"type":"verb",
+  "c":"ab945f90f08940c573c29352d767fee4",
+  "type":"verb",
   "verb":{
     "messaging":">0.1.1",
     "voice":">=1.0",
@@ -21,7 +21,7 @@ And a response will contain the exact supported versions (if any)
 
 ```json
 {
-	"c":"ab945f90f08940c573c29352d767fee4",
+  "c":"ab945f90f08940c573c29352d767fee4",
   "verbs":{
     "messaging":"0.4.2",
     "voice":"1.2.11"
