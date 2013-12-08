@@ -611,9 +611,11 @@ Here's some summary notes for implementors:
 <a name="seek" />
 ### `"type":"seek"` - Finding Hashnames (DHT)
 
-The core of Telehash is a basic Kademlia-based DHT. The bulk of the complexity is in the rules around maintaining a mesh of lines and calculating distance explained [below](#kademlia). The `"seek":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"` value is always another hashname that the app is trying to connect to.
+The core of Telehash is a basic Kademlia-based DHT. The bulk of the complexity is in the rules around maintaining a mesh of lines and calculating distance explained [below](#kademlia). The `"seek":"hex value"` is always part of another hashname that the app is trying to connect to.
 
-When one hashname wants to connect to another hashname, it finds the closest lines it knows and sends a `seek` containing the hash value to them.  They return a compact `"see":[...]` array of addresses that are closest to the hash value.  The addresses are a compound comma-delimited string containing the "hash,ip,port" (these are intentionally not JSON as the verbosity is not helpful here), for example "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c,123.45.67.89,10111".
+In order to protect any recipient from knowing exactly what hashname the requestor is seeking, the `seek` value is only the complete bytes of the hashname being saught that matches the distance to the recipient plus one more byte in order for it to determine closer hashnames.
+
+When one hashname wants to connect to another hashname, it finds the closest lines it knows and sends a `seek` containing the matching prefix hash value to them.  They return a compact `"see":[...]` array of addresses that are closest to the hash value.  The addresses are a compound comma-delimited string containing the "hash,ip,port" (these are intentionally not JSON as the verbosity is not helpful here), for example "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c,123.45.67.89,10111". The ip and port parts are optional and only act as hints for NAT hole punching.
 
 The response `see` packet must always include an `"end":true`.
 
