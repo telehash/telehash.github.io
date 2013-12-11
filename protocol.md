@@ -491,6 +491,14 @@ var lineDecryptKey = crypto.createHash("sha256")
   .digest();
 ```
 
+#### Retransmission
+
+A switch is usually initiating an `open` on behalf of the local application's request to open a channel to a remote application instance. The switch should therefore attempt to retransmit `open` packets at a reasonable rate if it hasn't received an `open` in response. A good rule of thumb is to send a maximum of 3 `open` packets, one second apart, and signalling a timeout to higher application layers if there is still no response.
+
+Each `open` packet should use the same "at" timestamp for retransmission, but generate a new "iv" for the outer packet each time. In the event the remote switch receives more than one, this keeps the operation roughly idempotent.
+
+Transmitting an `open` packet with a larger "at" timestamp (and ideally a new ecc shared key) will invalidate an existing line, and should be considered distinct from re-transmitting a request to open a new line.
+
 <a name="line" />
 ### `line` - Packet Encryption
 
@@ -629,6 +637,8 @@ The connect request is an immediate result of a peer request and must also conta
 The recipient can use the given IP, port, and public key to send an open request to the target.  If a NAT is suspected to exist, the target should have already sent a packet to ensure their side has a path mapped through the NAT and the open should then make it through.
 
 These requests are also sent with a `"end":true` and no response is generated.
+
+To avoid amplification attacks, the recipient should only send one [`open`](#open) per `connect` without any retransmission. It is left to the original initiator to send a new [`peer`](#peer) if any packets are lost.
 
 ### `"type":"relay"` - Guaranteed Connectivity
 
