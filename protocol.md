@@ -662,8 +662,8 @@ Each alt object must contain a `"type":"..."` to identify which type of network 
 
 * `ipv4` - contains `ip` and `port` (typically the LAN values)
 * `ipv6` - contains `ip` and `port` (to enable the recipient to ugprade if supported)
-* `webrtc` - is empty, to just signal webrtc support (TBD)
-* `bluetooth` - TBD
+* `webrtc` - see [path_webrtc][]
+* `http` - see [path_http][]
 
 Upon receiving a path containing an `alts`, the array should be processed to look for new/unknown networks and those should be sent a path in return to validate and send any priority information.
 
@@ -711,3 +711,5 @@ This logic will have to evolve into a more efficient/concise pattern at scale, l
 [tickets]: ext_tickets.md
 [bridge]: ext_bridge.md
 [kademlia]: kademlia.md
+[path_webrtc]: path_webrtc.md
+[path_http]: path_http.md
