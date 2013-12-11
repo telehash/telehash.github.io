@@ -365,10 +365,7 @@ The inner packet's required values are defined as:
    * `to` - which hashname this line is being created to
    * `line` - the unique id the recipient must use for sending any line
      packets, 16 random bytes hex encoded
-   * `at` - an integer timestamp (milliseconds since epoch) of when it
-     was sent, used to another open request is newer
-   * `family` - an [optional field](#family) that can be included/set
-     by the app to add a grouping or other identity
+   * `at` - an integer timestamp of when it was sent, used to verify another incoming open request is newer
 
 This inner packet holds the sender's RSA public key as the BODY
 attachment, in binary DER format.
@@ -388,8 +385,7 @@ A rough order of the steps needed create a new open packet are:
   4. SHA-256 hash the public elliptic key to form the encryption key
      for the inner packet
   5. Form the inner packet containing a current timestamp `at`, `line`
-     identifier, recipient `hashname`, and `family` (if you have such a
-     value). Your own RSA public key is the packet BODY in the binary DER format.
+     identifier, recipient `hashname`. Your own RSA public key is the packet BODY in the binary DER format.
   6. Encrypt the inner packet using the hashed public elliptic key from
      #4 and the IV you generated at #2 using AES-256-CTR.
   7. Create a signature from the encrypted inner packet using your own
@@ -444,8 +440,7 @@ rough order of steps:
   4. Verify the `to` value of the inner packet matches your hashname
   5. Extract the RSA public key of the sender from the inner packet BODY (binary DER format)
   6. SHA-256 hash the RSA public key to derive the sender's hashname
-  7. Verify the `at` timestamp is both within a reasonable amount of
-     time to account for network delays and clock skew, and is newer
+  7. Verify the `at` timestamp is newer
      than any other 'open' requests received from the sender.
   8. SHA-256 hash the ECC public key with the 16 bytes derived from the inner `line` hex value to generate an new AES key
   9. Decrypt the outer packet `sig` value using AES-256-CTR with the key from #8 and the same IV value as #3.
@@ -696,13 +691,6 @@ A simple rule to start is invalidating a line after it has been idle for more th
 If the switch knows that it is behind a NAT, for any lines that it want's to maintain as active it MUST send at least one packet out at least once every 60 seconds.
 
 This logic will have to evolve into a more efficient/concise pattern at scale, likely involving regular or triggered `path` and `seek` requests, as well as differentiating between if an app is using the line versus the switch maintaining it for it's DHT.
-
-<a name="family" />
-## Family Usage
-
-The family key included in the open packet can be used to create a private/closed DHT by only responding to packets that have a valid value.  The app should always set the family value and provide a function to validate it.
-
-It is also used to optimize the DHT for both resistance to general flooding and for search speed by creating an affinity for other hashnames with a trusted family value.  If an app predominantly only searches for and connects to hashnames created by other instances of itself, it should always send a family value that its other instances can validate.  Every switch must include the ability to maintain a preference in it's bucket list for the DHT, and if the app has a family then up to 50% of each bucket should be dedicated to any peers that have been validated.
 
 
 [rsa]:     https://en.wikipedia.org/wiki/RSA_(algorithm)
