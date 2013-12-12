@@ -5,24 +5,17 @@ Telehash protocol draft
 
 > Note: This is the second major version of the Telehash protocol, the
 > first one is deprecated and was a minimal experimental spec 
-> to create a distributed hash table, it is a work in progress yet
-> and unstable!
+> to create a distributed hash table.  This is a work in progress yet
+> and starting to stabilize.
 
-Telehash is a new encrypted mesh protocol enabling applications to
+Telehash is a new secure wire protocol that creates a decentralized overlay network, enabling apps and devices to
 find, identify, and communicate directly with each other.  It is built
-on public-key security (PKI) and fundamentally creates peer-to-peer
-(P2P) connections using a distributed hash-table (DHT) to form the
-mesh.
-
-As a protocol, it does not provide direct end-user functionality or
-application specifications. Instead, Telehash is primarily a tool for
-developers of specifications and of libraries/SDKs to use in creating
-modern applications which require rich experiences and private
-interconnectivity at scale.
+on public-key security (PKI) and fundamentally creates mesh of peer-to-peer
+(P2P) connections using a distributed hash-table (DHT).
 
 The principle idea that drove the creation and development of Telehash
 is the belief that any application instance should be able to easily and
-securely talk to any other application instance, whether they are two
+securely talk to any other application instance or device, whether they are two
 instances of the same application, or completely different
 applications. They should be able to do so directly, and in any
 environment, from servers to mobile devices down to embedded systems
@@ -49,8 +42,8 @@ devices and sensors. The design goals also include not forcing any
 particular architectural design such as client-server,
 centralized/federated/distributed, polling/push, REST, streaming,
 publish-subscribe, or message passing... any can be used, as Telehash
-simply facilitates secure connectivity between any two or more
-applications.
+simply facilitates secure reliable connectivity between any two or more
+applications in any networking environment.
 
 # Protocol Details
 
