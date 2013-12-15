@@ -614,12 +614,16 @@ This also serves as a workaround if any NAT exists, so that the two hashnames ca
 
 These requests are always sent with a `"end":true` and no response is generated.
 
+If a sender has multiple known public network paths back to it, it should include an [alts](#alts) array with those paths, such as when it has a valid public ipv6 address.
+
 <a name="connect" />
 ### `"type":"connect"` - Connect to a hashname
 
-The connect request is an immediate result of a peer request and must also contain an `"ip":"1.2.3.4"` and `"port":5678` with the values being of the peer requestor and a BODY of their public key.
+The connect request is an immediate result of a peer request and must also contain an `"ip":"1.2.3.4"` and `"port":5678` with the values being of the peer requestor and a BODY of their public key.  The `ip` value may be an IPv4 or IPv6 address, whatever the network path info is from the incoming `peer` that generated it.
 
 The recipient can use the given IP, port, and public key to send an open request to the target.  If a NAT is suspected to exist, the target should have already sent a packet to ensure their side has a path mapped through the NAT and the open should then make it through.
+
+When an [alts](#alts) is included, each network path type included should also be sent an open (one for "ipv4" and one for "ipv6", etc).
 
 These requests are also sent with a `"end":true` and no response is generated.
 
@@ -645,8 +649,7 @@ The sending switch may also time the response speed and use that to break a tie 
 
 A switch only needs to send a `path` automatically when it detects more than one (potential) network path between itself and another hashname, such as when it's public IP changes (moving from wifi to cellular), when line packets come in from different IP/Ports, when it has two network interfaces itself, etc.  The sending and return of priority information will help reset which networks are then used by default.
 
-When the [bridge][] extension is used, it also becomes an additional network path that can be shared/tested automatically.
-
+<a name="alts" />
 #### `"alts":[...]` - Alternate Network Paths
 
 Any `path` packet may also contain an optional `"alts":[{"type":"ipv4","ip":1.2.3.4,"port":5678},...]` array of objects each of which contains information about an alernate network path to it.  This array is used whenever the sender has additional networks that it would like the recipient to try using.
