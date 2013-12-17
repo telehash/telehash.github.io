@@ -614,7 +614,7 @@ This also serves as a workaround if any NAT exists, so that the two hashnames ca
 
 These requests are always sent with a `"end":true` and no response is generated.
 
-If a sender has multiple known public network paths back to it, it should include an [alts](#alts) array with those paths, such as when it has a valid public ipv6 address.
+If a sender has multiple known public network paths back to it, it should include an [alts](#alts) array with those paths, such as when it has a valid public ipv6 address.  Any internal paths (local area network addresses) must not be included in a peer request, only known public address information can be sent here.  Internal paths must only be sent in a [path](#path) request.
 
 <a name="connect" />
 ### `"type":"connect"` - Connect to a hashname
@@ -627,6 +627,7 @@ When an [alts](#alts) is included, each network path type included should also b
 
 These requests are also sent with a `"end":true` and no response is generated.
 
+<a name="relay" />
 ### `"type":"relay"` - Guaranteed Connectivity
 
 There are a number of situations where two different hashnames will be unable to connect directly to each other, and while these are not very common, the protocol must ensure that any two hashnames have the ability to securely exchange information.
@@ -635,10 +636,11 @@ The two most common cases are with combinations of certain NATs where at least o
 
 When a hashname detects that it cannot connect directly with another (there are different detection techniques for the various cases), it sends a `peer` that also includes a `"relay":true` in the request. The hashname receiving the `peer` and generating the `connect` must include the relay flag in the connect request. Upon receiving a `connect` with the relay flag set in it, that hashname must additionally open a `relay` channel and send the identical `open` packet over the relay as well as sending it to the included ip/port info in the connect. If the relay is the only connectivity established, the subsequent `line` packets may be sent over it.
 
-A `relay` channel is very simple, the initial packet must contain a `"to":"..."` of the hashname to relay to, and that hashname must be one that the receiving switch already has an open line to.  The initial relay packet is then sent as-is over the line to the recipient, and any/all packets sent from either side are then relay'd as-is to the other. The channel is unreliable and the relayed packets MUST NOT contain any reliability information.
+A `relay` channel is very simple, the initial packet must contain a `"to":"..."` of the hashname to relay to, and that hashname must be one that the receiving switch already has an open line to.  The initial relay packet is then sent as-is over the line to the recipient, and any/all packets sent from either side are then relay'd as-is to the other. The channel is unreliable and the relayed packets MUST NOT contain any reliability information.  Only one relay channel must exist between any two hashnames, such that a new relay will become the only response path upon receiving any packet via it.
 
-To prevent abuse, all switches must limit the volume of relay packets between any two hashnames to no more than five per second from either sender.  Any packets over that rate MUST be dropped/discarded. This is a fast enough rate for any two hashnames to negotiate additional connectivity (like using a [bridge][]) and do basic DHT queries. Any relay state may be discarded after 10 seconds of inactivity.
+To prevent abuse, all switches must limit the volume of relay packets between any two hashnames to no more than five per second from either sender.  Any packets over that rate MUST be dropped/discarded. This is a fast enough rate for any two hashnames to negotiate additional connectivity (like using a [bridge][]) and do basic DHT queries. Any relay state may be discarded after 10 seconds of inactivity.  Switches must also prevent double-relaying, sending packets coming in via a relay outgoing via another relay, a relay is only a one-hop utility and two hashnames must negotiate alternate paths for additional needs. Any `peer` requests coming in via a relay must also not have their relay flag set in the accompanying outgoing `connect`.
 
+<a name="path" />
 ### `"type":"path"` - Network Path Prioritization
 
 Any switch may have multiple network interfaces, such as on a mobile device both cellular and wifi may be available simutaneously or be transitioning between them, and for a local network there may be a public IP via the gateway/NAT and an internal LAN IP. A switch should always try to be aware of all of the networks it has available to send on (ipv4 and ipv6 for instance), as well as what network paths exist between it and any other hashname. 
