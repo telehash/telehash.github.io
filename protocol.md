@@ -614,7 +614,7 @@ This also serves as a workaround if any NAT exists, so that the two hashnames ca
 
 These requests are always sent with a `"end":true` and no response is generated.
 
-If a sender has multiple known public network paths back to it, it should include an [alts](#alts) array with those paths, such as when it has a valid public ipv6 address.  Any internal paths (local area network addresses) must not be included in a peer request, only known public address information can be sent here.  Internal paths must only be sent in a [path](#path) request.
+If a sender has multiple known public network paths back to it, it should include an [alts](#alts) array with those paths, such as when it has a valid public ipv6 address.  Any internal paths (local area network addresses) must not be included in a peer request, only known public address information can be sent here.  Internal paths must only be sent in a [path](#path) request since that is private over a line and not exposed to any third party (like the peer/connect flow is).
 
 <a name="connect" />
 ### `"type":"connect"` - Connect to a hashname
@@ -664,6 +664,12 @@ Each alt object must contain a `"type":"..."` to identify which type of network 
 * `http` - see [path_http][]
 
 Upon receiving a path containing an `alts`, the array should be processed to look for new/unknown networks and those should be sent a path in return to validate and send any priority information.
+
+#### Path Detection / Handling
+
+There are two types of network paths, `possible` and `established`.  A possible path is one that is suggested from an incoming `connect` or one that is listed in an `alts` array, as the switch only knows the network information from another source than that network interface itself.  Possible paths should only be used once on request and not trusted as a valid destination for a hashname beyond that.
+
+An established path is one that comes from the network interface, the actual encoded details of the sender information.  When any `open` or `line` is received from any network, the sender's path is considerd established and should be stored by the switch as such so that it can be used as a validated destination for any outgoing packets.  When a switch detects that a path may not be working, it may also redundantly send the hashname packets on any other established path.
 
 # Switch Behaviors
 
