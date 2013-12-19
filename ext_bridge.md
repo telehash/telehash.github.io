@@ -20,6 +20,8 @@ When any line id coming into the switch matches the `from` value it's resent to 
 
 This enables a supporting switch to do essentially no work in bridging packets as it can process them outside any encryption.  To prevent any loops, a cache of recently used `iv` values on the bridge packets should be kept and any repeat ones should be dropped.
 
-## Bridge Suggestion
+## Connect Hinting
 
-When a hashname that is receiving a `peer` and sending out a `connect` recognizes that neither the sender or recipient has a public network path (ipv4 or ipv6), it may include a `"bridge":{"type":"foo","id":"bar"}` that specifies a path that it can be sent in a `bridge` request to create one to the sender of the peer.  Otherwise, the two may have no way of connecting directly outside of a temporary `relay`.
+Since a bridge only works when the requestor knows the network path it wants to create a bridge to, and there are times when it may not have that information such as when both hashnames are connected via private paths to the bridge (like via http).
+
+When a hashname that is receiving a `peer` and sending out a `connect` recognizes that neither the sender or recipient has a public network path (ipv4 or ipv6), it may include a `"bridge":{"type":"bridge","id":"uniqueid",...}` which specifies a custom bridge path that can be sent back to it in a `bridge` request to create one directly to the sender of the peer.  Otherwise, the two may have no way of connecting directly outside of a temporary `relay`.

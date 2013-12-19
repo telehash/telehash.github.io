@@ -667,7 +667,7 @@ Upon receiving a path containing an `alts`, the array should be processed to loo
 
 #### Path Detection / Handling
 
-There are two types of network paths, `possible` and `established`.  A possible path is one that is suggested from an incoming `connect` or one that is listed in an `alts` array, as the switch only knows the network information from another source than that network interface itself.  Possible paths should only be used once on request and not trusted as a valid destination for a hashname beyond that.
+There are two states of network paths, `possible` and `established`.  A possible path is one that is suggested from an incoming `connect` or one that is listed in an `alts` array, as the switch only knows the network information from another source than that network interface itself.  Possible paths should only be used once on request and not trusted as a valid destination for a hashname beyond that.
 
 An established path is one that comes from the network interface, the actual encoded details of the sender information.  When any `open` or `line` is received from any network, the sender's path is considerd established and should be stored by the switch as such so that it can be used as a validated destination for any outgoing packets.  When a switch detects that a path may not be working, it may also redundantly send the hashname packets on any other established path.
 
