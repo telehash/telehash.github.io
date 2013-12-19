@@ -614,7 +614,7 @@ This also serves as a workaround if any NAT exists, so that the two hashnames ca
 
 These requests are always sent with a `"end":true` and no response is generated.
 
-If a sender has multiple known public network paths back to it, it should include an [alts](#alts) array with those paths, such as when it has a valid public ipv6 address.  Any internal paths (local area network addresses) must not be included in a peer request, only known public address information can be sent here.  Internal paths must only be sent in a [path](#path) request since that is private over a line and not exposed to any third party (like the peer/connect flow is).
+If a sender has multiple known public network paths back to it, it should include an [paths](#paths) array with those paths, such as when it has a valid public ipv6 address.  Any internal paths (local area network addresses) must not be included in a peer request, only known public address information can be sent here.  Internal paths must only be sent in a [path](#path) request since that is private over a line and not exposed to any third party (like the peer/connect flow is).
 
 <a name="connect" />
 ### `"type":"connect"` - Connect to a hashname
@@ -654,11 +654,11 @@ The sending switch may also time the response speed and use that to break a tie 
 A switch only needs to send a `path` automatically when it detects more than one (potential) network path between itself and another hashname, such as when it's public IP changes (moving from wifi to cellular), when line packets come in from different IP/Ports, when it has two network interfaces itself, etc.  The sending and return of priority information will help reset which networks are then used by default.
 
 <a name="paths" />
-#### `"paths":[...]` - Network Path List
+### `"paths":[...]` - Network Path List
 
-Any `path` packet may also contain an optional `"paths":[{"type":"ipv4","ip":1.2.3.4,"port":5678},...]` array of objects each of which contains information about an alernate network path to it.  This array is used whenever the sender has additional networks that it would like the recipient to try using.
+Any `peer`, `connect`, or `path` packet may also contain a `"paths":[{"type":"ipv4","ip":1.2.3.4,"port":5678},...]` array of objects each of which contains information about a possible network path.  This array is used whenever the sender has additional networks that it would like the recipient to try using.
 
-Each alt object must contain a `"type":"..."` to identify which type of network information it describes. This enables two hashnames on the same local network to decide to exchange their internal IP/Port and establish a local connection as the primary one. Current types of alts defined:
+Each paths object must contain a `"type":"..."` to identify which type of network information it describes. Current types of paths defined:
 
 * `ipv4` - contains `ip` and `port` (typically the LAN values)
 * `ipv6` - contains `ip` and `port` (to enable the recipient to ugprade if supported)
@@ -671,7 +671,7 @@ Upon receiving a path request containing an `paths`, the array should be process
 
 #### Path Detection / Handling
 
-There are two states of network paths, `possible` and `established`.  A possible path is one that is suggested from an incoming `connect` or one that is listed in an `alts` array, as the switch only knows the network information from another source than that network interface itself.  Possible paths should only be used once on request and not trusted as a valid destination for a hashname beyond that.
+There are two states of network paths, `possible` and `established`.  A possible path is one that is suggested from an incoming `connect` or one that is listed in an `paths` array, as the switch only knows the network information from another source than that network interface itself.  Possible paths should only be used once on request and not trusted as a valid destination for a hashname beyond that.
 
 An established path is one that comes from the network interface, the actual encoded details of the sender information.  When any `open` or `line` is received from any network, the sender's path is considerd established and should be stored by the switch as such so that it can be used as a validated destination for any outgoing packets.  When a switch detects that a path may not be working, it may also redundantly send the hashname packets on any other established path.
 
