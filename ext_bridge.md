@@ -22,4 +22,4 @@ This enables a supporting switch to do essentially no work in bridging packets a
 
 ## Bridge Suggestion
 
-When a hashname that is receiving a `peer` and sending out a `connect` recognizes that neither the sender or recipient has a public network path (ipv4 or ipv6), it may include a `"bridge":{"type":"foo","id":"bar"}` that specifies a path that it can be sent in a `bridge` request to create one to the sender of the peer.  Otherwise, the two may have no way of connecting directly outside of a `relay` temporarily.
+When a hashname that is receiving a `peer` and sending out a `connect` recognizes that neither the sender or recipient has a public network path (ipv4 or ipv6), it may include a `"bridge":{"type":"foo","id":"bar"}` that specifies a path that it can be sent in a `bridge` request to create one to the sender of the peer.  Otherwise, the two may have no way of connecting directly outside of a temporary `relay`.

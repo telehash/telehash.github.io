@@ -619,11 +619,11 @@ If a sender has multiple known public network paths back to it, it should includ
 <a name="connect" />
 ### `"type":"connect"` - Connect to a hashname
 
-The connect request is an immediate result of a peer request and must also contain an `"ip":"1.2.3.4"` and `"port":5678` with the values being of the peer requestor and a BODY of their public key.  The `ip` value may be an IPv4 or IPv6 address, whatever the network path info is from the incoming `peer` that generated it.
+The connect request is an immediate result of a peer request and must always contain a BODY of their public key. It may also contain an `"ip":"1.2.3.4"` (either IPv4 or IPv6 address) and `"port":5678` with the values being of the peer requestor if the request came in from an ip network path.
 
 The recipient can use the given IP, port, and public key to send an open request to the target.  If a NAT is suspected to exist, the target should have already sent a packet to ensure their side has a path mapped through the NAT and the open should then make it through.
 
-When an [alts](#alts) is included, each network path type included should also be sent an open (one for "ipv4" and one for "ipv6", etc).
+When an [alts](#alts) is included, each network path type included should also be sent an open (one for "ipv4" and one for "ipv6", etc). This helps prevent any kind of spamming with fake entries in the alts, so that only one open packet can be triggered for each kind of network interface.
 
 These requests are also sent with a `"end":true` and no response is generated.
 
