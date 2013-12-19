@@ -623,7 +623,7 @@ The connect request is an immediate result of a peer request and must always con
 
 The recipient can use the given IP, port, and public key to send an open request to the target.  If a NAT is suspected to exist, the target should have already sent a packet to ensure their side has a path mapped through the NAT and the open should then make it through.
 
-When an [alts](#alts) is included, each network path type included should also be sent an open (one for "ipv4" and one for "ipv6", etc). This helps prevent any kind of spamming with fake entries in the alts, so that only one open packet can be triggered for each kind of network interface.
+When an [alts](#alts) is included, each network path type included should also be sent an open (one for "ipv4" and one for "ipv6", etc). This speeds up path discovery (no additional [`path`](#path) round trip), while preventing spamming with fake entries in the alts. A switch should not send more than one open packet for each "type" indicated in [alts](#alts).
 
 These requests are also sent with a `"end":true` and no response is generated.
 
