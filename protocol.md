@@ -619,11 +619,11 @@ If a sender has multiple known public network paths back to it, it should includ
 <a name="connect" />
 ### `"type":"connect"` - Connect to a hashname
 
-The connect request is an immediate result of a peer request and must always contain a BODY of their public key. It may also contain an `"ip":"1.2.3.4"` (either IPv4 or IPv6 address) and `"port":5678` with the values being of the peer requestor if the request came in from an ip network path.
+The connect request is an immediate result of a peer request and must always contain a BODY of their public key as well as a [paths](#paths) array identifying possible network paths to it.
 
-The recipient can use the given IP, port, and public key to send an open request to the target.  If a NAT is suspected to exist, the target should have already sent a packet to ensure their side has a path mapped through the NAT and the open should then make it through.
+The recipient can use the given public to send an open request to the target via the possible paths.  If a NAT is suspected to exist, the target should have already sent a packet to ensure their side has a path mapped through the NAT and the open should then make it through.
 
-When an [alts](#alts) is included, each network path type included should also be sent an open (one for "ipv4" and one for "ipv6", etc). This helps prevent any kind of spamming with fake entries in the alts, so that only one open packet can be triggered for each kind of network interface.
+When there's multiple paths the processing of them must only send an open per *type* to prevent spamming of fake entries triggering unsolicited outgoing packets.  For "ipv4" and "ipv6" there may be two of each sent, one for a public IP and one for a private IP of each type.
 
 These requests are also sent with a `"end":true` and no response is generated.
 
@@ -634,11 +634,11 @@ There are a number of situations where two different hashnames will be unable to
 
 The two most common cases are with combinations of certain NATs where at least one dynamically maps external ports such that the sending hashname has no way to detect it (often called symmetric NATs), and the other is when two hashnames are on the same local network and their shared NAT doesn't allow them to send public data to each other. Typical solutions in other protocols involve using a shared/trusted third party to relay the data via (TURN), and exchanging internal network addresses via a third party. There are additional cases that will become more common in the future as well, such as when there are diverse networks and two hashnames are on different ones entirely (one is ip based and the other bluetooth) connected only by a hashname that handles both.
 
-When a hashname detects that it cannot connect directly with another (there are different detection techniques for the various cases), it sends a `peer` that also includes a `"relay":true` in the request. The hashname receiving the `peer` and generating the `connect` must include the relay flag in the connect request. Upon receiving a `connect` with the relay flag set in it, that hashname must additionally open a `relay` channel and send the identical `open` packet over the relay as well as sending it to the included ip/port info in the connect. If the relay is the only connectivity established, the subsequent `line` packets may be sent over it.
+When a hashname detects that it cannot connect directly with another (there are different detection techniques for the various cases), it sends a `peer` that also includes a relay path in the [paths](#paths) array. Upon receiving a `connect` with the relay path in it, that hashname must additionally open a `relay` channel and send the identical `open` packet over the relay as well as sending it to the included ip/port info in the connect. If the relay is the only connectivity established, the subsequent `line` packets may be sent over it.
 
-A `relay` channel is very simple, the initial packet must contain a `"to":"..."` of the hashname to relay to, and that hashname must be one that the receiving switch already has an open line to.  The initial relay packet is then sent as-is over the line to the recipient, and any/all packets sent from either side are then relay'd as-is to the other. The channel is unreliable and the relayed packets MUST NOT contain any reliability information.  Only one relay channel must exist between any two hashnames, such that a new relay will become the only response path upon receiving any packet via it.
+A `relay` channel is very simple, every packet must contain a `"to":"..."` of the hashname to relay to, and that hashname must be one that the receiving switch already has an open line to.  The relay packets are then sent as-is over the line to the recipient, and any/all packets sent from either side are then relay'd as-is to the other. The channel is unreliable and the relayed packets must not contain any reliability information.
 
-To prevent abuse, all switches must limit the volume of relay packets between any two hashnames to no more than five per second from either sender.  Any packets over that rate MUST be dropped/discarded. This is a fast enough rate for any two hashnames to negotiate additional connectivity (like using a [bridge][]) and do basic DHT queries. Any relay state may be discarded after 10 seconds of inactivity.  Switches must also prevent double-relaying, sending packets coming in via a relay outgoing via another relay, a relay is only a one-hop utility and two hashnames must negotiate alternate paths for additional needs. Any `peer` requests coming in via a relay must also not have their relay flag set in the accompanying outgoing `connect`.
+To prevent abuse, all switches must limit the volume of relay packets between any two hashnames to no more than five per second between any pair.  Any packets over that rate MUST be dropped/discarded. This is a fast enough rate for any two hashnames to negotiate additional connectivity (like using a [ext_bridge][]) and do basic DHT queries. Switches must also prevent double-relaying, sending packets coming in via a relay outgoing via another relay, a relay is only a one-hop utility and two hashnames must negotiate alternate paths for additional needs. Any `peer` requests coming in via a relay must also not have a relay included in their paths.
 
 <a name="path" />
 ### `"type":"path"` - Network Path Prioritization
@@ -651,19 +651,21 @@ The sending switch may also time the response speed and use that to break a tie 
 
 A switch only needs to send a `path` automatically when it detects more than one (potential) network path between itself and another hashname, such as when it's public IP changes (moving from wifi to cellular), when line packets come in from different IP/Ports, when it has two network interfaces itself, etc.  The sending and return of priority information will help reset which networks are then used by default.
 
-<a name="alts" />
-#### `"alts":[...]` - Alternate Network Paths
+<a name="paths" />
+#### `"paths":[...]` - Alternate Network Paths
 
-Any `path` packet may also contain an optional `"alts":[{"type":"ipv4","ip":1.2.3.4,"port":5678},...]` array of objects each of which contains information about an alernate network path to it.  This array is used whenever the sender has additional networks that it would like the recipient to try using.
+Any `path` packet may also contain an optional `"paths":[{"type":"ipv4","ip":1.2.3.4,"port":5678},...]` array of objects each of which contains information about an alernate network path to it.  This array is used whenever the sender has additional networks that it would like the recipient to try using.
 
 Each alt object must contain a `"type":"..."` to identify which type of network information it describes. This enables two hashnames on the same local network to decide to exchange their internal IP/Port and establish a local connection as the primary one. Current types of alts defined:
 
 * `ipv4` - contains `ip` and `port` (typically the LAN values)
 * `ipv6` - contains `ip` and `port` (to enable the recipient to ugprade if supported)
+* `relay` - contains `id` of the channel id to create a relay with
+* `bridge` - see [ext_bridge][]
 * `webrtc` - see [path_webrtc][]
 * `http` - see [path_http][]
 
-Upon receiving a path containing an `alts`, the array should be processed to look for new/unknown networks and those should be sent a path in return to validate and send any priority information.
+Upon receiving a path request containing an `paths`, the array should be processed to look for new/unknown possible networks and those should individually be sent a path request in return to validate and send any priority information.
 
 #### Path Detection / Handling
 
@@ -713,7 +715,7 @@ This logic will have to evolve into a more efficient/concise pattern at scale, l
 
 [sockets]: ext_sockets.md
 [tickets]: ext_tickets.md
-[bridge]: ext_bridge.md
+[ext_bridge]: ext_bridge.md
 [kademlia]: kademlia.md
 [path_webrtc]: path_webrtc.md
 [path_http]: path_http.md
