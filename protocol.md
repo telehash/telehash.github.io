@@ -621,7 +621,7 @@ If a sender has multiple known public network paths back to it, it should includ
 
 The connect request is an immediate result of a peer request and must always contain a BODY of their public key as well as a [paths](#paths) array identifying possible network paths to it.
 
-The recipient can use the given public to send an open request to the target via the possible paths.  If a NAT is suspected to exist, the target should have already sent a packet to ensure their side has a path mapped through the NAT and the open should then make it through.
+The recipient can use the given public key to send an open request to the target via the possible paths.  If a NAT is suspected to exist, the target should have already sent a packet to ensure their side has a path mapped through the NAT and the open should then make it through.
 
 When generating a connect, the switch must always verify the sending path is included in the paths array, and if not insert it in. This ensures that the recipient has at least one valid path, and when there were others it included it speeds up path discovery since no additional [`path`](#path) round trip such as for an IPv6 one.
 
@@ -654,7 +654,7 @@ The sending switch may also time the response speed and use that to break a tie 
 A switch only needs to send a `path` automatically when it detects more than one (potential) network path between itself and another hashname, such as when it's public IP changes (moving from wifi to cellular), when line packets come in from different IP/Ports, when it has two network interfaces itself, etc.  The sending and return of priority information will help reset which networks are then used by default.
 
 <a name="paths" />
-#### `"paths":[...]` - Alternate Network Paths
+#### `"paths":[...]` - Network Path List
 
 Any `path` packet may also contain an optional `"paths":[{"type":"ipv4","ip":1.2.3.4,"port":5678},...]` array of objects each of which contains information about an alernate network path to it.  This array is used whenever the sender has additional networks that it would like the recipient to try using.
 
