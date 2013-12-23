@@ -46,6 +46,16 @@ publish-subscribe, or message passing... any can be used, as Telehash
 simply facilitates secure reliable connectivity between any two or more
 applications in any networking environment.
 
+## Parallels
+
+Since Telehash is it's own networking stack layered above existing networks, it has mechanisms that parallel well known Internet ones and is easy to draw an analogy to:
+
+* `IP` - Addressing in Telehash is based on a fingerprint of a public key generated locally by an app (called a `hashname`) instead of a centrally assigned number.
+* `Routing` - Hashnames are organized into a DHT that every peer helps maintain, there are no core routers or managed backbone.
+* `SSL` - Every hashname is it's own cryptographic identity, there are no central certificate authorites and all communications are always encrypted via a `line`.
+* `TCP/UDP` - Any two hashnames can create one or more channels between them to transfer content, each channel can either be reliable (everything is ordered/confirmed) or unreliable (lossy).
+
+
 ## Security
 
 The goal of Telehash isn't to invent new kinds of security, it's to simply use the best of existing solutions and apply them to a decentralied system.  All of the crypto currently used is a subset of the strongest ciphers available in TLS 1.2, including RSA (2048), ECC-DH (256), AES-CTR (256), and SHA (256). 
@@ -63,7 +73,7 @@ There is a conscious choice to use two fundamentally different algorithms while 
     (Network Address Translation)
   * **Hashname**: The unique ID of an individual application/instance
     using Telehash
-  * **Packet**: A UDP packet less than 1400 bytes sent between any
+  * **Packet**: A single message containing JSON and/or binary data of less than 1400 bytes sent between any two
     hashnames
   * **Switch**: The name of the software layer or service parsing
     packets for one or more hashnames
@@ -71,7 +81,7 @@ There is a conscious choice to use two fundamentally different algorithms while 
     to form a temporary encrypted session (like a VPN tunnel between
     them)
   * **Channels**: Dynamic bi-directional transport that can transfer
-    reliable/ordered or lossy binary/json mixed content within any line
+    reliable/ordered or lossy binary/JSON mixed content within any line
 
 ## Telehash Switches
 
@@ -150,11 +160,9 @@ support binary data transfer for efficiency.
 Every packet must begin with two bytes which form a network byte-order
 short unsigned integer. This integer represents the length in bytes of
 the UTF-8 encoded JSON object which follows it. The JSON portion of the
-packet is required, so the length must be at least 2 (the JSON document
-`{}`), and less than the length of the raw UDP message minus the two 
-bytes for length value.
+packet is optional, so the length may be from zero up to the length of the packet minus two (for the length bytes).
 
-Any remaining bytes on the packet are considered raw binary and
+Any remaining bytes on the packet after the JSON are considered raw binary and
 referenced as the 'BODY' when used in definitions below.
 
 The format is thus:
@@ -201,7 +209,7 @@ just from UDP messagess, but from a BODY or after decryption.
 
 Telehash uses several different cryptographic algorithms to secure traffic 
 between applications. This section attempts to summarize the elements and how 
-they are leveraged.
+they are leveraged.  These are the draft requirements to enable development of the protocol, the long-term goal is to parallel TLS 1.3 or use it as-is if possible.
 
 ### Identification
 
