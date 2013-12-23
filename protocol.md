@@ -3,10 +3,11 @@ Telehash protocol draft
 
 # Introduction
 
-> Note: This is the second major version of the Telehash protocol, the
+> Editorial Note: This is the second major version of the Telehash protocol, the
 > first one is deprecated and was a minimal experimental spec 
 > to create a distributed hash table.  This is a work in progress yet
-> and starting to stabilize.
+> and starting to stabilize.  This intro/overview will likely soon be broken 
+> out into it's own document separate from the protocol details.
 
 Telehash is a new secure wire protocol that creates a decentralized overlay network, enabling apps and devices to
 find, identify, and communicate directly with each other.  It is built
@@ -44,6 +45,14 @@ centralized/federated/distributed, polling/push, REST, streaming,
 publish-subscribe, or message passing... any can be used, as Telehash
 simply facilitates secure reliable connectivity between any two or more
 applications in any networking environment.
+
+## Security
+
+The goal of Telehash isn't to invent new kinds of security, it's to simply use the best of existing solutions and apply them to a decentralied system.  All of the crypto currently used is a subset of the strongest ciphers available in TLS 1.2, including RSA (2048), ECC-DH (256), AES-CTR (256), and SHA (256). 
+
+The specific algorithms used currently are a chosen primarily to ease the development process.  As the protocol matures it will include the cipher suite abilities of TLS 1.3 and follow it's development closely, using it entirely if possible.
+
+There is a conscious choice to use two fundamentally different algorithms while developing the protocol: RSA for identity verification, ECC+AES for content encryption and forward secrecy.  These were selected as good independent starting points for each of those functions and to prepare the implementations for a wider range of dependencies that future versions of the protocol will require.
 
 # Protocol Details
 
