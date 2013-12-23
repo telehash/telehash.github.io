@@ -484,6 +484,14 @@ var lineDecryptKey = crypto.createHash("sha256")
   .digest();
 ```
 
+#### Retransmission
+
+A switch is usually initiating an `open` on behalf of the local application's request to open a channel to a remote application instance. The switch should therefore attempt to retransmit `open` packets at a reasonable rate if it hasn't received an `open` in response. A good rule of thumb is to send a maximum of 3 `open` packets, one second apart, and signalling a timeout to higher application layers if there is still no response.
+
+Each `open` packet should use the same "at" timestamp for retransmission, but generate a new "iv" for the outer packet each time. In the event the remote switch receives more than one, this keeps the operation roughly idempotent.
+
+Transmitting an `open` packet with a larger "at" timestamp (and ideally a new ecc shared key) will invalidate an existing line, and should be considered distinct from re-transmitting a request to open a new line.
+
 <a name="line" />
 ### `line` - Packet Encryption
 
@@ -625,7 +633,7 @@ The recipient can use the given public key to send an open request to the target
 
 When generating a connect, the switch must always verify the sending path is included in the paths array, and if not insert it in. This ensures that the recipient has at least one valid path, and when there were others it included it speeds up path discovery since no additional [`path`](#path) round trip such as for an IPv6 one.
 
-When there's multiple paths the processing of them must only send an open per *type* to prevent spamming of fake entries triggering unsolicited outgoing packets.  For "ipv4" and "ipv6" there may be two of each sent, one for a public IP and one for a private IP of each type.
+When there's multiple paths the processing of them must only send an open per *type* to prevent spamming of fake entries triggering unsolicited outgoing packets.  For "ipv4" and "ipv6" there may be two of each sent, one for a public IP and one for a private IP of each type.  Also to minimize unsolicited opens, no more than one connect per second should be processed for a given hashname.
 
 These requests are also sent with a `"end":true` and no response is generated.
 
