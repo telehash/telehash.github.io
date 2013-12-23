@@ -486,11 +486,9 @@ var lineDecryptKey = crypto.createHash("sha256")
 
 #### Retransmission
 
-A switch is usually initiating an `open` on behalf of the local application's request to open a channel to a remote application instance. The switch should therefore attempt to retransmit `open` packets at a reasonable rate if it hasn't received an `open` in response. A good rule of thumb is to send a maximum of 3 `open` packets, one second apart, and signalling a timeout to higher application layers if there is still no response.
+An `open` is always triggered by the creation of a channel to a hashname, such that when a channel generates it's first packet the switch recognizes that a line doesn't exist yet and attempts to create one.  This usually also requires some `seek` requests to find the target hashname and then `peer` to request a connection.  The initiating channel logic is internally responsible for any retransmission of it's own packets, and those retransmissions are the source of re-triggering the sending of any `peer` and/or `open` requests.
 
-Each `open` packet should use the same "at" timestamp for retransmission, but generate a new "iv" for the outer packet each time. In the event the remote switch receives more than one, this keeps the operation roughly idempotent.
-
-Transmitting an `open` packet with a larger "at" timestamp (and ideally a new ecc shared key) will invalidate an existing line, and should be considered distinct from re-transmitting a request to open a new line.
+When a line is being created the switch generates it's temporary ECC key for the line and must also store it's local timestamp of when it created the ECC key to send that timestamp value as the `at` in any open request.  This enables the recipient to recognize retransmissions of the same line initiation request, as well as detect when an open is generated for a new line as it will have a newer `at` value than the existing one.
 
 <a name="line" />
 ### `line` - Packet Encryption
