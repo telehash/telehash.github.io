@@ -60,7 +60,7 @@ Since Telehash is it's own networking stack layered above existing networks, it 
 
 The goal of Telehash isn't to invent new kinds of security, it's to simply use the best of existing solutions and apply them to a decentralied system.  All of the crypto currently used is a subset of the strongest ciphers available in TLS 1.2, including RSA (2048), ECC-DH (256), AES-CTR (256), and SHA (256). 
 
-The specific algorithms used currently are a chosen primarily to ease the development process.  As the protocol matures it will include the cipher suite abilities of TLS 1.3 and follow it's development closely, using it entirely if possible.
+The specific algorithms used currently are a chosen primarily to ease the development process.  As the protocol matures it will include the cipher suite abilities of TLS 1.3 and follow its development closely, using it entirely if possible.
 
 There is a conscious choice to use two fundamentally different algorithms while developing the protocol: RSA for identity verification, ECC+AES for content encryption and forward secrecy.  These were selected as good independent starting points for each of those functions and to prepare the implementations for a wider range of dependencies that future versions of the protocol will require.
 
