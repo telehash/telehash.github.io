@@ -14,7 +14,7 @@ A `bridge` packet looks like:
 }
 ```
 
-The `to` value is the incoming line id, when any packet comes in with that id the packet is sent to the specified `path` (same format as `alts` entries).  It is the responsibility of the bridge creator to ensure the path is valid, as the bridge will provide no feedback as to status.
+The `to` value is the incoming line id, when any packet comes in with that id the packet is sent to the specified `path` (same format as `paths` entries).  It is the responsibility of the bridge creator to ensure the path is valid, as the bridge will provide no feedback as to status.
 
 When any line id coming into the switch matches the `from` value it's resent to the network path that the bridge was created from.  Bridges should be persisted until the hashname that created it goes offline.
 
