@@ -624,7 +624,7 @@ Here's some summary notes for implementors:
 
 The core of Telehash is a basic Kademlia-based DHT. The bulk of the complexity is in the rules around maintaining a mesh of lines and calculating distance explained [below](#kademlia). The `"seek":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"` value is always another hashname that the app is trying to connect to.
 
-When one hashname wants to connect to another hashname, it finds the closest lines it knows and sends a `seek` containing the hash value to them.  They return a compact `"see":[...]` array of addresses that are closest to the hash value.  The addresses are a compound comma-delimited string containing the "hash,ip,port" (these are intentionally not JSON as the verbosity is not helpful here), for example "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c,123.45.67.89,10111".
+When one hashname wants to connect to another hashname, it finds the closest lines it knows and sends a `seek` containing the hash value to them.  They return a compact `"see":[...]` array of addresses that are closest to the hash value (based on the rules [below](#kademlia)).  The addresses are a compound comma-delimited string containing the "hash,ip,port" (these are intentionally not JSON as the verbosity is not helpful here), for example "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c,123.45.67.89,10111".
 
 The response `see` packet must always include an `"end":true`.
 
@@ -710,18 +710,6 @@ Besides parsing the protocol, decoding the packets and processing the different 
 Hashname discovery and connectivity is governed by a Kademlia-based DHT that switches collectively help maintain.  This process involves initial seeding on startup, tracking "buckets" of other switches based on a distance metric and actively maintaining connections to them for handling [seek](#seek) requests.
 
 The details of how [kademlia][] is implemented for Telehash are broken out into their own document.
-
-## Line Maintenance
-
-(this area in progress...)
-
-A line may at any point become invalidated if the remote side is disconnected or restarts, so the process of detecting that and deciding to restart a line needs to be defined.
-
-A simple rule to start is invalidating a line after it has been idle for more than 60 seconds or after sending channel packets and not getting any responses for more than 10 seconds (if the switch internally sends seek queries regularly and there's no replies, for instance).
-
-If the switch knows that it is behind a NAT, for any lines that it want's to maintain as active it MUST send at least one packet out at least once every 60 seconds.
-
-This logic will have to evolve into a more efficient/concise pattern at scale, likely involving regular or triggered `path` and `seek` requests, as well as differentiating between if an app is using the line versus the switch maintaining it for it's DHT.
 
 
 [rsa]:     https://en.wikipedia.org/wiki/RSA_(algorithm)

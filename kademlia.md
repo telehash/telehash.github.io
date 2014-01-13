@@ -79,11 +79,11 @@ Even when so many nodes are processed, we still only fill the first 15 buckets.
 
 ## Default Limits
 
-The suggestions for a default Nmin and Nmax are 64 and 1024, with bare minimums being 8 and 32 for low-resource switches. For Kmin and Kmax (per-bucket) the defaults are 8 and 32, with minimums being 2 and 8.  The Nmax must always be less than or equal to 256 * Kmax.
+The suggestions for a default Nmin and Nmax are 64 and 1024, with bare minimums being 8 and 256 for low-resource switches. For Kmin and Kmax (per-bucket) the defaults are 8 and 32, with minimums being 2 and 8.  The Nmax must always be less than or equal to 256 * Kmax.
 
 The Kmin/Kmax can be thought of as soft are hard limits for each bucket, with the min being the number of hashnames that are sent maintenance checks and the max being the point at which new nodes are denied being added to the bucket.
 
-The Nmin is used to trigger seeding requests, regularly querying other hashnames to reach the Nmin. If Nmax is reached, nodes should still be added to closer buckets with capacity but will force eviction from further buckets (always maintain closer neighbors).
+The Nmin is used to trigger seeding requests, regularly querying other hashnames to reach the Nmin. If Nmax is reached, nodes should still be added to closer buckets with capacity but will force eviction from further buckets (always maintain closer neighbors) but never let any bucket fall below 2 (the minimum Kmin).
 
 ## `"type":"bucket"` - Adding a node to a Bucket
 
