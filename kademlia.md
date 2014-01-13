@@ -107,7 +107,7 @@ In case there are multiple bucket channels between any two nodes, only the most 
 
 Some nodes may need to be discoverable, but do not have resources to help maintain the DHT and cannot therefore be returned to normal `seek` queries.  When a bucket channel is opened it may contain an optional `"hide":true` that signals this special case.  This should not be used or exposed in normal switches and is only for very low resource (compute, embedded devices) or expensive/slow data (older cellular/satellite networks).
 
-The hidden node is still added to the bucket, but it is not sent any maintenance `see` packets, it must generate them in order to keep the channel alive.  Hidden nodes should not count against the per-bucket limit
+The hidden node is still added to the bucket, but it is not sent any maintenance `see` packets (it must generate them in order to keep the channel alive) and does not count towards Kmin for the bucket.  Hidden nodes do count against Kmax like any other node in a bucket.
 
 When handling a `seek` a hidden node can only be returned if it *exactly* matches the seek request, if the given seek hash does not entirely match, a hidden node must not be returned.
 
