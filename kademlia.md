@@ -99,13 +99,13 @@ When the total nodes in all buckets reaches Kmax the switch must either evict a 
 
 ## Bucket Maintenance
 
-Every bucket must be checked once every 25 seconds for possible maintenance. Only the Kmin number of nodes in a bucket need to be sent maintenance packets, and they should be sorted/prioritized by uptime.  Any node that hasn't sent any packets on it's bucket channel in more than 60 seconds should be evicted from the bucket. Based on the last received packet on the channel, if that time plus 25 seconds would be more than 60 it should be sent a maintenance request.
+Every bucket must be checked once every 25 seconds for possible maintenance. Only the Kmin number of nodes in a bucket need to be sent maintenance packets, and they should be sorted/prioritized by uptime with the longest uptime being preferred.  Any node that hasn't sent any packets on it's bucket channel in more than 60 seconds should be evicted from the bucket. Based on the last received packet on the channel, if that time plus 25 seconds would be more than 60 it should be sent a maintenance request.
 
 In case there are multiple bucket channels between any two nodes, only the most recently active one should be used for maintenance checks/requests.  Whenever a new bucket channel is started, it replaces the last known one (if any).
 
 ### "hide":true - Hidden Nodes
 
-Some nodes may need to be discoverable, but do not have resources to help maintain the DHT and cannot therefore be returned to normal `seek` queries.  When a bucket channel is opened it may contain an optional `"hide":true` that signals this special case.
+Some nodes may need to be discoverable, but do not have resources to help maintain the DHT and cannot therefore be returned to normal `seek` queries.  When a bucket channel is opened it may contain an optional `"hide":true` that signals this special case.  This should not be used or exposed in normal switches and is only for very low resource (compute, embedded devices) or expensive/slow data (older cellular/satellite networks).
 
 The hidden node is still added to the bucket, but it is not sent any maintenance `see` packets, it must generate them in order to keep the channel alive.  Hidden nodes should not count against the per-bucket limit
 
