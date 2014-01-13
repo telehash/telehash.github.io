@@ -707,9 +707,7 @@ Besides parsing the protocol, decoding the packets and processing the different 
 <a name="kademlia" />
 ## Distributed Hash Table
 
-Every switch must have both a startup/seeding routine and a background line maintenance process in order to properly support the Kademlia-based DHT.
-
-The seeding process involves recursively performing a [seek](#seek) for it's own hashname against the list of seeds (provided by the app). The act of seeking ones own hashname will bootstrap lines to hashnames that are closest to it, and those hashnames then start to fill in the buckets.
+Hashname discovery and connectivity is governed by a Kademlia-based DHT that switches collectively help maintain.  This process involves initial seeding on startup, tracking "buckets" of other switches based on a distance metric and actively maintaining connections to them for handling [seek](#seek) requests.
 
 The details of how [kademlia][] is implemented for Telehash are broken out into their own document.
 

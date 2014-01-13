@@ -7,8 +7,7 @@ Telehash uses a DHT system based on [Kademlia][].
 
 Every node inside Telehash is a 256bit value based on the sha256 hash of the node's public key.
 
-Based on this size, there will be 256 buckets (so-called k-buckets) which all have room for a certain amount of nodes.
-This number K, is not yet defined, but somewhere between 8 and 20 will suffice.
+Based on this size, there will be 256 buckets (so-called k-buckets) which all have room for a certain amount of nodes. The number of nodes maintained in each bucket should have two limits, a soft Kmin and hard Kmax, with an overall limit on total nodes maintained of Nmin and Nmax.
 
 In a big p2p network, it's pretty impossible to know all information about all nodes. There would be too much network
 overhead for nodes to update each other and the amount of storage you need just to keep track of all nodes is too big.
@@ -78,25 +77,37 @@ The following [pastebin][] shows you an example on how k-buckets are filled with
 random generated nodes, as seen from our own node: 736711cf55ff95fa967aa980855a0ee9f7af47d6287374a8cd65e1a36171ef08.
 Even when so many nodes are processed, we still only fill the first 15 buckets.
 
+## Default Limits
 
-## When to store a node
-Most of the time, especially on the buckets with a low distance, those buckets will be already be full whenever you
-receive a new node for that bucket. At that point, you have to decide what to do with the incoming node.
+The suggestions for a default Nmin and Nmax are 64 and 1024, with bare minimums being 8 and 32 for low-resource switches. For Kmin and Kmax (per-bucket) the defaults are 8 and 32, with minimums being 2 and 8.  The Nmax must always be less than or equal to 256 * Kmax.
 
-A node itself could be one of the three following types: a good node, an unknown node, or a bad node. A good node is a
-node with which you have communicated not long ago (in the last 60 seconds). Since these nodes are considered good
-and should not be removed from the bucket. Unknown nodes are nodes which had no activity since the last 60 seconds, but
-they still could be there (you just haven't had a reason to talk to them). Here, you would send out a ping-request, and
-see if they would respond. Since we are using UDP, it might be possible that our packet or the response packet has
-disappeared, so we make a maximum of 3 attemps. When we didn't receive anything a node is
-considered a bad node.
+The Kmin/Kmax can be thought of as soft are hard limits for each bucket, with the min being the number of hashnames that are sent maintenance checks and the max being the point at which new nodes are denied being added to the bucket.
 
-Whenever a new node is available, you should only store them whenever you have bad nodes inside your bucket. If there
-are only good nodes, don't store the node inside the bucket. If there are unknown nodes, you could temporarily store
-them until you figured out whether or not the unknown node is a good or bad node. From there you could either drop the
-new node or replace it bad node with the new node.
+The Nmin is used to trigger seeding requests, regularly querying other hashnames to reach the Nmin. If Nmax is reached, nodes should still be added to closer buckets with capacity but will force eviction from further buckets (always maintain closer neighbors).
 
-This determination of what nodes are best in each bucket is likely to evolve, particularly to deal with different types of flooding attack possibilities at scale and optimizing for hashname seek/query speed.
+## `"type":"bucket"` - Adding a node to a Bucket
+
+An unreliable channel of type `bucket` is used to signal the desire to add a node to a bucket.  Whenever a hashname is encountered that would be in a bucket that has capacity, the switch may start this channel to see if it can be added to that bucket.
+
+The bucket channel start request should always include a `see` array identical to the `seek` response of the hashnames closest to the recipient.
+
+Upon receiving a bucket channel request, the switch should check the bucket the sender would be in for capacity.  If it is at Kmax (or Nmax and it's a distant bucket) it should return an error, otherwise it should always immediately return a packet to confirm the channel and include a `see` array of the hashnames closest to the sender and place them in the correct bucket.
+
+Once the original initiator has received a confirmation back for a bucket channel it should also place them in the correct bucket.
+
+At any point either side of a bucket channel may send an ad-hoc packet on the channel containing a `see` array.  Upon receiving this, the recipient must return a `see` array if it hasn't sent one in over 30 seconds.  These are called maintenance packets/requests.  The hashnames included in the array should be examined for possible inclusion in buckets that have capacity.
+
+## Bucket Maintenance
+
+Every bucket must be checked once every 25 seconds for possible maintenance. Only the Kmin number of nodes in a bucket need to be sent maintenance packets, and they should be sorted/prioritized by uptime.  Any node that hasn't sent any packets on it's bucket channel in more than 60 seconds should be evicted from the bucket. Based on the last received packet on the channel, if that time plus 25 seconds would be more than 60 it should be sent a maintenance request.
+
+### "hide":true - Hidden Nodes
+
+Some nodes may need to be discoverable, but do not have resources to help maintain the DHT and cannot therefore be returned to normal `seek` queries.  When a bucket channel is opened it may contain an optional `"hide":true` that signals this special case.
+
+The hidden node is still added to the bucket, but it is not sent any maintenance `see` packets, it must generate them in order to keep the channel alive.  Hidden nodes should not count against the per-bucket limit
+
+When handling a `seek` a hidden node can only be returned if it *exactly* matches the seek request, if the given seek hash does not entirely match, a hidden node must not be returned.
 
 
 [pastebin]: http://pastebin.com/0mBr3D8V
