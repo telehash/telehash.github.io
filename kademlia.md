@@ -7,7 +7,7 @@ Telehash uses a DHT system based on [Kademlia][].
 
 Every node inside Telehash is a 256bit value based on the sha256 hash of the node's public key.
 
-Based on this size, there will be 256 buckets (so-called k-buckets) which all have room for a certain amount of nodes. The number of nodes maintained in each bucket should have two limits, a soft Kmin and hard Kmax, with an overall limit on total nodes maintained of Nmin and Nmax.
+Based on this size, there will be 256 buckets (so-called k-buckets) which all have room for a certain amount of nodes. The number of nodes maintained in each bucket is called Kmin, and the overall limit on total nodes maintained across all buckets is called Kmax.
 
 In a big p2p network, it's pretty impossible to know all information about all nodes. There would be too much network
 overhead for nodes to update each other and the amount of storage you need just to keep track of all nodes is too big.
@@ -77,29 +77,31 @@ The following [pastebin][] shows you an example on how k-buckets are filled with
 random generated nodes, as seen from our own node: 736711cf55ff95fa967aa980855a0ee9f7af47d6287374a8cd65e1a36171ef08.
 Even when so many nodes are processed, we still only fill the first 15 buckets.
 
-## Default Limits
-
-The suggestions for a default Nmin and Nmax are 64 and 1024, with bare minimums being 8 and 256 for low-resource switches. For Kmin and Kmax (per-bucket) the defaults are 8 and 32, with minimums being 2 and 8.  The Nmax must always be less than or equal to 256 * Kmax.
-
-The Kmin/Kmax can be thought of as soft are hard limits for each bucket, with the min being the number of hashnames that are sent maintenance checks and the max being the point at which new nodes are denied being added to the bucket.
-
-The Nmin is used to trigger seeding requests, regularly querying other hashnames to reach the Nmin. If Nmax is reached, nodes should still be added to closer buckets with capacity but will force eviction from further buckets (always maintain closer neighbors) but never let any bucket fall below 2 (the minimum Kmin).
-
 ## `"type":"bucket"` - Adding a node to a Bucket
 
 An unreliable channel of type `bucket` is used to signal the desire to add a node to a bucket.  Whenever a hashname is encountered that would be in a bucket that has capacity, the switch may start this channel to see if it can be added to that bucket.
 
 The bucket channel start request should always include a `see` array identical to the `seek` response of the hashnames closest to the recipient.
 
-Upon receiving a bucket channel request, the switch should check the bucket the sender would be in for capacity.  If it is at Kmax (or Nmax and it's a distant bucket) it should return a `see` response and include an `"end":true` to signal that they're at capacity.  Otherwise it should always immediately return a packet to confirm the channel and include a `see` array of the hashnames closest to the sender and place them in the correct bucket.
+Upon receiving a bucket channel request, the switch should check if it is at Kmax and handle appropriately (see below). The sending node should be placed in the correct bucket and the channel should be immediately confirmed by returning a `see` array of the hashnames closest to the sender.
 
 Once the original initiator has received a confirmation back for a bucket channel it should also place them in the correct bucket.
 
-At any point either side of a bucket channel may send an ad-hoc packet on the channel containing a `see` array.  Upon receiving this, the recipient must return a `see` array if it hasn't sent one in over 30 seconds.  These are called maintenance packets/requests.  The hashnames included in the array should be examined for possible inclusion in buckets that have capacity.
+At any point either side of a bucket channel may send an ad-hoc packet on the channel containing a `see` array.  Upon receiving this, the recipient must return a `see` array if it hasn't sent one in over 30 seconds.  These are called maintenance packets/requests.  The hashnames included in the array should be examined for possible inclusion in buckets that have capacity (are below Kmin).
+
+## Handling Kmin and Kmax
+
+The suggested defaults for Kmin and Kmax are 8 and 1024, with bare minimums being 2 and 32 for low-resource switches. 
+
+The Kmin is the number of hashnames in each bucket that are sent maintenance checks (see Bucket Maintenance). A bucket will likely have additional nodes that are not maintained, but where the other side is doing the maintenance.  When a bucket has less than Kmin active nodes in it then it also has extra "capacity" and any newly seen hashnames at that distance should be sent a new bucket channel request.
+
+When the total nodes in all buckets reaches Kmax the switch must either evict a more distant node (but never go below Kmin per bucket!) and add the new one, or send an `"end":true` to the new one to signal that they're at capacity (and still include a `see` array to be helpful).
 
 ## Bucket Maintenance
 
 Every bucket must be checked once every 25 seconds for possible maintenance. Only the Kmin number of nodes in a bucket need to be sent maintenance packets, and they should be sorted/prioritized by uptime.  Any node that hasn't sent any packets on it's bucket channel in more than 60 seconds should be evicted from the bucket. Based on the last received packet on the channel, if that time plus 25 seconds would be more than 60 it should be sent a maintenance request.
+
+In case there are multiple bucket channels between any two nodes, only the most recently active one should be used for maintenance checks/requests.  Whenever a new bucket channel is started, it replaces the last known one (if any).
 
 ### "hide":true - Hidden Nodes
 
