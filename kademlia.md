@@ -91,7 +91,7 @@ An unreliable channel of type `bucket` is used to signal the desire to add a nod
 
 The bucket channel start request should always include a `see` array identical to the `seek` response of the hashnames closest to the recipient.
 
-Upon receiving a bucket channel request, the switch should check the bucket the sender would be in for capacity.  If it is at Kmax (or Nmax and it's a distant bucket) it should return an error, otherwise it should always immediately return a packet to confirm the channel and include a `see` array of the hashnames closest to the sender and place them in the correct bucket.
+Upon receiving a bucket channel request, the switch should check the bucket the sender would be in for capacity.  If it is at Kmax (or Nmax and it's a distant bucket) it should return a `see` response and include an `"end":true` to signal that they're at capacity.  Otherwise it should always immediately return a packet to confirm the channel and include a `see` array of the hashnames closest to the sender and place them in the correct bucket.
 
 Once the original initiator has received a confirmation back for a bucket channel it should also place them in the correct bucket.
 
