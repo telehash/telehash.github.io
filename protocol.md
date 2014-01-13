@@ -73,7 +73,7 @@ There is a conscious choice to use two fundamentally different algorithms while 
     (Network Address Translation)
   * **Hashname**: The unique ID of an individual application/instance
     using Telehash
-  * **Packet**: A single message containing JSON and/or binary data of less than 1400 bytes sent between any two
+  * **Packet**: A single message containing JSON and/or binary data sent between any two
     hashnames
   * **Switch**: The name of the software layer or service parsing
     packets for one or more hashnames
@@ -178,6 +178,8 @@ dgram.createSocket("udp4", function(msg){
     var body = msg.slice(length + 2);
 });
 ```
+
+Packets sent over the Internet should be less than 1472 bytes max size (1500 ethernet MTU minus UDP overhead) unless there is prior knowledge that larger ones will work (MTU detection, alternet/direct network types, etc).
 
 ### JSON
 
