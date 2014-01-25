@@ -58,11 +58,9 @@ Since Telehash is it's own networking stack layered above existing networks, it 
 
 ## Security
 
-The goal of Telehash isn't to invent new kinds of security, it's to simply use the best of existing solutions and apply them to a decentralied system.  All of the crypto currently used is a subset of the strongest ciphers available in TLS 1.2, including RSA (2048), ECC-DH (256), AES-CTR (256), and SHA (256). 
+The goal of Telehash isn't to invent new kinds of security, it's to simply use the best of existing solutions and apply them to a long-term decentralied system.  There isn't any existing security standard that can be adopted as-is for this type of usage, so the approach is to use and evolve sets of well known ciphers and algorithms with as minimal adaptation as is possible.
 
-The specific algorithms used currently are a chosen primarily to ease the development process.  As the protocol matures it will include the cipher suite abilities of TLS 1.3 and follow its development closely, using it entirely if possible.
-
-There is a conscious choice to use two fundamentally different algorithms while developing the protocol: RSA for identity verification, ECC+AES for content encryption and forward secrecy.  These were selected as good independent starting points for each of those functions and to prepare the implementations for a wider range of dependencies that future versions of the protocol will require.
+There is a conscious choice to use three different techniques within the protcol, one for addressing validation, one for forward secrecy, and one for packet encryption.  There is no new crypto being invented as part of the protocol, existing libraries/systems are used for each of those three different aspects.
 
 # Protocol Details
 
@@ -71,7 +69,7 @@ There is a conscious choice to use two fundamentally different algorithms while 
   * **DHT**: Distributed Hash Table (based on [Kademlia][])
   * **NAT**: A device/router that acts as a bridge to internal IPPs
     (Network Address Translation)
-  * **Hashname**: The unique ID of an individual application/instance
+  * **Hashname**: The unique address of an individual application/instance
     using Telehash
   * **Packet**: A single message containing JSON and/or binary data sent between any two
     hashnames
@@ -128,27 +126,15 @@ DHT, but Telehash also supports applications creating their own private
 DHTs if needed.
 
 The hashname, which identifies an endpoint within Telehash, is a
-64-character hex string, formed by the [SHA-256][] digest of the DER binary
-RSA public key. This key is required to have at least 2048 bits.
-
-Since the DHT is based on Kademlia, this makes a [Sybil][] attack more
-difficult, but not impossible. Additional techniques which are described 
-later are used to further combat this attack when deciding which hashnames to
-maintain in the bucket list.
+64-character hex string, formed by the [SHA-256][] digest of the `keys`. The keys are the fingerprints of the one or more public keys that are used to create a new hashname. Each key has a unique numeric identifier and a string fingerprint value as defined in [Cipher Sets][].  The hashname is the digest of the key values concatenated in descending order.
 
 Here's an example of how to create a hashname using Node.js:
 
 ``` js
-var key = new
-    Buffer("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArq38dvKzL5W2Qqp
-    gQN7Ao5OWFhX04aIrYZH5sLjOzyI0gWZ6ZzpQifRk+L1yNU3nkotKfeQF5zzZvo4F7Y
-    C4fZgkCN2TnvBihKj25CHVDKLOtV01LvPvEEX+oHQyUzT90FT5UUIdOqTXHY4yT+nox
-    bQOAMSOsJHulpIMeDR+hPWYuZ5eZWfRimu0vEE1ujAeKGUk5avKtNtJIRDXBRRem/CB
-    PG5QRe+54w94Xwp1l3VQdJaD+qRKBEG/hhSVqUHfRqVccNR4AV+q37XGDAupGc7YUJ6
-    qnj7TnapQGrSno13IG+2PIhL3gB1lMWEGE/hwN1dxuUAXXsIgPU3KwIDAQAB",
-    "base64");
-var hashname =
-    require("crypto").createHash("sha256").update(key).digest('hex');
+var keys = {"1":"bf6e23c6db99ed2d24b160e89a37c9cd183fb61afeca40c4bc378cf6e488bebe","0":"861b9311b1ad8ec9ae810f454745d37b46355604637e068cea6a8131191b7d4f"};
+var sorted = Object.keys(keys).sort(function(a,b){return b-a});
+var values = sorted.map(function(key){return keys[key.toString()]});
+var hashname = require("crypto").createHash("sha256").update(values.join("")).digest('hex');
 ```
 
 ## Packets
@@ -748,3 +734,4 @@ This logic will have to evolve into a more efficient/concise pattern at scale, l
 [kademlia]: kademlia.md
 [path_webrtc]: path_webrtc.md
 [path_http]: path_http.md
+[cipher sets]: cipher_sets.md
