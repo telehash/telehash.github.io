@@ -5,9 +5,9 @@ Kademlia
 
 Telehash uses a DHT system based on [Kademlia][].
 
-Every node inside Telehash is a 256bit value based on the sha256 hash of the node's public key.
+Every node inside Telehash is a 256bit value based on the sha256 hashname.
 
-Based on this size, there will be 256 buckets (so-called k-buckets) which all have room for a certain amount of nodes. The number of nodes maintained in each bucket is called Kmin, and the overall limit on total nodes maintained across all buckets is called Kmax.
+Based on this size, there could be a theoretical maximum of 256 buckets (also called `k-buckets`) which each bucket tracking a certain amount of active nodes. The number of nodes maintained in each bucket is called Kmin, and the overall limit on total nodes maintained across all buckets is called Kmax.
 
 In a big p2p network, it's pretty impossible to know all information about all nodes. There would be too much network
 overhead for nodes to update each other and the amount of storage you need just to keep track of all nodes is too big.
@@ -17,10 +17,11 @@ we need a way to calculate a "distance" between nodes. Note that "distance" here
 be possible that you are a "close" neighbour to a node on the other side of the world, while a node running on a computer
 in the same room, could be a far away.
 
+With 100k active nodes, there would only be approximately 14 buckets used for the average node (though they may not be in linear order, bucket 18 could have an entry whereas 17 may not for instance).  The average number of k-buckets should increase as the network grows, but since k is a small constant, the total number of "required peers" for nodes participating in the DHT also grows logarithmically as the network size increases.
+
 
 ## Calculating distance
 Distance calculation in kademlia is a 2-step process:
-
 
    - Exclusive or (xor) the 2 node strings.
    - Find the first bit that is 1, starting from the most significant bit.
@@ -79,7 +80,7 @@ Even when so many nodes are processed, we still only fill the first 15 buckets.
 
 ## Adding a node to a Bucket
 
-An unreliable channel of type [](protocol.md#link) is used to signal the desire to add a node to a bucket.  Whenever a hashname is encountered that would be in a bucket that has capacity, the switch may request a link to see if it can be added to that bucket.
+An unreliable channel of type [link](protocol.md#link) is used to signal the desire to add a node to a bucket.  Whenever a hashname is encountered that would be in a bucket that has capacity, the switch may request a link to see if it can be added to that bucket.
 
 Upon receiving a link request the switch should check if it is at Kmax and handle appropriately (see below). The requesting node should be placed in the correct bucket and the link should be confirmed. Once the original initiator has received a confirmation back for the link it should also place them in the correct bucket.
 
