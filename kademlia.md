@@ -99,4 +99,4 @@ Every bucket must be checked once every 55 seconds for possible maintenance. Onl
 In case there are multiple links between any two nodes, only the most recently active one should be used for maintenance checks/requests.  Whenever a new link is started, it replaces the last known one (if any).
 
 [pastebin]: http://pastebin.com/0mBr3D8V
-[kademlia]: https://en.wikipedia.org/wiki/Kademlia
+[kademlia]: references.md
