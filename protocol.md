@@ -82,6 +82,7 @@ There is a conscious choice to use two fundamentally different algorithms while 
     them)
   * **Channels**: Dynamic bi-directional transport that can transfer
     reliable/ordered or lossy binary/JSON mixed content within any line
+  * **Seed**: A hashname that is acting as a seed for the DHT and will respond to search and introduction requests
 
 ## Telehash Switches
 
@@ -555,7 +556,8 @@ An unreliable channel has no retransmit or ordering guarantees, and an `end` alw
 The following values for `type` are for unreliable channels that are used to locate and communicate with
 application instances on the DHT. They are part of the core spec, and must be implemented internally by all switches:
 
-  * [`seek`](#seek) - return any pointers to other closer hashnames for the given `hash` (DHT), answer contains `see`
+  * [`seek`](#seek) - given a hashname, return any pointers to other hashnames closer to it (DHT)
+  * [`link`](#link) - request/enable another hashname to return the other in a `seek` request (DHT)
   * [`peer`](#peer) - ask the recipient to make an introduction to one of it's peers
   * [`connect`](#connect) - a request asking to try to open a connection to a given hashname (result of a `peer`)
   * [`relay`](#relay) - the capability for a switch to help two peers exchange connectivity information
@@ -628,7 +630,43 @@ The core of Telehash is a basic Kademlia-based DHT. The bulk of the complexity i
 
 When one hashname wants to connect to another hashname, it finds the closest lines it knows and sends a `seek` containing the hash value to them.  They return a compact `"see":[...]` array of addresses that are closest to the hash value (based on the rules [below](#kademlia)).  The addresses are a compound comma-delimited string containing the "hash,ip,port" (these are intentionally not JSON as the verbosity is not helpful here), for example "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c,123.45.67.89,10111".
 
-The response `see` packet must always include an `"end":true`.
+Only hashnames with an active `link` may be returned in the `see` response, and it must always include an `"end":true`.  Only other seeds will be returned unless the seek hashname matches exactly, then it will also be included in the response even if it isn't seeding.
+
+<a name="link" />
+### `"type":"link"` - Enabling Discovery (DHT)
+
+In order for any hashname to be returned in a `seek` it must have a link channel open.  This channel is the only mechanism enabling one hashname to store another in it's list of [buckets](#kademlia) for the DHT.  It is bi-directional, such that any hashname can request to add another to it's buckets but both sides must agree/maintain that relationship.
+
+The initial request:
+
+```json
+{
+  "c":"ab945f90f08940c573c29352d767fee4",
+  "type":"link",
+  "seed":true,
+  "see":["c6db0918a767f00b9841f4366ade7ffc13c86541c40bf0a1612e939988fdefb0,184.96.145.75,59474"]
+}
+```
+
+Initial response, accepting the link:
+
+```json
+{
+  "c":"ab945f90f08940c573c29352d767fee4",
+  "seed":false,
+  "see":["9e5ecd193b14abaef376067f80f442be97f6f3110abb865398c2a6ec83a4ee9b"]
+}
+```
+
+The `see` value is identical to the `seek` response and pro-actively sends other seeds to help both sides establish a full mesh.  The `seed` value indicates wether the sender/recipient wants to act as a seed and be included in `seek` requests, otherwise it will only be included in the see response when it matches the seek exactly.
+
+In the initial response or at any point an `end` or `err` can be sent to cancel the link, at which point both sides must remove the corresponding ones from their DHT.
+
+The link channel requires a keepalive at least once a minute in both directions, and after two minutes of no incoming activity it is considered errored and cancelled.  When one side sends the keepalive, the other should immediately respond with one to keep the link alive as often only one side is maintaining the link.  Links initiated without seeding must be maintained by the requestor.
+
+The keepalive requires only the single key/value of `"seed":true` or `"seed":false` to be included to indicate it's seeding status. This keepalive timing is primarily due to the prevalance of NATs with 60 second activity timeouts, but it also serves to keep only responsive hashnames returned for the DHT.
+
+See [Kademlia][] for more background and details.
 
 <a name="peer" />
 ### `"type":"peer"` - Introductions to new hashnames

@@ -77,40 +77,25 @@ The following [pastebin][] shows you an example on how k-buckets are filled with
 random generated nodes, as seen from our own node: 736711cf55ff95fa967aa980855a0ee9f7af47d6287374a8cd65e1a36171ef08.
 Even when so many nodes are processed, we still only fill the first 15 buckets.
 
-## `"type":"bucket"` - Adding a node to a Bucket
+## Adding a node to a Bucket
 
-An unreliable channel of type `bucket` is used to signal the desire to add a node to a bucket.  Whenever a hashname is encountered that would be in a bucket that has capacity, the switch may start this channel to see if it can be added to that bucket.
+An unreliable channel of type [](protocol.md#link) is used to signal the desire to add a node to a bucket.  Whenever a hashname is encountered that would be in a bucket that has capacity, the switch may request a link to see if it can be added to that bucket.
 
-The bucket channel start request should always include a `see` array identical to the `seek` response of the hashnames closest to the recipient.
-
-Upon receiving a bucket channel request, the switch should check if it is at Kmax and handle appropriately (see below). The sending node should be placed in the correct bucket and the channel should be immediately confirmed by returning a `see` array of the hashnames closest to the sender.
-
-Once the original initiator has received a confirmation back for a bucket channel it should also place them in the correct bucket.
-
-At any point either side of a bucket channel may send an ad-hoc packet on the channel containing a `see` array.  Upon receiving this, the recipient must return a `see` array if it hasn't sent one in over 30 seconds.  These are called maintenance packets/requests.  The hashnames included in the array should be examined for possible inclusion in buckets that have capacity (are below Kmin).
+Upon receiving a link request the switch should check if it is at Kmax and handle appropriately (see below). The requesting node should be placed in the correct bucket and the link should be confirmed. Once the original initiator has received a confirmation back for the link it should also place them in the correct bucket.
 
 ## Handling Kmin and Kmax
 
 The suggested defaults for Kmin and Kmax are 8 and 1024, with bare minimums being 2 and 32 for low-resource switches. 
 
-The Kmin is the number of hashnames in each bucket that are sent maintenance checks (see Bucket Maintenance). A bucket will likely have additional nodes that are not maintained, but where the other side is doing the maintenance.  When a bucket has less than Kmin active nodes in it then it also has extra "capacity" and any newly seen hashnames at that distance should be sent a new bucket channel request.
+The Kmin is the number of hashnames in each bucket that are sent link maintenance. A bucket will likely have additional nodes that are not maintained, but where the other side is doing the maintenance.  When a bucket has less than Kmin active nodes in it then it also has extra "capacity" and any newly seen hashnames at that distance should be sent new link requests.
 
-When the total nodes in all buckets reaches Kmax the switch must either evict a more distant node (but never go below Kmin per bucket!) and add the new one, or send an `"end":true` to the new one to signal that they're at capacity (and still include a `see` array to be helpful).
+When the total nodes in all buckets reaches Kmax the switch must either evict a more distant node (but never go below Kmin per bucket!) and add the new one, or send an `"end":true` to a new link request to signal that they're at capacity (and still include a `see` array to be helpful).
 
 ## Bucket Maintenance
 
-Every bucket must be checked once every 25 seconds for possible maintenance. Only the Kmin number of nodes in a bucket need to be sent maintenance packets, and they should be sorted/prioritized by uptime with the longest uptime being preferred.  Any node that hasn't sent any packets on it's bucket channel in more than 60 seconds should be evicted from the bucket. Based on the last received packet on the channel, if that time plus 25 seconds would be more than 60 it should be sent a maintenance request.
+Every bucket must be checked once every 55 seconds for possible maintenance. Only the Kmin number of nodes in a bucket need to be sent maintenance packets, and they should be sorted/prioritized by uptime with the longest uptime being preferred.  Any node without any received link maintenance activity in more than 120 seconds should be evicted from the bucket.
 
-In case there are multiple bucket channels between any two nodes, only the most recently active one should be used for maintenance checks/requests.  Whenever a new bucket channel is started, it replaces the last known one (if any).
-
-### "hide":true - Hidden Nodes
-
-Some nodes may need to be discoverable, but do not have resources to help maintain the DHT and cannot therefore be returned to normal `seek` queries.  When a bucket channel is opened it may contain an optional `"hide":true` that signals this special case.  This should not be used or exposed in normal switches and is only for very low resource (compute, embedded devices) or expensive/slow data (older cellular/satellite networks).
-
-The hidden node is still added to the bucket, but it is not sent any maintenance `see` packets (it must generate them in order to keep the channel alive) and does not count towards Kmin for the bucket.  Hidden nodes do count against Kmax like any other node in a bucket.
-
-When handling a `seek` a hidden node can only be returned if it *exactly* matches the seek request, if the given seek hash does not entirely match, a hidden node must not be returned.
-
+In case there are multiple links between any two nodes, only the most recently active one should be used for maintenance checks/requests.  Whenever a new link is started, it replaces the last known one (if any).
 
 [pastebin]: http://pastebin.com/0mBr3D8V
 [kademlia]: https://en.wikipedia.org/wiki/Kademlia
