@@ -58,9 +58,9 @@ Since Telehash is it's own networking stack layered above existing networks, it 
 
 ## Security
 
-The goal of Telehash isn't to invent new kinds of security, it's to simply use the best of existing solutions and apply them to a long-term decentralied system.  There isn't any existing security standard that can be adopted as-is for this type of usage, so the approach is to use and evolve sets of well known ciphers and algorithms with as minimal adaptation as is possible.
+The goal of Telehash isn't to invent new kinds of security, it's to simply use the best of existing solutions and apply them to a long-term decentralied system.  There isn't any current security standard that can be adopted as-is for this type of usage, so the approach is to use and evolve sets of well known ciphers and algorithms with as minimal adaptation as is possible.
 
-There is a conscious choice to use three different techniques within the protcol, one for addressing validation, one for forward secrecy, and one for packet encryption.  There is no new crypto being invented as part of the protocol, existing libraries/systems are used for each of those three different aspects.
+There is a conscious choice to use three different techniques within the protcol, one for addressing validation, one for forward secrecy, and one for packet encryption.  There is no new crypto being invented as part of the protocol, existing libraries/systems are used for each of those three different aspects as defined in [Cipher Sets][].
 
 # Protocol Details
 
@@ -107,23 +107,20 @@ would love your help - pull requests to list them here are welcome!
 
 ## Creating Applications
 
-In addition to a switch, each instance of an application must generate
-its own unique, private RSA keypair. This keypair is used to used to
-identify and each application instance when communicating with other
-applications.
+In addition to using a switch library, each instance of an application must generate
+its own unique address as a set of cryptographic keys.  These keys are used to locate and verify other instances of the application on the network.
 
 An application must also bundle and optionally provide a mechanism to
 retrieve a list of "seeds" - well-known and accessible DHT members.
-This will be used to bootstrap and connect into the DHT. The entries in
-this list will consist minimally of the public key, IP address and port
-of each seed.
+This will be used to bootstrap and connect into the DHT the first time. The entries in
+this list will consist minimally of the public keys and network addresses of each seed. This format is described more in the [Seeds JSON](seeds.md).
 
 ## Hashnames
 Every instance of an application has a unique public id that is called
 its "hashname". Any application instance can use the DHT to find
-others by knowing their hashname. By default there is a single global
-DHT, but Telehash also supports applications creating their own private
-DHTs if needed.
+others by knowing only their hashname. By default there is a single global
+DHT to support this discovery and connectivity, but Telehash also supports applications creating their own private
+DHTs for other uses.
 
 The hashname, which identifies an endpoint within Telehash, is a
 64-character hex string, formed by the [SHA-256][] digest of the `keys`. The keys are the fingerprints of the one or more public keys that are used to create a new hashname. Each key has a unique numeric identifier and a string fingerprint value as defined in [Cipher Sets][].  The hashname is the digest of the key values concatenated in descending order.
@@ -131,17 +128,15 @@ The hashname, which identifies an endpoint within Telehash, is a
 Here's an example of how to create a hashname using Node.js:
 
 ``` js
-var keys = {"1":"bf6e23c6db99ed2d24b160e89a37c9cd183fb61afeca40c4bc378cf6e488bebe","0":"861b9311b1ad8ec9ae810f454745d37b46355604637e068cea6a8131191b7d4f"};
-var sorted = Object.keys(keys).sort(function(a,b){return b-a});
-var values = sorted.map(function(key){return keys[key.toString()]});
+var fingerprints = {"1":"bf6e23c6db99ed2d24b160e89a37c9cd183fb61afeca40c4bc378cf6e488bebe","0":"861b9311b1ad8ec9ae810f454745d37b46355604637e068cea6a8131191b7d4f"};
+var sorted = Object.keys(fingerprints).sort(function(a,b){return b-a});
+var values = sorted.map(function(id){return fingerprints[id.toString()]});
 var hashname = require("crypto").createHash("sha256").update(values.join("")).digest('hex');
 ```
 
 ## Packets
 
-Packets are a foundational piece of the protocol. A packet uses JSON as
-a core extensible and widely supported data format, but also must
-support binary data transfer for efficiency.
+A packet uses JSON as a core extensible and widely supported data format, but also support binary data transfer for efficiency.
 
 Every packet must begin with two bytes which form a network byte-order
 short unsigned integer. This integer represents the length in bytes of
@@ -494,21 +489,7 @@ If the switch knows that it is behind a NAT, for any lines that it want's to mai
 
 This logic will have to evolve into a more efficient/concise pattern at scale, likely involving regular or triggered `path` and `seek` requests, as well as differentiating between if an app is using the line versus the switch maintaining it for it's DHT.
 
-
-[rsa]:     https://en.wikipedia.org/wiki/RSA_(algorithm)
 [sha-256]: https://en.wikipedia.org/wiki/SHA-2
-[sybil]:   https://en.wikipedia.org/wiki/Sybil_attack
-[ecc]:     https://en.wikipedia.org/wiki/Elliptic_curve_cryptography
-[der]:     https://en.wikipedia.org/wiki/Distinguished_Encoding_Rules
-[aes]:     https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
-[oaep]:    https://en.wikipedia.org/wiki/Optimal_asymmetric_encryption_padding
-[ecdh]:    https://en.wikipedia.org/wiki/Elliptic_curve_Diffie–Hellman
-[ctr]:     https://en.wikipedia.org/wiki/CTR_mode#Counter_.28CTR.29
-[pkcs15]:  https://en.wikipedia.org/wiki/PKCS1
-
-[nist p-256]: http://csrc.nist.gov/groups/ST/toolkit/documents/dss/NISTReCur.pdf
-[uncompressed]: https://www.secg.org/collateral/sec1_final.pdf
-
 [sockets]: ext_sockets.md
 [tickets]: ext_tickets.md
 [ext_bridge]: ext_bridge.md
