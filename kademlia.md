@@ -3,25 +3,28 @@ Kademlia
 
 # Introduction
 
-Telehash uses a DHT system based on [Kademlia][].
+Telehash adapts the [Kademlia][] Distributed Hash Table for simple
+peer discovery. Unlike classic Kademlia, there is no arbitrary data
+stored in the DHT. Nodes query the DHT purely to locate other nodes,
+independent of IP or other transient network identifiers. Telehash
+also departs from Kademlia by using SHA2 256-bit hashes (rather than
+SHA1 160-bit hashes).
 
-Every node inside Telehash is a 256bit value based on the sha256 hash of the node's public key.
+Like any DHT, Telehash nodes cooperatively store all network
+information while minimizing per-node costs. Derived from Kademlia's hash-based addressing and distance calculations, 
+the average number of "nearby" nodes will grow logarithmically
+compared to the total global number of nodes. Nodes then attempt to keep
+track of all of the closest nodes, and progressively fewer of the
+farther away nodes. This pattern minimizes "degrees of separation"
+between nodes while also minimizing the number of other nodes each
+indidivual node must keep track of.
 
-Based on this size, there will be 256 buckets (so-called k-buckets) which all have room for a certain amount of nodes.
-This number K, is not yet defined, but somewhere between 8 and 20 will suffice.
+Like Kademlia, Telehash measures distance with a bitwise XOR metric which divides the address space into 256 possible partitions, also called `k-buckets`.  Every node when compared will have a `bucket` value based on the bit that differs, if the first bit is different the bucket would be 255, and if the entire first byte is the same the bucket for that node would be 247.
 
-In a big p2p network, it's pretty impossible to know all information about all nodes. There would be too much network
-overhead for nodes to update each other and the amount of storage you need just to keep track of all nodes is too big.
+The two protocol elements for interacting with the Telehash DHT are [seek](protocol.md#seek) and [link](protocol.md#link) channels.  The `seek` channel allows asking any node for a list of closer hashnames, and the `link` channel is how nodes signal to each other that they are actively participating in the DHT.
 
-Kademlia is based the fact that you know a lot about your neighbours, but less and less about further nodes. This means
-we need a way to calculate a "distance" between nodes. Note that "distance" here isn't geographical distance. It might
-be possible that you are a "close" neighbour to a node on the other side of the world, while a node running on a computer
-in the same room, could be a far away.
-
-
-## Calculating distance
-Distance calculation in kademlia is a 2-step process:
-
+## XOR - Calculating distance
+Distance calculation is a 2-step process:
 
    - Exclusive or (xor) the 2 node strings.
    - Find the first bit that is 1, starting from the most significant bit.
@@ -57,47 +60,43 @@ The distance between two very close neighbours:
 Here the first 1 bit is at position 5. And thus this node should be stored in k-bucket (6-5) = 1
 
 
+## Managing Limits
+
+In order to manage how many nodes each one has to keep track of, there are two limits that every node must manage, `k` and `max-link`.
+
+### `k` - Bucket Size
+
+When storing any node in a bucket (based on an open `link`) a switch must manage how many nodes it maintains per bucket to minimize it's own resource usage.  The `k` value default is currently 8, and should never be set below 2 so that any bucket always has at least one backup node in it.  When performing bucket maintenance (below) only this value of nodes is processed per bucket.
+
+A small value impacts both the speed of querying other nodes since the buckets act as an initial index of where to send the first `seek`, and too few will likely result in additional round-trips to find another node.  It also impacts a nodes own discovery, as it reduces how many nearby nodes know about it so an incoming `seek` for it will take more round-trips to get closer.
+
+A larger value then both reduces the seek time for connecting to other nodes, and reduces the time it takes for incoming connections.  Having a value larger than 100 is diminishing returns though and should only be needed in very special cases.
+
+### `max-link` - Total Links
+
+The primary mechanism for any node to limit how many other nodes it's keeping track of overall is `max-link`, the total number of active `link` channels open to other nodes.  The default value is currently 256, with a minimum of 8, and a maximum of unlimited (for dedicated seeds).
+
+When any new incoming `link` is requested this value is checked, and if the total links is less than `max-link` then the new request should be accepted.  If the switch is at `max-link` then it must check the distance to the new incoming node to see if it should evict a more distant one.  This eviction check looks at any bucket that is further (larger) than the incoming link and has more than `k` nodes in it, and evict the newest link in that bucket if any.  If there are no other links to evict, then the incoming one should be denied.
+
+A small value will have the same impact as a small `k`, increasing the cost to search and be found on the DHT.  If it's too small (below 8) it may mean the node cannot be found at all.
+
+A large value increases the number of maintenance activity from all of the active links, with a minimum of one packet sent/received per link per minute, with a `max-link` of 600 active it would average 10 packets per second to maintain the DHT.
 
 ## Knowing a lot about your neighbours
-If you add many nodes to your buckets, you will notice that on average 50% of the nodes will be stored in bucket 6, 25%
-will be stored in bucket 5, 12.5% in bucket 4 etc etc. In the end, the 1'st bucket holds the nodes that are very close
-to you, and only 1.5% of the nodes will actually be stored here.
+If you add many nodes to your buckets, you will notice that on average 50% of the nodes will be stored in bucket 255, 25%
+will be stored in bucket 254, 12.5% in bucket 253, etc. There is a 0.00076% chance that bucket 240 (where the first 16 bits of the hashname matches), will be used. The chances that the first 50 bits will match (and the node would be stored in bucket 206), is phenomenally small: 0.000000000000001%.
 
-When dealing with 256bit, there is a 0.00076% chance that bucket 240 (thus, where the first 16 bits of the nodename
-matches), will be stored. The chances that the first 50 bits will match (and the node would be stored in bucket 206),
-is phenomenally small: 0.000000000000001%.
-
-As said before, k-buckets only has room for a certain amount of nodes (between 8 and 20 normally). Because half of the
-nodes you will receive falls into bucket 256 (where distance = 0), we can only store up to 20 of those. So if we receive
-500 nodes, on average, 250 of them will fall in bucket 256 but we only store 20 of them (see the next chapter on how to
-figure out which nodes to store). In bucket 250, where the distance of the nodes are 6, and thus are "closer" to use,
-will on average be able to store 0.78% of the nodes. Again, from the 500 incoming nodes this means we would store on
-average around 4 nodes. As 4 nodes could easily fit inside this bucket, we can remember all these nodes.
+As explained above, each k-bucket only has room for maintaining `k` number of nodes, so for a random 500 nodes then on average 250 of them will fall in bucket 255, but only `k` of them would have their link maintained by us. In bucket 250 where the nodes are "closer", we will on average be able to maintain 0.78% of the nodes. Again, from the 500 random nodes this means we would maintain approximately 4 nodes.
 
 The following [pastebin][] shows you an example on how k-buckets are filled with a 100,000
 random generated nodes, as seen from our own node: 736711cf55ff95fa967aa980855a0ee9f7af47d6287374a8cd65e1a36171ef08.
 Even when so many nodes are processed, we still only fill the first 15 buckets.
 
+## Bucket Maintenance
 
-## When to store a node
-Most of the time, especially on the buckets with a low distance, those buckets will be already be full whenever you
-receive a new node for that bucket. At that point, you have to decide what to do with the incoming node.
+Every bucket must be checked once every 55 seconds for possible maintenance. Only the `k` number of nodes in a bucket need to be sent maintenance packets, and they should be sorted/prioritized by uptime with the longest uptime being preferred.  Any node without any received link maintenance activity in more than 120 seconds should be evicted from the bucket.
 
-A node itself could be one of the three following types: a good node, an unknown node, or a bad node. A good node is a
-node with which you have communicated not long ago (in the last 60 seconds). Since these nodes are considered good
-and should not be removed from the bucket. Unknown nodes are nodes which had no activity since the last 60 seconds, but
-they still could be there (you just haven't had a reason to talk to them). Here, you would send out a ping-request, and
-see if they would respond. Since we are using UDP, it might be possible that our packet or the response packet has
-disappeared, so we make a maximum of 3 attemps. When we didn't receive anything a node is
-considered a bad node.
-
-Whenever a new node is available, you should only store them whenever you have bad nodes inside your bucket. If there
-are only good nodes, don't store the node inside the bucket. If there are unknown nodes, you could temporarily store
-them until you figured out whether or not the unknown node is a good or bad node. From there you could either drop the
-new node or replace it bad node with the new node.
-
-This determination of what nodes are best in each bucket is likely to evolve, particularly to deal with different types of flooding attack possibilities at scale and optimizing for hashname seek/query speed.
-
+In case there are multiple links between any two nodes, only the most recently active one should be used for maintenance checks/requests.  Whenever a new link is started, it replaces the last known one (if any).
 
 [pastebin]: http://pastebin.com/0mBr3D8V
-[kademlia]: https://en.wikipedia.org/wiki/Kademlia
+[kademlia]: references.md

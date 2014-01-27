@@ -1,6 +1,6 @@
 References
 ==========
-
+- https://en.wikipedia.org/wiki/Kademlia
 - Petar Maymounkov and David Mazières. 2007. "Kademlia: A Peer-to-peer Information System
 Based on the XOR Metric" ([PDF](http://pdos.csail.mit.edu/~petar/papers/maymounkov-kademlia-lncs.pdf))
 - Petar Maymounkov and David Mazières. 2002. "Kademlia: A Peer-to-peer Information System
