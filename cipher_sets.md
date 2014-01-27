@@ -16,7 +16,7 @@ A hashname is the [SHA-256][] of the one or more fingerprints of CS keys.  Each 
 
 Here is an example JSON object defining two CS keys:
 
-```js
+```json
 {
   "1": "bf6e23c6db99ed2d24b160e89a37c9cd183fb61afeca40c4bc378cf6e488bebe",
   "0": "861b9311b1ad8ec9ae810f454745d37b46355604637e068cea6a8131191b7d4f"
