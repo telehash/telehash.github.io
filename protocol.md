@@ -626,9 +626,13 @@ Here's some summary notes for implementors:
 <a name="seek" />
 ### `"type":"seek"` - Finding Hashnames (DHT)
 
-The core of Telehash is a basic Kademlia-based DHT. The bulk of the complexity is in the rules around maintaining a mesh of lines and calculating distance explained [below](#kademlia). The `"seek":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"` value is always another hashname that the app is trying to connect to.
+The core of Telehash is a basic Kademlia-based DHT, the bulk of the logic is in the rules around maintaining a mesh of lines and calculating distance explained [below](#kademlia). When one hashname wants to connect to another, it recursively sends `seek` requests to find closer and closer peers until it's discovered or there are none closer. The seek request contains a `"seek":"hex-value"` that is always a prefix of the hashname that it is trying to connect to.
 
-When one hashname wants to connect to another hashname, it finds the closest lines it knows and sends a `seek` containing the hash value to them.  They return a compact `"see":[...]` array of addresses that are closest to the hash value (based on the rules [below](#kademlia)).  The addresses are a compound comma-delimited string containing the "hash,ip,port" (these are intentionally not JSON as the verbosity is not helpful here), for example "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c,123.45.67.89,10111".
+When initating a new connection, the first seek requests should always be sent to the closest hashnames with active [links](#link).  Then the switch recursively sends seeks to the closest hashnames to the target until it discovers it or cannot find any closer.  It is suggested that this recursive seeking process should have at least three threads running in parallel to optmize for non-responsive nodes and round-trip time.  If no closer nodes are being discovered, the connection process should fail after the 9 closest nodes have been queried or timed-out.
+
+Only the prefix hex value is sent in each seek request to reduce the amount of information being shared about who's seeking who. The value then is only the bytes of the hashname being saught that match the distance to the recipient plus one more byte in order for the recipient to determine closer hashnames.  So if a seek is being sent to  "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c" for the hashname "171042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6" the value would be `"seek":"1710"`.
+
+The response is a compact `"see":[...]` array of addresses that are closest to the hash value (based on the rules [below](#kademlia)).  The addresses are a compound comma-delimited string containing the "hash,ip,port" (these are intentionally not JSON as the verbosity is not helpful here), for example "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c,123.45.67.89,10111". The ip and port parts are optional and only act as hints for NAT hole punching.
 
 Only hashnames with an active `link` may be returned in the `see` response, and it must always include an `"end":true`.  Only other seeds will be returned unless the seek hashname matches exactly, then it will also be included in the response even if it isn't seeding.
 
@@ -747,7 +751,7 @@ Besides parsing the protocol, decoding the packets and processing the different 
 <a name="kademlia" />
 ## Distributed Hash Table
 
-Hashname discovery and connectivity is governed by a Kademlia-based DHT that switches collectively help maintain.  This process involves initial seeding on startup, tracking "buckets" of other switches based on a distance metric and actively maintaining connections to them for handling [seek](#seek) requests.
+Hashname discovery and connectivity is governed by a Kademlia-based DHT that switches collectively help maintain.  This process involves initial seeding on startup, tracking "buckets" of other switches based on a distance metric and actively maintaining [links](#link) to them for handling [seek](#seek) requests.
 
 The details of how [kademlia][] is implemented for Telehash are broken out into their own document.
 
