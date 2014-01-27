@@ -116,27 +116,19 @@ This will be used to bootstrap and connect into the DHT the first time. The entr
 this list will consist minimally of the public keys and network addresses of each seed. This format is described more in the [Seeds JSON](seeds.md).
 
 ## Hashnames
-Every instance of an application has a unique public id that is called
-its "hashname". Any application instance can use the DHT to find
+Every instance of an application has a unique public address that is called
+its `hashname`. Any application instance can use the DHT to find
 others by knowing only their hashname. By default there is a single global
 DHT to support this discovery and connectivity, but Telehash also supports applications creating their own private
 DHTs for other uses.
 
-The hashname, which identifies an endpoint within Telehash, is a
-64-character hex string, formed by the [SHA-256][] digest of the `keys`. The keys are the fingerprints of the one or more public keys that are used to create a new hashname. Each key has a unique numeric identifier and a string fingerprint value as defined in [Cipher Sets][].  The hashname is the digest of the key values concatenated in descending order.
+The hashname is a 64-character hex string, formed by the [SHA-256][] digest of the fingerprints of a set of public keys that is generated the first time an application starts, an example hashname is `2dbf1ce81180d9ed9258e3e8729ba642c8ab2a31268d31cd2c7ffe8693e3a02e`.
 
-Here's an example of how to create a hashname using Node.js:
-
-``` js
-var fingerprints = {"1":"bf6e23c6db99ed2d24b160e89a37c9cd183fb61afeca40c4bc378cf6e488bebe","0":"861b9311b1ad8ec9ae810f454745d37b46355604637e068cea6a8131191b7d4f"};
-var sorted = Object.keys(fingerprints).sort(function(a,b){return b-a});
-var values = sorted.map(function(id){return fingerprints[id.toString()]});
-var hashname = require("crypto").createHash("sha256").update(values.join("")).digest('hex');
-```
+The details of how the hashname is calculated from the generated keys is described in the [Cipher Sets](cipher_sets.md#hashnames) document.
 
 ## Packets
 
-A packet uses JSON as a core extensible and widely supported data format, but also support binary data transfer for efficiency.
+A packet uses JSON as a core extensible and widely supported data format, but also support raw binary data transfer for efficiency.
 
 Every packet must begin with two bytes which form a network byte-order
 short unsigned integer. This integer represents the length in bytes of
@@ -150,7 +142,7 @@ The format is thus:
 
     <length><JSON>[BODY]
 
-An example of how to decode a packet, written in Node.js:
+A simplified example of how to decode a packet, written in Node.js:
 
 ``` js
 dgram.createSocket("udp4", function(msg){
@@ -160,48 +152,63 @@ dgram.createSocket("udp4", function(msg){
 });
 ```
 
-Packets sent over the Internet should be less than 1472 bytes max size (1500 ethernet MTU minus UDP overhead) unless there is prior knowledge that larger ones will work (MTU detection, alternet/direct network types, etc).
+Packet size is determined by the MTU of the network path between any two instances, and in general any sent over the Internet using UDP can safely be up to 1472 bytes max size (1500 ethernet MTU minus UDP overhead).  There are plans to add MTU size detection capabilities, but they are not standardized yet.  In most cases a switch will handle any data fragmentation/composition so that an application doesn't need to be aware of the actual packet/payload sizes in use.
 
 ### JSON
 
 The JSON section of a packet often acts as a header of a binary payload.
 The fields used vary depending on the context and are specified below,
-but all top-level packets contain a `type` field with a string value.
+but all packets sent over the network contain a `type` field with a string value.
 
 ### BODY
 
 The optional BODY is always a raw binary of the remainder bytes between
 the packet's total length and that of the JSON as indicated by LENGTH
 above. Often a BODY is another full raw packet and will be decoded
-identically to being read from the UDP socket, this pattern of one
-packet enclosing/attaching another is how the RSA signatures and
-encryption are implemented.
+identically to being read from the network, this pattern of one
+packet enclosing/attaching another is how the [Cipher Sets][] encrypt data.
 
 The BODY is also used as the raw (optionally binary) content transport
 for channels and for any app-specific usage.
 
-### Packet Processing
+<a name="paths" />
+### Network Paths
 
-The Telehash specification as well as other applications may use
-packets recursively, by embedding the (possibly encrypted) byte
-representation of an inner packet into the BODY of an outer one. As a
-result, switch implementations must be prepared to decode packets not
-just from UDP messagess, but from a BODY or after decryption.
+To enable the most direct P2P connectivity possible the default network transport between any two switches is UDP.  Additional transports are defined below for when UDP is not supported or as a fallback if it's blocked.  All UDP packets map 1:1 to a Telehash packet.
 
+Every unique network sender/recipient is called a `path` and defined by a JSON object that contains a `"type":"..."` to identify which type of network information it describes. The current path types defined are:
+
+* `ipv4` - UDP, contains `ip` and `port`, default and most common path
+* `ipv6` - UDP, contains `ip` and `port`, preferred/upgraded when both sides support it
+* `http` - see [path_http][], also is the primary fallback when UDP is blocked
+* `webrtc` - see [path_webrtc][], preferred when possible
+* `relay` - contains `id` of the channel id to create a [relay](#relay) with
+* `bridge` - see [ext_bridge][], fallback when no other path works
+
+These paths are used often within the protocol to exchange network information, and frequently sent as an array, for example:
+
+```js
+[{
+  "type": "ipv4",
+  "ip": "127.0.0.1",
+  "port": 42424
+}, {
+  "type": "ipv6",
+  "ip": "fe80::2a37:37ff:fe02:3c22",
+  "port": 42424
+}, {
+  "type": "http",
+  "http": "http://127.0.0.1"
+}]
+```
 
 ## Packet types
-When a packet is being processed from a UDP message initially, it's
+When a packet is being processed from the network initially, it's
 JSON must contain a `type` field with a string value of `open` or
 `line`, each of which determine how to process the BODY of the packet:
 
- * [`open`](#open) - this is a request to establish a new encrypted
-   session (a `line`) and contains the data to do so
- * [`line`](#line) - this is an encrypted packet for an already
-   established session
-
-Once a line is established, all packets sent thereafter within a line
-must be part of a [channel](#channel) as the content-transport method
-between any two hashnames.
+ * [`open`](#open) - this is a request to establish a new encrypted session
+ * [`line`](#line) - this is an encrypted packet for an already established session
 
 <a name="open" />
 ### `open` - Establishing a Line
@@ -442,21 +449,7 @@ The sending switch may also time the response speed and use that to break a tie 
 
 A switch only needs to send a `path` automatically when it detects more than one (potential) network path between itself and another hashname, such as when it's public IP changes (moving from wifi to cellular), when line packets come in from different IP/Ports, when it has two network interfaces itself, etc.  The sending and return of priority information will help reset which networks are then used by default.
 
-<a name="paths" />
-### `"paths":[...]` - Network Path List
-
-Any `peer`, `connect`, or `path` packet may also contain a `"paths":[{"type":"ipv4","ip":1.2.3.4,"port":5678},...]` array of objects each of which contains information about a possible network path.  This array is used whenever the sender has additional networks that it would like the recipient to try using.
-
-Each paths object must contain a `"type":"..."` to identify which type of network information it describes. Current types of paths defined:
-
-* `ipv4` - contains `ip` and `port` (typically the LAN values)
-* `ipv6` - contains `ip` and `port` (to enable the recipient to ugprade if supported)
-* `relay` - contains `id` of the channel id to create a relay with
-* `bridge` - see [ext_bridge][]
-* `webrtc` - see [path_webrtc][]
-* `http` - see [path_http][]
-
-Upon receiving a path request containing an `paths`, the array should be processed to look for new/unknown possible networks and those should individually be sent a path request in return to validate and send any priority information.
+A [paths](#paths) array should be sent with every new path channel containing all of the sender's paths that they would like the recipient to use. Upon receiving a path request containing an `paths`, the array should be processed to look for new/unknown possible paths and those should individually be sent a new path request in return to validate and send any priority information.
 
 #### Path Detection / Handling
 
@@ -464,30 +457,6 @@ There are two states of network paths, `possible` and `established`.  A possible
 
 An established path is one that comes from the network interface, the actual encoded details of the sender information.  When any `open` or `line` is received from any network, the sender's path is considerd established and should be stored by the switch as such so that it can be used as a validated destination for any outgoing packets.  When a switch detects that a path may not be working, it may also redundantly send the hashname packets on any other established path.
 
-# Switch Behaviors
-
-Besides parsing the protocol, decoding the packets and processing the different channel types, in order to fully implement Telehash a switch must also internally track and respond with the correct behaviors to support both the DHT and manage the network quality and availability between itself and other hashnames.
-
-<a name="kademlia" />
-## Distributed Hash Table
-
-Every switch must have both a startup/seeding routine and a background line maintenance process in order to properly support the Kademlia-based DHT.
-
-The seeding process involves recursively performing a [seek](#seek) for it's own hashname against the list of seeds (provided by the app). The act of seeking ones own hashname will bootstrap lines to hashnames that are closest to it, and those hashnames then start to fill in the buckets.
-
-The details of how [kademlia][] is implemented for Telehash are broken out into their own document.
-
-## Line Maintenance
-
-(this area in progress...)
-
-A line may at any point become invalidated if the remote side is disconnected or restarts, so the process of detecting that and deciding to restart a line needs to be defined.
-
-A simple rule to start is invalidating a line after it has been idle for more than 60 seconds or after sending channel packets and not getting any responses for more than 10 seconds (if the switch internally sends seek queries regularly and there's no replies, for instance).
-
-If the switch knows that it is behind a NAT, for any lines that it want's to maintain as active it MUST send at least one packet out at least once every 60 seconds.
-
-This logic will have to evolve into a more efficient/concise pattern at scale, likely involving regular or triggered `path` and `seek` requests, as well as differentiating between if an app is using the line versus the switch maintaining it for it's DHT.
 
 [sha-256]: https://en.wikipedia.org/wiki/SHA-2
 [sockets]: ext_sockets.md
