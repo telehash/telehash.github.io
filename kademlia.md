@@ -93,11 +93,20 @@ The following [pastebin][] shows you an example on how k-buckets are filled with
 random generated peers, as seen from our own peer: 736711cf55ff95fa967aa980855a0ee9f7af47d6287374a8cd65e1a36171ef08.
 Even when so many peers are processed, we still only fill the first 15 buckets.
 
+## Age Tracking (Sybil Resistance)
+
+In order to make the various kinds of common DHT attacks such as [Sybil](https://en.wikipedia.org/wiki/Sybil_attack) more difficult, it is a requirement for every peer to permanently track the timestamp of the first time it establishes a link with any other hashname.  This timestamp is called `age` and is used when determining what hashnames to include in any `see` response, both during the link exchange and in seek responses.
+
+When generating a `see` during link setup, if there are more peers in the bucket for that link then those peers are sorted only by age, returning the oldest of them.  This ensures that any peer that is bootstrapping new links only discovers the older ones, and any newer nearer peers that are generated after it don't get prioritized over peers that existed nearby before it.
+
+When answering a `seek` request, the `see` must contain both older and newer peers from the same bucket to provide balance between speed and reliability.  When there's more peers in the same bucket than can fit in the see response, half should be the closest and half should be the oldest.
+
 ## Bucket Maintenance
 
-Every bucket must be checked once every 55 seconds for possible maintenance. Only the `k` number of peers in a bucket need to be sent maintenance packets, and they should be sorted/prioritized by uptime with the longest uptime being preferred.  Any peer without any received link maintenance activity in more than 120 seconds should be evicted from the bucket.
+Every bucket must be checked once every 55 seconds for possible maintenance. Only the `k` number of peers in a bucket need to be sent maintenance packets, and they should be sorted/prioritized by uptime with the oldest age being preferred.  Any peer without any received link maintenance activity in more than 120 seconds should be evicted from the bucket.
 
 In case there are multiple links between any two peers, only the most recently active one should be used for maintenance checks/requests.  Whenever a new link is started, it replaces the last known one (if any).
+
 
 [pastebin]: http://pastebin.com/0mBr3D8V
 [kademlia]: references.md
