@@ -3,130 +3,30 @@ Cipher Set 1
 
 This profile is the base algorithms selected for the telehash development process in 2013.
 
-## Open Packets
+The base algorithms used in this set are:
 
-```js
-{
-    "type":"open",
-    "open":"ZkQklgyD91XQaih07VBUGeQmAM9tnR5qMGMavZ9TNqQMCVfTW8TxDr9y37cgB8g6r9dngWLjXuRKe+nYNAG/1ZU4XK+GiR2vUBS8VTcAMzBcUls+GIfZU6WO/zEIu4ra1I1vI8qnYY5MqS/FQ/kMXk9RyzERaD38IWZLk3DYhn8VYPnVnQX62mE5u20usMWQt99F8ITLy972nOhdx5y9RUnnSrtc1SD9xr8O0rco22NtOEWC3uAISwC9xuihT+U7OEcvSKolScFI4oSpRu+DQWl19EAuG9ACqhs5+X3qNeBRMSH8w5+ThOVHaAWKGfFs/FNMdAte3ki8rFesMtfhXQ==",
-    "iv":"60aa6514ef28178f816d701b9d81a29d",
-    "sig":"o6buYor8o3YXkPIDJjufn9udfWDJt5hrgnVtKtvZI2ObOPlPSqlb2AdH6QsC7CuwtboGlt6eMbE7Ep6Js2CXeksXTCSZOJ99US7TH0kZ1H1aDqxYpQlM6BADOjG6YOcW+EhniotNUBiw3r02Xt4ohSm0wXxQ97JM95ntFBRnWr1vG25d+5pJQE4LyN2TwB4uApu9zeUoTPhF7daJQOcIMn9en+XxyuBsG61oR/x29bpaoZJGnKrk2DGH1jDnI5GpxIKUbT/Pa7QOlrICUCjGDgxy2TMQ+fiip5sIflxtFUPM/BV9mh4K7/ZaekJXTFfG2FKvJFytQkWbisDVy5EbEA=="
-}
-```
+* `public key` - [RSA][] (2048)
+* `session key` - [ECC][] (P-256)
+* `encryption` - [AES][] (256-GCM)
+
+## Open Packets
 
 The required values of the open packet are defined as:
 
-   * `open` - a base64 string value that is is created by generating a
-     new elliptic (ECC) public key and using RSA to encrypt it *to* the
-	 recipient's RSA public key. The ECC keypair should be generated
-	 using the P-256 ([nistp256/secp256r/X9.62 prime256v1] 
-	 (http://tools.ietf.org/html/rfc6239#page-4)) curve. The key
-     should be in the uncompressed form, 65 bytes (ANSI X9.63 format). The RSA encryption
-     should use PKCS1 OAEP (v2) padding.
-   * `iv` - 16 random bytes hex encoded to be used as an initialization
-     vector
-   * `sig` - a string created by first using the sender's RSA public key
-     to sign (SHA256 hash and PKCS1 v1.5 padding) the attached
-     (encrypted) binary body, then encrypt that signature (detailed below), then base64 encoded.
+* `open` - a base64 string value that is is created by generating a new elliptic (ECC) public key and using RSA to encrypt it *to* the recipient's RSA public key. The ECC keypair should be generated using the P-256 ([nistp256/secp256r/X9.62 prime256v1](http://tools.ietf.org/html/rfc6239#page-4)) curve. The key should be in the uncompressed form, 65 bytes (ANSI X9.63 format). The RSA encryption should use PKCS1 OAEP (v2) padding.
+* `iv` - 16 random bytes hex encoded to be used as an initialization vector
+* `sig` - a string created by first using the sender's RSA public key to sign (SHA256 hash and PKCS1 v1.5 padding) the attached (encrypted) binary body, then encrypt that signature (detailed below), then base64 encoded.
 
+Example:
 
-## Line Packets
-
-As soon as any two hashnames have both send and received a valid `open` then a line is created between them. Since one part is always the initiator and sent the open as a result of needing to create a channel to the other hashname, immediately upon creating a `line` that initiator will then send line packets.
-
-The encryption key for a line is defined as the SHA 256 digest of the ECDH shared secret (32 bytes) + outgoing line id (16 bytes) + incoming line id (16 bytes).  The decryption key is the same process, but with the outgoing/incoming line ids reversed.
-
-A packet with a `"type":"line"` is required to have a `line` parameter (such as
-`"line":"be22ad779a631f63336fe051d5aa2ab2"`) with the value being the
-same as the one the recipient sent in its `open` packet, and a random
-IV value (such as `"iv":"8b945f90f08940c573c29352d767fee4"`) used for
-the AES encryption.  This ensures that no line packets can be received
-without being invited in an open. Any unknown ones are just ignored.
-
-The BODY is a binary encoded encrypted packet using AES-256-CTR with
-the encryption key that was generated for the line (above) and the 16-byte initialization
-vector decoded from the included "iv" hex value.  Once decrypted (using the twin generated decryption key), the
-recipient then processes it as a normal packet (LENGTH/JSON/BODY) from
-the sending hashname.  All decrypted packets must contain a "c"
-value as defined below to identify the channel they belong to (below).
-
-
-### RSA Key pair
-
-The application instance [RSA public key](rsa) is used to sign the body of 
-[`open`](#open) packets to authenticate the sender. Incoming [`open`](#open) 
-packets also contain the sender's [Elliptic Curve](ecc) public key, which is 
-encrypted with the recipient's RSA public key. This EC public key is also used 
-to derive an [AES][] key which partially encrypts the packet (see below). As 
-a result, the RSA private key of the recipient is required to decrypt the 
-packet.
-  
-A minimum 2048 bit key size is required for RSA keys. Implementations should
-refuse to communicate with a party using shorter keys.
-  
-The algorithms used are RSA with [OAEP][] (SHA-1, MFG1, aka PKCS1 v2) for encrypting the 
-sender's Elliptic Curve public key, and RSA with a SHA-256 digest and PKCS1 v1.5
-padding for signing the encrypted inner packet.
-  
-The RSA public key of the recipient of an [`open`](#open) packet must be known.
-There are normally three ways that you learn about the public key of a 
-hashname:
-  
-* Public keys of any seed members must be known.
-* You receive and decrypt the sender's public key as part of an [`open`](#open)
-  packet
-* You receive and decrypt the public key of an introduced peer as part of a
-  [`connect`](#connect) request
-
-Top level packets do not have any addressing, instead relying on the ip/port 
-corresponding to a single hashname. You may be able to determine the sender of 
-an [`open`](#open) packet by attempting to verify the embedded RSA signature 
-against known public keys.
-
-### Elliptic Curve Diffie-Hellman
-[Elliptic Curves](ecc) (EC) are used ephemerally to generate [`line`](#line) 
-packet [AES][] keys. This is used to provide forward secrecy of line 
-communication.
-
-A public EC key pair is created when you send an [`open`](#open) packet. The 
-[NIST P-256][] curve group (sometimes referred to as "prime256v1" or 
-"secp256r1") is used for these keys. Due to fewer implementations, EC keys 
-are exchanged in "[uncompressed][]" encoding.
-
-The public key is exchanged encrypted with the recipient's 
-[RSA public key](rsa) in an [`open`](#open) packet. It is also used as part of 
-[`open`](#open) packet processing, as the [SHA-256][] digest of the public 
-key is used to AES encrypt the inner packet.
-
-These keys live until the line has been established or has failed. Generally 
-retries of an [`open`](#open) packet will be identical (contain the same EC 
-public key).
-
-Once you have both sent and received [`open`](#open) packets, you use 
-[Elliptic Curve Diffie-Hellman](ecdh) to derive a value that becomes that basis 
-of the two line keys. The forming of the two line keys is described in the next
-section.
-
-<a name='aes' />
-### AES
-[AES][] is used to protect the inner data of an [`open`](#open) packet, as 
-well as all line communication.
-
-AES ciphers are created with a Counter algorithm mode ([CTR][]) and 
-[PKCS1.5 padding](pkcs15). The counter is always zero, and not incremented as 
-part of [channel](#channel) sequencing.
-
-An Elliptic Curve public key is sent as part of an [`open`](#open) packet, 
-encrypted with the recipient's [public RSA key](rsa). The [SHA-256][] digest of
-this key is used to create an AES key which is used to encrypt the inner 
-packet data, and another key is created to encrypt the attached signature.
-
-Once [`open`](#open) packets have been exchanged, the two elliptic curves are 
-used with [ECDH][] to derive a value used for the two line keys. A line key 
-is formed by SHA-256 digest of the concatenation of the derived ECDH value, 
-binary source line identifier, and binary destination line identifier.
-This results in one key used to encrypt outgoing  packets, and a separate key 
-used to decrypt incoming packets.
+```json
+{
+  "type": "open",
+  "open": "ZkQklgyD91XQaih07VBUGeQmAM9tnR5qMGMavZ9TNqQMCVfTW8TxDr9y37cgB8g6r9dngWLjXuRKe+nYNAG/1ZU4XK+GiR2vUBS8VTcAMzBcUls+GIfZU6WO/zEIu4ra1I1vI8qnYY5MqS/FQ/kMXk9RyzERaD38IWZLk3DYhn8VYPnVnQX62mE5u20usMWQt99F8ITLy972nOhdx5y9RUnnSrtc1SD9xr8O0rco22NtOEWC3uAISwC9xuihT+U7OEcvSKolScFI4oSpRu+DQWl19EAuG9ACqhs5+X3qNeBRMSH8w5+ThOVHaAWKGfFs/FNMdAte3ki8rFesMtfhXQ==",
+  "iv": "60aa6514ef28178f816d701b9d81a29d",
+  "sig": "o6buYor8o3YXkPIDJjufn9udfWDJt5hrgnVtKtvZI2ObOPlPSqlb2AdH6QsC7CuwtboGlt6eMbE7Ep6Js2CXeksXTCSZOJ99US7TH0kZ1H1aDqxYpQlM6BADOjG6YOcW+EhniotNUBiw3r02Xt4ohSm0wXxQ97JM95ntFBRnWr1vG25d+5pJQE4LyN2TwB4uApu9zeUoTPhF7daJQOcIMn9en+XxyuBsG61oR/x29bpaoZJGnKrk2DGH1jDnI5GpxIKUbT/Pa7QOlrICUCjGDgxy2TMQ+fiip5sIflxtFUPM/BV9mh4K7/ZaekJXTFfG2FKvJFytQkWbisDVy5EbEA=="
+}
+```
 
 #### Packet Generation
 
@@ -145,10 +45,10 @@ A rough order of the steps needed create a new open packet are:
   5. Form the inner packet containing a current timestamp `at`, `line`
      identifier, recipient `hashname`. Your own RSA public key is the packet BODY in the binary DER format.
   6. Encrypt the inner packet using the hashed public elliptic key from
-     #4 and the IV you generated at #2 using AES-256-CTR.
+     #4 and the IV you generated at #2 using AES-256-GCM.
   7. Create a signature from the encrypted inner packet using your own
      RSA keypair, a SHA 256 digest, and PKCSv1.5 padding
-	8. Encrypt the signature using a new AES-256-CTR cipher with the same IV and a new SHA-256 key hashed from the public elliptic key + the line value (16 bytes from #5), then base64 encode the result as the value for the `sig` param.
+	8. Encrypt the signature using a new AES-256-GCM cipher with the same IV and a new SHA-256 key hashed from the public elliptic key + the line value (16 bytes from #5), then base64 encode the result as the value for the `sig` param.
   9. Create an `open` param, by encrypting the public elliptic curve key
      you generated (in uncompressed form, aka ANSI X9.63) with the recipient's RSA
      public key and OAEP padding.
@@ -176,11 +76,11 @@ An example of the generation of an open packet in Node.js is:
 
  var aesKey = crypto.createHash("sha256").update(eccSession.PublicKey).digest();
  var aesIV = crypto.randomBytes(16);
- var aesCipher = crypto.createCipheriv("AES-256-CTR", aesKey, aesIV);
+ var aesCipher = crypto.createCipheriv("AES-256-GCM", aesKey, aesIV);
  open.body = Buffer.concat([aesCipher.update(attachedRaw),aesCipher.final()]);
  open.js.iv = aesIV.toString("hex");
  aesKey = crypto.createHash("sha256").update(eccSession.PublicKey).update(line).digest();
- var aesCipher = crypto.createCipheriv("AES-256-CTR", aesKey, aesIV); 
+ var aesCipher = crypto.createCipheriv("AES-256-GCM", aesKey, aesIV); 
  open.js.sig = Buffer.concat([aesCipher.update(rsa(myRSAPrivateKey).hashAndSign("sha256", open.body, "PKCS1_PADDING")),aesCipher.final()]).toString("base64");
 
  var openRaw = packetEncode(open);
@@ -194,14 +94,14 @@ rough order of steps:
      extracting the ECC public key (in uncompressed form) of the sender
   2. Hash the ECC public key with SHA-256 to generate an AES key
   3. Decrypt the inner packet using the generated key and IV value with
-     the AES-256-CTR algorithm.
+     the AES-256-GCM algorithm.
   4. Verify the `to` value of the inner packet matches your hashname
   5. Extract the RSA public key of the sender from the inner packet BODY (binary DER format)
   6. SHA-256 hash the RSA public key to derive the sender's hashname
   7. Verify the `at` timestamp is newer
      than any other 'open' requests received from the sender.
   8. SHA-256 hash the ECC public key with the 16 bytes derived from the inner `line` hex value to generate an new AES key
-  9. Decrypt the outer packet `sig` value using AES-256-CTR with the key from #8 and the same IV value as #3.
+  9. Decrypt the outer packet `sig` value using AES-256-GCM with the key from #8 and the same IV value as #3.
   10. Using the RSA public key of the sender, verify the signature (decrypted in #9) of
      the original (encrypted) form of the inner packet
   11. If an open packet has not already been sent to this hashname, do
@@ -222,7 +122,7 @@ var senderEccPublicKey = new eccKey("nistp256", open);
 
 var aesKey = crypto.createHash('sha256').update(open).digest();
 var aesIV = new Buffer(packet.js.iv, "hex");
-var aesDecipher = crypto.createDecipheriv("AES-256-CTR", aesKey, aesIV);
+var aesDecipher = crypto.createDecipheriv("AES-256-GCM", aesKey, aesIV);
 var attached = packetDecode(Buffer.concat([aesDecipher.update(packet.body),aesDecipher.final()]);
 
 var line = new Buffer(attached.js.line, "hex");
@@ -230,7 +130,7 @@ if(attached.js.to !== self.hashname || !line) return; // must match recipients h
 
 var senderRSAPublicKey = deciphered.body;
 var aesKey = crypto.createHash('sha256').update(open).update(line).digest();
-var aesDecipher = crypto.createDecipheriv("AES-256-CTR", aesKey, aesIV);
+var aesDecipher = crypto.createDecipheriv("AES-256-GCM", aesKey, aesIV);
 var sig = Buffer.concat([aesDecipher.update(new Buffer(packet.js.sig, "base64")),aesDecipher.final()]);
 var valid = rsa(senderRSAPublicKey).hashAndVerify("sha256", packet.body, sig, "PKCS1_PADDING");
 if(!valid) return;
@@ -249,6 +149,68 @@ var lineDecryptKey = crypto.createHash("sha256")
   .digest();
 ```
 
+## Line Packets
+
+The encryption key for a line is defined as the SHA 256 digest of the ECDH shared secret (32 bytes) + outgoing line id (16 bytes) + incoming line id (16 bytes).  The decryption key is the same process, but with the outgoing/incoming line ids reversed.
+
+The BODY is a binary encoded encrypted packet using AES-256-GCM with the encryption key that was generated for the line (above) and the 16-byte initialization vector decoded from the included "iv" hex value in the JSON.  Once decrypted (using the twin generated decryption key), the recipient then processes it as a normal packet (LENGTH/JSON/BODY) from the sending hashname.
+
+
+### RSA Key pair
+
+The application instance [RSA public key](rsa) is used to sign the body of 
+[`open`](#open) packets to authenticate the sender. Incoming [`open`](#open) 
+packets also contain the sender's [Elliptic Curve](ecc) public key, which is 
+encrypted with the recipient's RSA public key. This EC public key is also used 
+to derive an [AES][] key which partially encrypts the packet (see below). As 
+a result, the RSA private key of the recipient is required to decrypt the 
+packet.
+  
+A minimum 2048 bit key size is required for RSA keys. Implementations should
+refuse to communicate with a party using shorter keys.
+  
+The algorithms used are RSA with [OAEP][] (SHA-1, MFG1, aka PKCS1 v2) for encrypting the 
+sender's Elliptic Curve public key, and RSA with a SHA-256 digest and PKCS1 v1.5
+padding for signing the encrypted inner packet.
+  
+### Elliptic Curve Diffie-Hellman
+[Elliptic Curves](ecc) (EC) are used ephemerally to generate [`line`](#line) 
+packet [AES][] keys. This is used to provide forward secrecy of line 
+communication.
+
+A public EC key pair is created when you send an [`open`](#open) packet. The 
+[NIST P-256][] curve group (sometimes referred to as "prime256v1" or 
+"secp256r1") is used for these keys. Due to fewer implementations, EC keys 
+are exchanged in "[uncompressed][]" encoding.
+
+The public key is exchanged encrypted with the recipient's 
+[RSA public key](rsa) in an [`open`](#open) packet. It is also used as part of 
+[`open`](#open) packet processing, as the [SHA-256][] digest of the public 
+key is used to AES encrypt the inner packet.
+
+Once you have both sent and received [`open`](#open) packets, you use 
+[Elliptic Curve Diffie-Hellman](ecdh) to derive a value that becomes that basis 
+of the two line keys. The forming of the two line keys is described in the next
+section.
+
+<a name='aes' />
+### AES
+[AES][] ciphers are created with a Galois/Counter Mode ([GCM][]) and 
+[PKCS1.5 padding](pkcs15). The counter is always zero, and not incremented as 
+part of packet processing.
+
+An Elliptic Curve public key is sent as part of an [`open`](#open) packet, 
+encrypted with the recipient's [public RSA key](rsa). The [SHA-256][] digest of
+this key is used to create an AES key which is used to encrypt the inner 
+packet data, and another key is created to encrypt the attached signature.
+
+Once [`open`](#open) packets have been exchanged, the two elliptic curves are 
+used with [ECDH][] to derive a value used for the two line keys. A line key 
+is formed by SHA-256 digest of the concatenation of the derived ECDH value, 
+binary source line identifier, and binary destination line identifier.
+This results in one key used to encrypt outgoing  packets, and a separate key 
+used to decrypt incoming packets.
+
 
 [rsa]:     https://en.wikipedia.org/wiki/RSA_(algorithm)
 [sha-256]: https://en.wikipedia.org/wiki/SHA-2
@@ -258,7 +220,7 @@ var lineDecryptKey = crypto.createHash("sha256")
 [aes]:     https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
 [oaep]:    https://en.wikipedia.org/wiki/Optimal_asymmetric_encryption_padding
 [ecdh]:    https://en.wikipedia.org/wiki/Elliptic_curve_Diffie–Hellman
-[ctr]:     https://en.wikipedia.org/wiki/CTR_mode#Counter_.28CTR.29
+[gcm]:     http://en.wikipedia.org/wiki/Galois/Counter_Mode
 [pkcs15]:  https://en.wikipedia.org/wiki/PKCS1
 
 [nist p-256]: http://csrc.nist.gov/groups/ST/toolkit/documents/dss/NISTReCur.pdf
