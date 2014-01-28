@@ -65,6 +65,7 @@ Here the first 1 bit is at position 5. And thus this peer should be stored in k-
 
 In order to manage how many peers each one has to keep track of, there are two limits that every peer must manage, `k` and `max-link`.
 
+<a name="k" />
 ### `k` - Bucket Size
 
 When storing any peer in a bucket (based on an open `link`) a switch must manage how many peers it maintains per bucket to minimize it's own resource usage.  The `k` value default is currently 8, and should never be set below 2 so that any bucket always has at least one backup peer in it.  When performing bucket maintenance (below) only this value of peers is processed per bucket.
@@ -73,6 +74,7 @@ A small value impacts both the speed of querying other peers since the buckets a
 
 A larger value then both reduces the seek time for connecting to other peers, and reduces the time it takes for incoming connections.  Having a value larger than 100 is diminishing returns though and should only be needed in very special cases.
 
+<a name="max-link" />
 ### `max-link` - Total Links
 
 The primary mechanism for any peer to limit how many other peers it's keeping track of overall is `max-link`, the total number of active `link` channels open to other peers.  The default value is currently 256, with a minimum of 8, and a maximum of unlimited (for dedicated seeds).
@@ -93,14 +95,16 @@ The following [pastebin][] shows you an example on how k-buckets are filled with
 random generated peers, as seen from our own peer: 736711cf55ff95fa967aa980855a0ee9f7af47d6287374a8cd65e1a36171ef08.
 Even when so many peers are processed, we still only fill the first 15 buckets.
 
+<a name="age" />
 ## Age Tracking (Sybil Resistance)
 
-In order to make the various kinds of common DHT attacks such as [Sybil](https://en.wikipedia.org/wiki/Sybil_attack) more difficult, it is a requirement for every peer to permanently track the timestamp of the first time it establishes a link with any other hashname.  This timestamp is called `age` and is used when determining what hashnames to include in any `see` response, both during the link exchange and in seek responses.
+In order to make the various kinds of common DHT attacks such as [Sybil](https://en.wikipedia.org/wiki/Sybil_attack) more difficult, it is helpful for a peer to keep track the timestamp of the first time it establishes a link with any other hashname.  This timestamp is called `age` and is used when determining what hashnames to include in any `see` response, both during the link exchange and in seek responses.  The age should be stored long-term if possible, particularly for any peer that is acting as a seed.  Peers with an age that haven't been seen for more than 30 days may be expired/reset.
 
-When generating a `see` during link setup, if there are more peers in the bucket for that link then those peers are sorted only by age, returning the oldest of them.  This ensures that any peer that is bootstrapping new links only discovers the older ones, and any newer nearer peers that are generated after it don't get prioritized over peers that existed nearby before it.
+When generating a `see` during link setup, if there are more peers in the bucket for that link then those peers are sorted only by age, returning the oldest of them.  This ensures that any peer that is bootstrapping new links only discovers the older seeds, and any newer nearer seeds that are generated after it don't get prioritized over ones that existed nearby before it.
 
-When answering a `seek` request, the `see` must contain both older and newer peers from the same bucket to provide balance between speed and reliability.  When there's more peers in the same bucket than can fit in the see response, half should be the closest and half should be the oldest.
+When answering a `seek` request, the first entry in the `see` must be the oldest (active) seed from the matching bucket, followed by any exact matches and the other seeds in that bucket that are the closest. When performing a `seek` they should always be initiated to the oldest nearby seeds, and the first address returned in their `see` is tracked as the "backstop" to signal when to stop recusively seeking the results.  The backstop is updated whenever a previous backstop returns a closer first address in it's see.
 
+<a name="maintenance" />
 ## Bucket Maintenance
 
 Every bucket must be checked once every 55 seconds for possible maintenance. Only the `k` number of peers in a bucket need to be sent maintenance packets, and they should be sorted/prioritized by uptime with the oldest age being preferred.  Any peer without any received link maintenance activity in more than 120 seconds should be evicted from the bucket.
