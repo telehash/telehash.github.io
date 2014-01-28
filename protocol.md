@@ -309,7 +309,7 @@ When initating a new connection, the first seek requests should always be sent t
 
 Only the prefix hex value is sent in each seek request to reduce the amount of information being shared about who's seeking who. The value then is only the bytes of the hashname being saught that match the distance to the recipient plus one more byte in order for the recipient to determine closer hashnames.  So if a seek is being sent to  "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c" for the hashname "171042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6" the value would be `"seek":"1710"`.
 
-The response is a compact `"see":[...]` array of addresses that are closest to the hash value (based on the [kademlia][] rules).  The addresses are a compound comma-delimited string containing the "hash,ip,port" (these are intentionally not JSON as the verbosity is not helpful here), for example "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c,123.45.67.89,10111". The ip and port parts are optional and only act as hints for NAT hole punching.
+The response is a compact `"see":[...]` array of addresses that are closest to the hash value (based on the [kademlia][] rules).  The addresses are a compound comma-delimited string containing the "hash,cs,ip,port" (these are intentionally not JSON as the verbosity is not helpful here), for example "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c,1,123.45.67.89,10111". The "cs" is the [Cipher Set][] numeric ID and is required. The ip and port parts are optional and only act as hints for NAT hole punching.
 
 Only hashnames with an active `link` may be returned in the `see` response, and it must always include an `"end":true`.  Only other seeds will be returned unless the seek hashname matches exactly, then it will also be included in the response even if it isn't seeding.
 
@@ -325,7 +325,7 @@ The initial request:
   "c":"ab945f90f08940c573c29352d767fee4",
   "type":"link",
   "seed":true,
-  "see":["c6db0918a767f00b9841f4366ade7ffc13c86541c40bf0a1612e939988fdefb0,184.96.145.75,59474"]
+  "see":["c6db0918a767f00b9841f4366ade7ffc13c86541c40bf0a1612e939988fdefb0,1,184.96.145.75,59474"]
 }
 ```
 
@@ -335,7 +335,7 @@ Initial response, accepting the link:
 {
   "c":"ab945f90f08940c573c29352d767fee4",
   "seed":false,
-  "see":["9e5ecd193b14abaef376067f80f442be97f6f3110abb865398c2a6ec83a4ee9b"]
+  "see":["9e5ecd193b14abaef376067f80f442be97f6f3110abb865398c2a6ec83a4ee9b,2"]
 }
 ```
 
@@ -352,9 +352,9 @@ See [Kademlia][] for more background and details.
 <a name="peer" />
 ### `"type":"peer"` - Introductions to new hashnames
 
-For any hashname to send an open to another it must first have it's hashname, so there is a two step process starting with a peer request. Since new hashnames are discovered only from another (in the `see` values), they are tracked as a "via" so that they can be sent a peer request when a connection is being made to a hashname they sent.
+For any hashname to send an open to another it must first have one of it's public keys, so all new opens must be "introduced" via an existing line. This introduction is a two step process starting with a peer request to an intermediary. Since new hashnames are discovered only from another one in the `see` values, the one returning the see is tracked as a "via" so that they can be sent a `peer` request when a connection is being made to a hashname they sent. This also serves as a workaround if any NAT exists, so that the two hashnames can send a packet to each other to make sure the path between them is open, this is called "hole punching." 
 
-This also serves as a workaround if any NAT exists, so that the two hashnames can send a packet to each other to make sure the path between them is open, this is called "hole punching." A peer request requires a `"peer":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"` where the value is the hashname the sender is trying to reach. The recipient of the peer request must then send a connect (below) to the target hashname (that it already must have an open line to).
+A peer request requires a `"peer":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"` where the value is the hashname the sender is trying to reach. The BODY of the peer request must contain the binary public key of the sender, whichever key is the highest matching [Cipher Set][] as signalled in the original `see`.  The recipient of the peer request must then send a connect (below) to the target hashname (that it already must have an open line to).
 
 These requests are always sent with a `"end":true` and no response is generated.
 
@@ -363,7 +363,7 @@ If a sender has multiple known public network paths back to it, it should includ
 <a name="connect" />
 ### `"type":"connect"` - Connect to a hashname
 
-The connect request is an immediate result of a peer request and must always contain a BODY of their public key as well as a [paths](#paths) array identifying possible network paths to it.
+The connect request is an immediate result of a `peer` request and must always attach/forward the same original BODY it as well as a [paths](#paths) array identifying possible network paths to it.  It must also attach a `"from":{...}` that is the [Cipher Set][] keys of the peer sender, identical format as to what is sent as part of an `open`.
 
 The recipient can use the given public key to send an open request to the target via the possible paths.  If a NAT is suspected to exist, the target should have already sent a packet to ensure their side has a path mapped through the NAT and the open should then make it through.
 
@@ -418,3 +418,4 @@ An established path is one that comes from the network interface, the actual enc
 [path_webrtc]: path_webrtc.md
 [path_http]: path_http.md
 [cipher sets]: cipher_sets.md
+[cipher set]: cipher_sets.md
