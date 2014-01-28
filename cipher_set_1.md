@@ -3,6 +3,53 @@ Cipher Set 1
 
 This profile is the base algorithms selected for the telehash development process in 2013.
 
+## Open Packets
+
+```js
+{
+    "type":"open",
+    "open":"ZkQklgyD91XQaih07VBUGeQmAM9tnR5qMGMavZ9TNqQMCVfTW8TxDr9y37cgB8g6r9dngWLjXuRKe+nYNAG/1ZU4XK+GiR2vUBS8VTcAMzBcUls+GIfZU6WO/zEIu4ra1I1vI8qnYY5MqS/FQ/kMXk9RyzERaD38IWZLk3DYhn8VYPnVnQX62mE5u20usMWQt99F8ITLy972nOhdx5y9RUnnSrtc1SD9xr8O0rco22NtOEWC3uAISwC9xuihT+U7OEcvSKolScFI4oSpRu+DQWl19EAuG9ACqhs5+X3qNeBRMSH8w5+ThOVHaAWKGfFs/FNMdAte3ki8rFesMtfhXQ==",
+    "iv":"60aa6514ef28178f816d701b9d81a29d",
+    "sig":"o6buYor8o3YXkPIDJjufn9udfWDJt5hrgnVtKtvZI2ObOPlPSqlb2AdH6QsC7CuwtboGlt6eMbE7Ep6Js2CXeksXTCSZOJ99US7TH0kZ1H1aDqxYpQlM6BADOjG6YOcW+EhniotNUBiw3r02Xt4ohSm0wXxQ97JM95ntFBRnWr1vG25d+5pJQE4LyN2TwB4uApu9zeUoTPhF7daJQOcIMn9en+XxyuBsG61oR/x29bpaoZJGnKrk2DGH1jDnI5GpxIKUbT/Pa7QOlrICUCjGDgxy2TMQ+fiip5sIflxtFUPM/BV9mh4K7/ZaekJXTFfG2FKvJFytQkWbisDVy5EbEA=="
+}
+```
+
+The required values of the open packet are defined as:
+
+   * `open` - a base64 string value that is is created by generating a
+     new elliptic (ECC) public key and using RSA to encrypt it *to* the
+	 recipient's RSA public key. The ECC keypair should be generated
+	 using the P-256 ([nistp256/secp256r/X9.62 prime256v1] 
+	 (http://tools.ietf.org/html/rfc6239#page-4)) curve. The key
+     should be in the uncompressed form, 65 bytes (ANSI X9.63 format). The RSA encryption
+     should use PKCS1 OAEP (v2) padding.
+   * `iv` - 16 random bytes hex encoded to be used as an initialization
+     vector
+   * `sig` - a string created by first using the sender's RSA public key
+     to sign (SHA256 hash and PKCS1 v1.5 padding) the attached
+     (encrypted) binary body, then encrypt that signature (detailed below), then base64 encoded.
+
+
+## Line Packets
+
+As soon as any two hashnames have both send and received a valid `open` then a line is created between them. Since one part is always the initiator and sent the open as a result of needing to create a channel to the other hashname, immediately upon creating a `line` that initiator will then send line packets.
+
+The encryption key for a line is defined as the SHA 256 digest of the ECDH shared secret (32 bytes) + outgoing line id (16 bytes) + incoming line id (16 bytes).  The decryption key is the same process, but with the outgoing/incoming line ids reversed.
+
+A packet with a `"type":"line"` is required to have a `line` parameter (such as
+`"line":"be22ad779a631f63336fe051d5aa2ab2"`) with the value being the
+same as the one the recipient sent in its `open` packet, and a random
+IV value (such as `"iv":"8b945f90f08940c573c29352d767fee4"`) used for
+the AES encryption.  This ensures that no line packets can be received
+without being invited in an open. Any unknown ones are just ignored.
+
+The BODY is a binary encoded encrypted packet using AES-256-CTR with
+the encryption key that was generated for the line (above) and the 16-byte initialization
+vector decoded from the included "iv" hex value.  Once decrypted (using the twin generated decryption key), the
+recipient then processes it as a normal packet (LENGTH/JSON/BODY) from
+the sending hashname.  All decrypted packets must contain a "c"
+value as defined below to identify the channel they belong to (below).
+
 
 ### RSA Key pair
 

@@ -216,47 +216,16 @@ JSON must contain a `type` field with a string value of `open` or
 
 A packet of `"type":"open"` is used to establish a temporary encrypted
 session between any two hashnames, this session is called a "line". You
-must know the RSA public key of the recipient in order to send an
-`open` message to them.
+must know a public key of the recipient in order to send an
+`open` packet to them.
 
-Every open packet requires the additional JSON keys of `open`, `iv`,
-and `sig`, here's an example of the JSON part of the packet:
+The detailed requirements to create/process open packets are defined by the [Cipher Set](cipher_sets.md) being used between two hashnames, typically there will be additional JSON keys like `open`, `iv`, and `sig`.
 
-```js
-{
-    "type":"open",
-    "open":"ZkQklgyD91XQaih07VBUGeQmAM9tnR5qMGMavZ9TNqQMCVfTW8TxDr9y37cgB8g6r9dngWLjXuRKe+nYNAG/1ZU4XK+GiR2vUBS8VTcAMzBcUls+GIfZU6WO/zEIu4ra1I1vI8qnYY5MqS/FQ/kMXk9RyzERaD38IWZLk3DYhn8VYPnVnQX62mE5u20usMWQt99F8ITLy972nOhdx5y9RUnnSrtc1SD9xr8O0rco22NtOEWC3uAISwC9xuihT+U7OEcvSKolScFI4oSpRu+DQWl19EAuG9ACqhs5+X3qNeBRMSH8w5+ThOVHaAWKGfFs/FNMdAte3ki8rFesMtfhXQ==",
-    "iv":"60aa6514ef28178f816d701b9d81a29d",
-    "sig":"o6buYor8o3YXkPIDJjufn9udfWDJt5hrgnVtKtvZI2ObOPlPSqlb2AdH6QsC7CuwtboGlt6eMbE7Ep6Js2CXeksXTCSZOJ99US7TH0kZ1H1aDqxYpQlM6BADOjG6YOcW+EhniotNUBiw3r02Xt4ohSm0wXxQ97JM95ntFBRnWr1vG25d+5pJQE4LyN2TwB4uApu9zeUoTPhF7daJQOcIMn9en+XxyuBsG61oR/x29bpaoZJGnKrk2DGH1jDnI5GpxIKUbT/Pa7QOlrICUCjGDgxy2TMQ+fiip5sIflxtFUPM/BV9mh4K7/ZaekJXTFfG2FKvJFytQkWbisDVy5EbEA=="
-}
-```
-
-The required values of the open packet are defined as:
-
-   * `open` - a base64 string value that is is created by generating a
-     new elliptic (ECC) public key and using RSA to encrypt it *to* the
-	 recipient's RSA public key. The ECC keypair should be generated
-	 using the P-256 ([nistp256/secp256r/X9.62 prime256v1] 
-	 (http://tools.ietf.org/html/rfc6239#page-4)) curve. The key
-     should be in the uncompressed form, 65 bytes (ANSI X9.63 format). The RSA encryption
-     should use PKCS1 OAEP (v2) padding.
-   * `iv` - 16 random bytes hex encoded to be used as an initialization
-     vector
-   * `sig` - a string created by first using the sender's RSA public key
-     to sign (SHA256 hash and PKCS1 v1.5 padding) the attached
-     (encrypted) binary body, then encrypt that signature (detailed below), then base64 encoded.
-
-The BODY of the open packet will be a binary encrypted blob containing
-another packet. The encryption is done using AES-256-CTR using the IV
-value above. The AES key is formed by doing a SHA-256 hash of the ECC
-public key in uncompressed form. 
-
-Here's an example of the JSON content of this inner packet before
-encryption:
+The BODY of the open packet will be a binary encrypted blob containing another packet. Once decrypted by the process defined in the Cipher Set that is being used, it will contain another packet. Here's an example of the JSON content of this inner packet before encryption:
 
 ```js
 {
-    "to":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6",
+    "from":{"1":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"},
     "at":1375983687346,
     "line":"8b945f90f08940c573c29352d767fee4"
 }
@@ -264,41 +233,24 @@ encryption:
 
 The inner packet's required values are defined as:
 
-   * `to` - which hashname this line is being created to
-   * `line` - the unique id the recipient must use for sending any line
-     packets, 16 random bytes hex encoded
+   * `from` - the fingerprints of the public keys defining the sending hashname
+   * `line` - the unique id the recipient must use for sending any line packets, 16 random bytes hex encoded
    * `at` - an integer timestamp of when it was sent, used to verify another incoming open request is newer
 
-This inner packet holds the sender's RSA public key as the BODY
-attachment, in binary DER format.
+The inner packet may also contain a BODY that is used depending on the Cipher Set.
 
+An `open` is always triggered by the creation of a channel to a hashname, such that when a channel generates it's first packet the switch recognizes that a line doesn't exist yet or may be expired/invalid and attempts to create a new line.  The initiating channel logic is internally responsible for any retransmission of it's own packets, and those retransmissions are the source of re-triggering the sending of any `open` requests.
 
-#### Retransmission
-
-An `open` is always triggered by the creation of a channel to a hashname, such that when a channel generates it's first packet the switch recognizes that a line doesn't exist yet and attempts to create one.  This usually also requires some `seek` requests to find the target hashname and then `peer` to request a connection.  The initiating channel logic is internally responsible for any retransmission of it's own packets, and those retransmissions are the source of re-triggering the sending of any `peer` and/or `open` requests.
-
-When a line is being created the switch generates it's temporary ECC key for the line and must also store it's local timestamp of when it created the ECC key to send that timestamp value as the `at` in any open request.  This enables the recipient to recognize retransmissions of the same line initiation request, as well as detect when an open is generated for a new line as it will have a newer `at` value than the existing one.
+When a new line is created the switch must also store a local timestamp at that time and send that same value as the `at` in any open request.  This enables the recipient to recognize retransmissions of the same line initiation request, as well as detect when an open is generated for a new line as it will have a newer `at` value relative to the existing one.
 
 <a name="line" />
 ### `line` - Packet Encryption
 
 As soon as any two hashnames have both send and received a valid `open` then a line is created between them. Since one part is always the initiator and sent the open as a result of needing to create a channel to the other hashname, immediately upon creating a `line` that initiator will then send line packets.
 
-The encryption key for a line is defined as the SHA 256 digest of the ECDH shared secret (32 bytes) + outgoing line id (16 bytes) + incoming line id (16 bytes).  The decryption key is the same process, but with the outgoing/incoming line ids reversed.
+Every `"type":"line"` packet is required to have a `line` parameter that matches the outgoing id sent in the open, unknown line ids are ignored/dropped.  The BODY is always an encrypted binary that is defined by the encryption/decryption used in the given [Cipher Set](cipher_sets.md), which may also require additional JSON attributes (such as `iv`).
 
-A packet with a `"type":"line"` is required to have a `line` parameter (such as
-`"line":"be22ad779a631f63336fe051d5aa2ab2"`) with the value being the
-same as the one the recipient sent in its `open` packet, and a random
-IV value (such as `"iv":"8b945f90f08940c573c29352d767fee4"`) used for
-the AES encryption.  This ensures that no line packets can be received
-without being invited in an open. Any unknown ones are just ignored.
-
-The BODY is a binary encoded encrypted packet using AES-256-CTR with
-the encryption key that was generated for the line (above) and the 16-byte initialization
-vector decoded from the included "iv" hex value.  Once decrypted (using the twin generated decryption key), the
-recipient then processes it as a normal packet (LENGTH/JSON/BODY) from
-the sending hashname.  All decrypted packets must contain a "c"
-value as defined below to identify the channel they belong to (below).
+Once decrypted, the resulting value is a packet that must minimally contain a "c" value as defined below to identify the channel the packet belongs to.
 
 <a name="channels" />
 ## Channels - Content Transport
