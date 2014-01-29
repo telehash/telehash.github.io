@@ -670,7 +670,7 @@ The link channel requires a keepalive at least once a minute in both directions,
 
 The keepalive requires only the single key/value of `"seed":true` or `"seed":false` to be included to indicate it's seeding status. This keepalive timing is primarily due to the prevalance of NATs with 60 second activity timeouts, but it also serves to keep only responsive hashnames returned for the DHT.
 
-See [Kademlia][] for more background and details.
+Details describing the distance logic, maintenance, and limits can be found in [DHT](dht.md) reference.
 
 <a name="peer" />
 ### `"type":"peer"` - Introductions to new hashnames
@@ -753,7 +753,7 @@ Besides parsing the protocol, decoding the packets and processing the different 
 
 Hashname discovery and connectivity is governed by a Kademlia-based DHT that switches collectively help maintain.  This process involves initial seeding on startup, tracking "buckets" of other switches based on a distance metric and actively maintaining [links](#link) to them for handling [seek](#seek) requests.
 
-The details of how [kademlia][] is implemented for Telehash are broken out into their own document.
+The details of how this is implemented for Telehash are broken out into their [own document](dht.md).
 
 
 [rsa]:     https://en.wikipedia.org/wiki/RSA_(algorithm)
@@ -773,6 +773,6 @@ The details of how [kademlia][] is implemented for Telehash are broken out into 
 [sockets]: ext_sockets.md
 [tickets]: ext_tickets.md
 [ext_bridge]: ext_bridge.md
-[kademlia]: kademlia.md
+[kademlia]: dht.md
 [path_webrtc]: path_webrtc.md
 [path_http]: path_http.md

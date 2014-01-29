@@ -1,5 +1,5 @@
-Kademlia
-=================
+Distributed Hash Table
+======================
 
 # Introduction
 
