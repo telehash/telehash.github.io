@@ -712,15 +712,17 @@ To prevent abuse, all switches must limit the volume of relay packets from any h
 Switches must also prevent double-relaying, sending packets coming in via a relay outgoing via another relay, a relay is only a one-hop utility and two hashnames must negotiate alternate paths for additional needs. Any `peer` requests coming in via a relay must also not have a relay included in their paths.
 
 <a name="path" />
-### `"type":"path"` - Network Path Prioritization
+### `"type":"path"` - Network Path Information
 
-Any switch may have multiple network interfaces, such as on a mobile device both cellular and wifi may be available simutaneously or be transitioning between them, and for a local network there may be a public IP via the gateway/NAT and an internal LAN IP. A switch should always try to be aware of all of the networks it has available to send on (ipv4 and ipv6 for instance), as well as what network paths exist between it and any other hashname. 
+Any switch may have multiple network interfaces, such as on a mobile device both cellular and wifi may be available simutaneously or be transitioning between them, and for a local network there may be a public IP via the gateway/NAT and an internal LAN IP. A switch should always try to discover and be aware of all of the networks it has available to send on (ipv4 and ipv6 for instance), as well as what network paths exist between it and any other hashname. 
  
-An unreliable channel of `"type":"path"` is the mechanism used to prioritize and test when there are multiple network paths available.  For each known/discovered network path to another hashname a `path` is sent over that network interface including an optional `"priority":1` (any positive integer, defaults to 0) representing it's preference for that network to be the default.  The responding hashname upon receiving any `path` must return a packet with `"end":true` and include an optional `"priority":1` with it's own priority for that network interface is to receive packets via.
+An unreliable channel of `"type":"path"` is the mechanism used to discover, share, prioritize and test any/all network paths available.  For each known/discovered network path to another hashname a `path` is sent over that network interface including an optional `"priority":1` (any positive integer, defaults to 0) representing it's preference for that network to be the default.  The responding hashname upon receiving any `path` must return a packet with `"end":true` and include an optional `"priority":1` with it's own priority for that network interface is to receive packets via.
 
-The sending switch may also time the response speed and use that to break a tie when there are multiple paths with the same priority.
+Every path request/response must also contain a `"path":{...}` where the value is the specific path information this request is being sent to. The sending switch may also time the response speed and use that to break a tie when there are multiple paths with the same priority.
 
-A switch only needs to send a `path` automatically when it detects more than one (potential) network path between itself and another hashname, such as when it's public IP changes (moving from wifi to cellular), when line packets come in from different IP/Ports, when it has two network interfaces itself, etc.  The sending and return of priority information will help reset which networks are then used by default.
+A switch should send path requests to it's seeds whenever it comes online or detects that it's local network information has changed in order to discover it's current public IP/Port from the response `path` value in case it's behind a NAT.
+
+Additional path requests only need to be sent when a switch detects more than one (potential) network path between itself and another hashname, such as when it's public IP changes (moving from wifi to cellular), when line packets come in from different IP/Ports, when it has two network interfaces itself, etc.  The sending and return of priority information will help reset which paths are then used by default.
 
 <a name="paths" />
 ### `"paths":[...]` - Network Path List
