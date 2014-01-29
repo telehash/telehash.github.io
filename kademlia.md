@@ -65,12 +65,14 @@ Here the first 1 bit is at position 5. And thus this peer should be stored in k-
 
 In order to manage how many peers each one has to keep track of, there are two limits that every peer must manage, `k` and `max-link`.
 
+When resource constrained and choosing low limits, all links should also be set to `"seed":false` so that the peer isn't participating in general DHT queries.
+
 <a name="k" />
 ### `k` - Bucket Size
 
 When storing any peer in a bucket (based on an open `link`) a switch must manage how many peers it maintains per bucket to minimize it's own resource usage.  The `k` value default is currently 8, and should never be set below 2 so that any bucket always has at least one backup peer in it.  When performing bucket maintenance (below) only this value of peers is processed per bucket.
 
-A small value impacts both the speed of querying other peers since the buckets act as an initial index of where to send the first `seek`, and too few will likely result in additional round-trips to find another peer.  It also impacts a peers own discovery, as it reduces how many nearby peers know about it so an incoming `seek` for it will take more round-trips to get closer.
+A small value impacts both the speed of querying other peers since the buckets act as an initial index of where to send the first `seek`, and too few will likely result in additional round-trips to find another peer.  It also impacts a peers own discovery, as it reduces how many nearby peers know about it so an incoming `seek` for it will take more round-trips to get closer.  
 
 A larger value then both reduces the seek time for connecting to other peers, and reduces the time it takes for incoming connections.  Having a value larger than 100 is diminishing returns though and should only be needed in very special cases.
 
@@ -81,7 +83,7 @@ The primary mechanism for any peer to limit how many other peers it's keeping tr
 
 When any new incoming `link` is requested this value is checked, and if the total links is less than `max-link` then the new request should be accepted.  If the switch is at `max-link` then it must check the distance to the new incoming peer to see if it should evict a more distant one.  This eviction check looks at any bucket that is further (larger) than the incoming link and has more than `k` peers in it, and evict the newest link in that bucket if any.  If there are no other links to evict, then the incoming one should be denied.
 
-A small value will have the same impact as a small `k`, increasing the cost to search and be found on the DHT.  If it's too small (below 8) it may mean the peer cannot be found at all.
+A small value will have the same impact as a small `k`, increasing the cost to search and be found on the DHT. Any single bucket should never fall below `k` even if the total links is greater than a small `max-link`.
 
 A large value increases the number of maintenance activity from all of the active links, with a minimum of one packet sent/received per link per minute, with a `max-link` of 600 active it would average 10 packets per second to maintain the DHT.
 
