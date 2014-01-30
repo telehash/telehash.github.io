@@ -339,7 +339,7 @@ Initial response, accepting the link:
 }
 ```
 
-The `see` value is identical to the `seek` response and pro-actively sends other seeds to help both sides establish a full mesh.  The `seed` value indicates wether the sender/recipient wants to act as a seed and be included in `seek` requests, otherwise it will only be included in the see response when it matches the seek exactly.
+The `see` value is the same format as the `seek` response and pro-actively sends other seeds to help both sides establish a full mesh.  The see addresses should all be closer to the recipient, but if there are none then further addresses may be sent to help bootstrap.  The `seed` value indicates wether the sender/recipient wants to act as a seed and be included in `seek` requests, otherwise it will only be included in the see response when it matches the seek exactly.
 
 In the initial response or at any point an `end` or `err` can be sent to cancel the link, at which point both sides must remove the corresponding ones from their DHT.
 
@@ -347,7 +347,7 @@ The link channel requires a keepalive at least once a minute in both directions,
 
 The keepalive requires only the single key/value of `"seed":true` or `"seed":false` to be included to indicate it's seeding status. This keepalive timing is primarily due to the prevalance of NATs with 60 second activity timeouts, but it also serves to keep only responsive hashnames returned for the DHT.
 
-See [Kademlia][] for more background and details.
+Details describing the distance logic, maintenance, and limits can be found in [DHT](dht.md) reference.
 
 <a name="peer" />
 ### `"type":"peer"` - Introductions to new hashnames
@@ -389,15 +389,17 @@ To prevent abuse, all switches must limit the volume of relay packets from any h
 Switches must also prevent double-relaying, sending packets coming in via a relay outgoing via another relay, a relay is only a one-hop utility and two hashnames must negotiate alternate paths for additional needs. Any `peer` requests coming in via a relay must also not have a relay included in their paths.
 
 <a name="path" />
-### `"type":"path"` - Network Path Prioritization
+### `"type":"path"` - Network Path Information
 
-Any switch may have multiple network interfaces, such as on a mobile device both cellular and wifi may be available simutaneously or be transitioning between them, and for a local network there may be a public IP via the gateway/NAT and an internal LAN IP. A switch should always try to be aware of all of the networks it has available to send on (ipv4 and ipv6 for instance), as well as what network paths exist between it and any other hashname. 
+Any switch may have multiple network interfaces, such as on a mobile device both cellular and wifi may be available simutaneously or be transitioning between them, and for a local network there may be a public IP via the gateway/NAT and an internal LAN IP. A switch should always try to discover and be aware of all of the networks it has available to send on (ipv4 and ipv6 for instance), as well as what network paths exist between it and any other hashname. 
  
-An unreliable channel of `"type":"path"` is the mechanism used to prioritize and test when there are multiple network paths available.  For each known/discovered network path to another hashname a `path` is sent over that network interface including an optional `"priority":1` (any positive integer, defaults to 0) representing it's preference for that network to be the default.  The responding hashname upon receiving any `path` must return a packet with `"end":true` and include an optional `"priority":1` with it's own priority for that network interface is to receive packets via.
+An unreliable channel of `"type":"path"` is the mechanism used to discover, share, prioritize and test any/all network paths available.  For each known/discovered network path to another hashname a `path` is sent over that network interface including an optional `"priority":1` (any positive integer, defaults to 0) representing it's preference for that network to be the default.  The responding hashname upon receiving any `path` must return a packet with `"end":true` and include an optional `"priority":1` with it's own priority for that network interface is to receive packets via.
 
-The sending switch may also time the response speed and use that to break a tie when there are multiple paths with the same priority.
+Every path request/response must also contain a `"path":{...}` where the value is the specific path information this request is being sent to. The sending switch may also time the response speed and use that to break a tie when there are multiple paths with the same priority.
 
-A switch only needs to send a `path` automatically when it detects more than one (potential) network path between itself and another hashname, such as when it's public IP changes (moving from wifi to cellular), when line packets come in from different IP/Ports, when it has two network interfaces itself, etc.  The sending and return of priority information will help reset which networks are then used by default.
+A switch should send path requests to it's seeds whenever it comes online or detects that it's local network information has changed in order to discover it's current public IP/Port from the response `path` value in case it's behind a NAT.
+
+Additional path requests only need to be sent when a switch detects more than one (potential) network path between itself and another hashname, such as when it's public IP changes (moving from wifi to cellular), when line packets come in from different IP/Ports, when it has two network interfaces itself, etc.  The sending and return of priority information will help reset which paths are then used by default.
 
 A [paths](#paths) array should be sent with every new path channel containing all of the sender's paths that they would like the recipient to use. Upon receiving a path request containing an `paths`, the array should be processed to look for new/unknown possible paths and those should individually be sent a new path request in return to validate and send any priority information.
 
@@ -408,13 +410,11 @@ There are two states of network paths, `possible` and `established`.  A possible
 An established path is one that comes from the network interface, the actual encoded details of the sender information.  When any `open` or `line` is received from any network, the sender's path is considerd established and should be stored by the switch as such so that it can be used as a validated destination for any outgoing packets.  When a switch detects that a path may not be working, it may also redundantly send the hashname packets on any other established path.
 
 
-
-
 [sha-256]: https://en.wikipedia.org/wiki/SHA-2
 [sockets]: ext_sockets.md
 [tickets]: ext_tickets.md
 [ext_bridge]: ext_bridge.md
-[kademlia]: kademlia.md
+[kademlia]: dht.md
 [path_webrtc]: path_webrtc.md
 [path_http]: path_http.md
 [cipher sets]: cipher_sets.md
