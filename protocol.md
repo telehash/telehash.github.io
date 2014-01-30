@@ -82,6 +82,7 @@ There is a conscious choice to use two fundamentally different algorithms while 
     them)
   * **Channels**: Dynamic bi-directional transport that can transfer
     reliable/ordered or lossy binary/JSON mixed content within any line
+  * **Seed**: A hashname that is acting as a seed for the DHT and will respond to search and introduction requests
 
 ## Telehash Switches
 
@@ -555,7 +556,8 @@ An unreliable channel has no retransmit or ordering guarantees, and an `end` alw
 The following values for `type` are for unreliable channels that are used to locate and communicate with
 application instances on the DHT. They are part of the core spec, and must be implemented internally by all switches:
 
-  * [`seek`](#seek) - return any pointers to other closer hashnames for the given `hash` (DHT), answer contains `see`
+  * [`seek`](#seek) - given a hashname, return any pointers to other hashnames closer to it (DHT)
+  * [`link`](#link) - request/enable another hashname to return the other in a `seek` request (DHT)
   * [`peer`](#peer) - ask the recipient to make an introduction to one of it's peers
   * [`connect`](#connect) - a request asking to try to open a connection to a given hashname (result of a `peer`)
   * [`relay`](#relay) - the capability for a switch to help two peers exchange connectivity information
@@ -624,11 +626,51 @@ Here's some summary notes for implementors:
 <a name="seek" />
 ### `"type":"seek"` - Finding Hashnames (DHT)
 
-The core of Telehash is a basic Kademlia-based DHT. The bulk of the complexity is in the rules around maintaining a mesh of lines and calculating distance explained [below](#kademlia). The `"seek":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"` value is always another hashname that the app is trying to connect to.
+The core of Telehash is a basic Kademlia-based DHT, the bulk of the logic is in the rules around maintaining a mesh of lines and calculating distance explained [below](#kademlia). When one hashname wants to connect to another, it recursively sends `seek` requests to find closer and closer peers until it's discovered or there are none closer. The seek request contains a `"seek":"hex-value"` that is always a prefix of the hashname that it is trying to connect to.
 
-When one hashname wants to connect to another hashname, it finds the closest lines it knows and sends a `seek` containing the hash value to them.  They return a compact `"see":[...]` array of addresses that are closest to the hash value.  The addresses are a compound comma-delimited string containing the "hash,ip,port" (these are intentionally not JSON as the verbosity is not helpful here), for example "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c,123.45.67.89,10111".
+When initating a new connection, the first seek requests should always be sent to the closest hashnames with active [links](#link).  Then the switch recursively sends seeks to the closest hashnames to the target until it discovers it or cannot find any closer.  It is suggested that this recursive seeking process should have at least three threads running in parallel to optmize for non-responsive nodes and round-trip time.  If no closer nodes are being discovered, the connection process should fail after the 9 closest nodes have been queried or timed-out.
 
-The response `see` packet must always include an `"end":true`.
+Only the prefix hex value is sent in each seek request to reduce the amount of information being shared about who's seeking who. The value then is only the bytes of the hashname being saught that match the distance to the recipient plus one more byte in order for the recipient to determine closer hashnames.  So if a seek is being sent to  "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c" for the hashname "171042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6" the value would be `"seek":"1710"`.
+
+The response is a compact `"see":[...]` array of addresses that are closest to the hash value (based on the rules [below](#kademlia)).  The addresses are a compound comma-delimited string containing the "hash,ip,port" (these are intentionally not JSON as the verbosity is not helpful here), for example "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c,123.45.67.89,10111". The ip and port parts are optional and only act as hints for NAT hole punching.
+
+Only hashnames with an active `link` may be returned in the `see` response, and it must always include an `"end":true`.  Only other seeds will be returned unless the seek hashname matches exactly, then it will also be included in the response even if it isn't seeding.
+
+<a name="link" />
+### `"type":"link"` - Enabling Discovery (DHT)
+
+In order for any hashname to be returned in a `seek` it must have a link channel open.  This channel is the only mechanism enabling one hashname to store another in it's list of [buckets](#kademlia) for the DHT.  It is bi-directional, such that any hashname can request to add another to it's buckets but both sides must agree/maintain that relationship.
+
+The initial request:
+
+```json
+{
+  "c":"ab945f90f08940c573c29352d767fee4",
+  "type":"link",
+  "seed":true,
+  "see":["c6db0918a767f00b9841f4366ade7ffc13c86541c40bf0a1612e939988fdefb0,184.96.145.75,59474"]
+}
+```
+
+Initial response, accepting the link:
+
+```json
+{
+  "c":"ab945f90f08940c573c29352d767fee4",
+  "seed":false,
+  "see":["9e5ecd193b14abaef376067f80f442be97f6f3110abb865398c2a6ec83a4ee9b"]
+}
+```
+
+The `see` value is the same format as the `seek` response and pro-actively sends other seeds to help both sides establish a full mesh.  The see addresses should all be closer to the recipient, but if there are none then further addresses may be sent to help bootstrap.  The `seed` value indicates wether the sender/recipient wants to act as a seed and be included in `seek` requests, otherwise it will only be included in the see response when it matches the seek exactly.
+
+In the initial response or at any point an `end` or `err` can be sent to cancel the link, at which point both sides must remove the corresponding ones from their DHT.
+
+The link channel requires a keepalive at least once a minute in both directions, and after two minutes of no incoming activity it is considered errored and cancelled.  When one side sends the keepalive, the other should immediately respond with one to keep the link alive as often only one side is maintaining the link.  Links initiated without seeding must be maintained by the requestor.
+
+The keepalive requires only the single key/value of `"seed":true` or `"seed":false` to be included to indicate it's seeding status. This keepalive timing is primarily due to the prevalance of NATs with 60 second activity timeouts, but it also serves to keep only responsive hashnames returned for the DHT.
+
+Details describing the distance logic, maintenance, and limits can be found in [DHT](dht.md) reference.
 
 <a name="peer" />
 ### `"type":"peer"` - Introductions to new hashnames
@@ -670,15 +712,17 @@ To prevent abuse, all switches must limit the volume of relay packets from any h
 Switches must also prevent double-relaying, sending packets coming in via a relay outgoing via another relay, a relay is only a one-hop utility and two hashnames must negotiate alternate paths for additional needs. Any `peer` requests coming in via a relay must also not have a relay included in their paths.
 
 <a name="path" />
-### `"type":"path"` - Network Path Prioritization
+### `"type":"path"` - Network Path Information
 
-Any switch may have multiple network interfaces, such as on a mobile device both cellular and wifi may be available simutaneously or be transitioning between them, and for a local network there may be a public IP via the gateway/NAT and an internal LAN IP. A switch should always try to be aware of all of the networks it has available to send on (ipv4 and ipv6 for instance), as well as what network paths exist between it and any other hashname. 
+Any switch may have multiple network interfaces, such as on a mobile device both cellular and wifi may be available simutaneously or be transitioning between them, and for a local network there may be a public IP via the gateway/NAT and an internal LAN IP. A switch should always try to discover and be aware of all of the networks it has available to send on (ipv4 and ipv6 for instance), as well as what network paths exist between it and any other hashname. 
  
-An unreliable channel of `"type":"path"` is the mechanism used to prioritize and test when there are multiple network paths available.  For each known/discovered network path to another hashname a `path` is sent over that network interface including an optional `"priority":1` (any positive integer, defaults to 0) representing it's preference for that network to be the default.  The responding hashname upon receiving any `path` must return a packet with `"end":true` and include an optional `"priority":1` with it's own priority for that network interface is to receive packets via.
+An unreliable channel of `"type":"path"` is the mechanism used to discover, share, prioritize and test any/all network paths available.  For each known/discovered network path to another hashname a `path` is sent over that network interface including an optional `"priority":1` (any positive integer, defaults to 0) representing it's preference for that network to be the default.  The responding hashname upon receiving any `path` must return a packet with `"end":true` and include an optional `"priority":1` with it's own priority for that network interface is to receive packets via.
 
-The sending switch may also time the response speed and use that to break a tie when there are multiple paths with the same priority.
+Every path request/response must also contain a `"path":{...}` where the value is the specific path information this request is being sent to. The sending switch may also time the response speed and use that to break a tie when there are multiple paths with the same priority.
 
-A switch only needs to send a `path` automatically when it detects more than one (potential) network path between itself and another hashname, such as when it's public IP changes (moving from wifi to cellular), when line packets come in from different IP/Ports, when it has two network interfaces itself, etc.  The sending and return of priority information will help reset which networks are then used by default.
+A switch should send path requests to it's seeds whenever it comes online or detects that it's local network information has changed in order to discover it's current public IP/Port from the response `path` value in case it's behind a NAT.
+
+Additional path requests only need to be sent when a switch detects more than one (potential) network path between itself and another hashname, such as when it's public IP changes (moving from wifi to cellular), when line packets come in from different IP/Ports, when it has two network interfaces itself, etc.  The sending and return of priority information will help reset which paths are then used by default.
 
 <a name="paths" />
 ### `"paths":[...]` - Network Path List
@@ -709,23 +753,9 @@ Besides parsing the protocol, decoding the packets and processing the different 
 <a name="kademlia" />
 ## Distributed Hash Table
 
-Every switch must have both a startup/seeding routine and a background line maintenance process in order to properly support the Kademlia-based DHT.
+Hashname discovery and connectivity is governed by a Kademlia-based DHT that switches collectively help maintain.  This process involves initial seeding on startup, tracking "buckets" of other switches based on a distance metric and actively maintaining [links](#link) to them for handling [seek](#seek) requests.
 
-The seeding process involves recursively performing a [seek](#seek) for it's own hashname against the list of seeds (provided by the app). The act of seeking ones own hashname will bootstrap lines to hashnames that are closest to it, and those hashnames then start to fill in the buckets.
-
-The details of how [kademlia][] is implemented for Telehash are broken out into their own document.
-
-## Line Maintenance
-
-(this area in progress...)
-
-A line may at any point become invalidated if the remote side is disconnected or restarts, so the process of detecting that and deciding to restart a line needs to be defined.
-
-A simple rule to start is invalidating a line after it has been idle for more than 60 seconds or after sending channel packets and not getting any responses for more than 10 seconds (if the switch internally sends seek queries regularly and there's no replies, for instance).
-
-If the switch knows that it is behind a NAT, for any lines that it want's to maintain as active it MUST send at least one packet out at least once every 60 seconds.
-
-This logic will have to evolve into a more efficient/concise pattern at scale, likely involving regular or triggered `path` and `seek` requests, as well as differentiating between if an app is using the line versus the switch maintaining it for it's DHT.
+The details of how this is implemented for Telehash are broken out into their [own document](dht.md).
 
 
 [rsa]:     https://en.wikipedia.org/wiki/RSA_(algorithm)
@@ -745,6 +775,6 @@ This logic will have to evolve into a more efficient/concise pattern at scale, l
 [sockets]: ext_sockets.md
 [tickets]: ext_tickets.md
 [ext_bridge]: ext_bridge.md
-[kademlia]: kademlia.md
+[kademlia]: dht.md
 [path_webrtc]: path_webrtc.md
 [path_http]: path_http.md
