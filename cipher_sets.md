@@ -5,9 +5,9 @@ A Cipher Set (`CS`) is a group of crypto algrithms that are used to implement th
 
 Each set is identified with a unique identifier (`CSID`) that represents the overall selection priority, a larger number is always preferred when selecting which set to use when multiple matches exist between any two nodes.
 
-* `0` - Minimum lightweight set for use primarily with embedded devices
-* `1` - Historical set from telehash development in 2013 using RSA (2048), ECC (P-256), and AES (256)
-* `2` - Newer set based on Curve25519
+* [CS-0][] - Minimum lightweight set for use primarily with embedded devices, required for most uses
+* [CS-8][] - Historical set from telehash development in 2013 using RSA (2048), ECC (P-256), and AES (256)
+* [CS-16][] - Newer set based on Curve25519
 
 <a name="hashnames" />
 ## Hashname Calculation
@@ -36,3 +36,6 @@ var hashname = require("crypto").createHash("sha256").update(values.join("")).di
 
 
 [sha-256]: https://en.wikipedia.org/wiki/SHA-2
+[cs-0]: cipher_set_0.md
+[cs-8]: cipher_set_8.md
+[cs-16]: cipher_set_16.md
