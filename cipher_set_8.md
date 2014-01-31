@@ -1,4 +1,4 @@
-Cipher Set 1
+Cipher Set 8
 ============
 
 This profile is the base algorithms selected for the telehash development process in 2013.
@@ -10,6 +10,14 @@ The base algorithms used in this set are:
 * `encryption` - [AES][] (256-GCM)
 
 ## Open Packets
+
+BODY bytes:
+
+* `0-31` - PKCS1 OAEP (v2) RSA encrpyted line key
+* `32-63` - PKCS1 v1.5 RSA signature of the encrypted inner packet
+* `64-95` - GCM auth
+* `96-111` - the IV
+* `111+` - the AES-128-GCM encrypted inner packet
 
 The required values of the open packet are defined as:
 
