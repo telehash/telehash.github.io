@@ -12,13 +12,13 @@ Each set is identified with a unique identifier (`CSID`) that represents the ove
 <a name="hashnames" />
 ## Hashname Calculation
 
-A hashname is the [SHA-256][] of the one or more fingerprints of CS keys.  Each CS specifies a string fingerprint of it's public key, and these are combined to create the unique hashname used for addressing in Telehash.
+A hashname is the [SHA-256][] of the one or more fingerprints of CS keys, called `parts`.  Each CS specifies a string fingerprint of it's public key, and these parts are all combined to create the unique hashname used for addressing in Telehash.
 
-Here is an example JSON object defining two CS keys:
+Here is an example JSON `parts` object defining two CS keys:
 
 ```json
 {
-  "1": "bf6e23c6db99ed2d24b160e89a37c9cd183fb61afeca40c4bc378cf6e488bebe",
+  "8": "bf6e23c6db99ed2d24b160e89a37c9cd183fb61afeca40c4bc378cf6e488bebe",
   "0": "861b9311b1ad8ec9ae810f454745d37b46355604637e068cea6a8131191b7d4f"
 }
 ```
@@ -28,9 +28,9 @@ Each fingerprint is concatenated in numerical ascending order by the CSID, so th
 Here is example node.js javascript to do the example calculation:
 
 ```js
-var fingerprints = {"1":"bf6e23c6db99ed2d24b160e89a37c9cd183fb61afeca40c4bc378cf6e488bebe","0":"861b9311b1ad8ec9ae810f454745d37b46355604637e068cea6a8131191b7d4f"};
-var sorted = Object.keys(fingerprints).sort(function(a,b){return a-b});
-var values = sorted.map(function(id){return fingerprints[id.toString()]});
+var parts = {"8":"bf6e23c6db99ed2d24b160e89a37c9cd183fb61afeca40c4bc378cf6e488bebe","0":"861b9311b1ad8ec9ae810f454745d37b46355604637e068cea6a8131191b7d4f"};
+var sorted = Object.keys(parts).sort(function(a,b){return a-b});
+var values = sorted.map(function(id){return parts[id.toString()]});
 var hashname = require("crypto").createHash("sha256").update(values.join("")).digest("hex");
 ```
 
