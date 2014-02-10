@@ -1,6 +1,6 @@
 # TeleSocket (TS)- WebSockets over Telehash
 
-The WebSocket definition is a simple connection abstraction layer defining minimal "open", "close", "error", and "message" events to/from a URI.
+The [WebSocket definition](http://dev.w3.org/html5/websockets/) is a simple connection abstraction layer defining minimal "open", "close", "error", and "message" events to/from a URI.
 
 Any switch can support this same abstraction using the URI structure of `ts://c6db0918a767f00b9841f4366ade7ffc13c86541c40bf0a1612e939988fdefb0/pathname` where the protocol is `ts` for TeleSocket, the host part is the target hashname, and the given path (defaults to `/` if none specified) as a selection mechanism.
 
