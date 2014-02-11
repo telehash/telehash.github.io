@@ -1,4 +1,4 @@
-Cipher Set 0
+Cipher Set 1
 ============
 
 Minimum lightweight profile to support embedded devices.
