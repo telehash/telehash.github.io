@@ -24,7 +24,7 @@ The BODY of any open packet is binary and defined with the following byte sectio
 
 * `HMAC` - 20 bytes, the calculated HMAC
 * `LINE KEY` - 40 bytes, the sender's temporary line public key (X+Y)
-* `INNER CIPHER` - the AES-128-CTR encrypted inner packet
+* `INNER CIPHERTEXT` - the AES-128-CTR encrypted inner packet
 
 By performing ECDH with the sender's given line-key and the recipient's hashname-key, the resulting 20 byte secret is used to create the AES cipher and decode the inner packet. The first 16 bytes of the secret are the AES key, and the remaining 4 bytes are used as the IV (left-zero-padded).
 
@@ -41,7 +41,7 @@ Line packets are designed to be very lightweight with minimum overhead for use o
 
 * `HMAC` - 4 bytes, the first part of the HMAC
 * `IV` - 4 bytes
-* `CHANNEL CIPHER` - the AES-128-CTR encrypted channel packet
+* `CHANNEL CIPHERTEXT` - the AES-128-CTR encrypted channel packet
 
 Using the correct line key the HMAC can be verified/created, and then using that key with the IV the channel packet can be encrypted/decrypted.
 
