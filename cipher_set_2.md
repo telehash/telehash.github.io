@@ -4,9 +4,11 @@ Cipher Set 2
 Based on Daniel J. Bernstein's ciphers and NaCl work
 
 ## Example Code For Discussion
+
+```js
 var sodium = require("sodium").api;
 
-// Identity Keys
+// Hashname Keys
 var senderKeys = sodium.crypto_box_keypair();
 var receiverKeys = sodium.crypto_box_keypair();
 
@@ -60,5 +62,5 @@ console.log("recvMacKey matches:", matches === 0);
 // At this point we would have the sender public key and can check the mac of the outer packet
 var authed = sodium.crypto_onetimeauth_verify(openHMAC, openPacketData, recvMacKey) === 0 ;
 console.log("Open hmac verify:", authed);
-
+```
 
