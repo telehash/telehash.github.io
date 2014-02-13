@@ -111,7 +111,7 @@ would love your help - pull requests to list them here are welcome!
 ## Creating Applications
 
 In addition to a switch, each instance of an application must generate
-its own unique, private RSA keypair. This keypair is used to used to
+its own unique, private RSA keypair. This keypair is used to
 identify and each application instance when communicating with other
 applications.
 
