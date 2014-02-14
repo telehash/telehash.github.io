@@ -233,29 +233,29 @@ The BODY of the open packet will be a binary encrypted blob containing another p
 
 The inner packet's required values are defined as:
 
-   * `from` - the fingerprints of the public keys defining the sending hashname
+   * `from` - the fingerprints of the public keys defining the sending hashname, called it's `parts`
    * `line` - the unique id the recipient must use for sending any line packets, 16 random bytes hex encoded
-   * `at` - an integer timestamp of when it was sent, used to verify another incoming open request is newer
+   * `at` - an integer timestamp of when the line was initiated, used to verify another incoming open request is newer based on the last received `at`
 
-The inner packet may also contain a BODY that is used depending on the Cipher Set.
+The inner packet may also contain a BODY that is the `key` for the Cipher Set being used.
 
 An `open` is always triggered by the creation of a channel to a hashname, such that when a channel generates it's first packet the switch recognizes that a line doesn't exist yet or may be expired/invalid and attempts to create a new line.  The initiating channel logic is internally responsible for any retransmission of it's own packets, and those retransmissions are the source of re-triggering the sending of any `open` requests.
 
-When a new line is created the switch must also store a local timestamp at that time and send that same value as the `at` in any open request.  This enables the recipient to recognize retransmissions of the same line initiation request, as well as detect when an open is generated for a new line as it will have a newer `at` value relative to the existing one.
+When a new line is initiated the switch must also store a local timestamp at that time and send that same value as the `at` in any open request.  This enables the recipient to recognize retransmissions of the same line initiation request, as well as detect when an open is generated for a new line as it will have a newer `at` value relative to the existing one. Any subsequent opens with matching or older `at` values must be ignored.
 
 <a name="line" />
 ### `line` - Packet Encryption
 
 As soon as any two hashnames have both send and received a valid `open` then a line is created between them. Since one part is always the initiator and sent the open as a result of needing to create a channel to the other hashname, immediately upon creating a `line` that initiator will then send line packets.
 
-Every `"type":"line"` packet is required to have a `line` parameter that matches the outgoing id sent in the open, unknown line ids are ignored/dropped.  The BODY is always an encrypted binary that is defined by the encryption/decryption used in the given [Cipher Set](cipher_sets.md), which may also require additional JSON attributes (such as `iv`).
+Every `"type":"line"` packet is required to have a `line` parameter that matches the outgoing id sent in the open, unknown line ids are ignored/dropped.  The BODY is always an encrypted binary that is defined by the encryption/decryption used in the given [Cipher Set](cipher_sets.md).
 
 Once decrypted, the resulting value is a packet that must minimally contain a "c" value as defined below to identify the channel the packet belongs to.
 
 <a name="channels" />
 ## Channels - Content Transport
 
-All data sent between any two hashnames (inside a line packet) must contain a `c` parameter with a unique value (16 random bytes hex encoded) determined by the sender for each channel.
+All data sent between any two hashnames (inside a line packet) must contain a `c` parameter with a unique hex string identifier (max length 32, or 16 bytes) determined by the sender for each channel. See [conflict avoidance](#conflict) for details on generating channel IDs.
 
 A channel may have only one outgoing initial packet, only one response to it, or it may be long-lived with many packets exchanged using the same "c" identifier (depending on the type of channel).  Channels are by default unreliable, they have no retransmit or ordering guarantees, and an `end` always signals the last packet for the channel with none in response.  When required, an app can also create a [reliable](reliable.md) channel that does provide ordering and retransmission functionality.
 
