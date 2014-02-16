@@ -318,7 +318,7 @@ When initating a new connection, the first seek requests should always be sent t
 
 Only the prefix hex value is sent in each seek request to reduce the amount of information being shared about who's seeking who. The value then is only the bytes of the hashname being saught that match the distance to the recipient plus one more byte in order for the recipient to determine closer hashnames.  So if a seek is being sent to  "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c" for the hashname "171042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6" the value would be `"seek":"1710"`.
 
-The response is a compact `"see":[...]` array of addresses that are closest to the hash value (based on the [kademlia][] rules).  The addresses are a compound comma-delimited string containing the "hash,cs,ip,port" (these are intentionally not JSON as the verbosity is not helpful here), for example "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c,1,123.45.67.89,10111". The "cs" is the [Cipher Set][] numeric ID and is required. The ip and port parts are optional and only act as hints for NAT hole punching.
+The response is a compact `"see":[...]` array of addresses that are closest to the hash value (based on the [kademlia][] rules).  The addresses are a compound comma-delimited string containing the "hash,cs,ip,port" (these are intentionally not JSON as the verbosity is not helpful here), for example "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c,1a,123.45.67.89,10111". The "cs" is the [Cipher Set][] ID and is required. The ip and port parts are optional and only act as hints for NAT hole punching.
 
 Only hashnames with an active `link` may be returned in the `see` response, and it must always include an `"end":true`.  Only other seeds will be returned unless the seek hashname matches exactly, then it will also be included in the response even if it isn't seeding.
 
@@ -334,7 +334,7 @@ The initial request:
   "c":1,
   "type":"link",
   "seed":true,
-  "see":["c6db0918a767f00b9841f4366ade7ffc13c86541c40bf0a1612e939988fdefb0,1,184.96.145.75,59474"]
+  "see":["c6db0918a767f00b9841f4366ade7ffc13c86541c40bf0a1612e939988fdefb0,1a,184.96.145.75,59474"]
 }
 ```
 
@@ -344,7 +344,7 @@ Initial response, accepting the link:
 {
   "c":1,
   "seed":false,
-  "see":["9e5ecd193b14abaef376067f80f442be97f6f3110abb865398c2a6ec83a4ee9b,2"]
+  "see":["9e5ecd193b14abaef376067f80f442be97f6f3110abb865398c2a6ec83a4ee9b,2a"]
 }
 ```
 

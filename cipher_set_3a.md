@@ -1,4 +1,4 @@
-Cipher Set 2
+Cipher Set 3a
 ============
 
 Based on Daniel J. Bernstein's ciphers and NaCl work

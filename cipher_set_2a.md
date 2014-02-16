@@ -1,4 +1,4 @@
-Cipher Set 1r
+Cipher Set 2a
 ============
 
 This profile is the base algorithms selected for the telehash development process in 2013.
