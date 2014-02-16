@@ -18,7 +18,7 @@ The `to` value is the incoming line id, when any packet comes in with that id th
 
 When any line id coming into the switch matches the `from` value it's resent to the network path that the bridge was created from.  Bridges should be persisted until the hashname that created it goes offline.
 
-This enables a supporting switch to do essentially no work in bridging packets as it can process them outside any encryption.  To prevent any loops, a cache of recently used `iv` values on the bridge packets should be kept and any repeat ones should be dropped.
+This enables a supporting switch to do essentially no work in bridging packets as it can process them outside any encryption.  To prevent circular loops, all bridged packets must have a hash calculated and temporary cache of the values stored to detect any repeat packets that should be dropped.
 
 ## Connect Path
 

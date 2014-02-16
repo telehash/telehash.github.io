@@ -58,9 +58,9 @@ Since Telehash is it's own networking stack layered above existing networks, it 
 
 ## Security
 
-The goal of Telehash isn't to invent new kinds of security, it's to simply use the best of existing solutions and apply them to a long-term decentralied system.  There isn't any current security standard that can be adopted as-is for this type of usage, so the approach is to use and evolve sets of well known ciphers and algorithms with as minimal adaptation as is possible.
+The goal of Telehash isn't to invent new kinds of security, it's to simply use the best of existing solutions and apply them to a long-term decentralied system.  There isn't any single standard that can be adopted as-is for this type of usage, so the approach is to use and evolve sets of well known ciphers and algorithms with as minimal adaptation as is possible.
 
-There is a conscious choice to use three different techniques within the protcol, one for addressing validation, one for forward secrecy, and one for packet encryption.  There is no new crypto being invented as part of the protocol, existing libraries/systems are used for each of those three different aspects as defined in [Cipher Sets][].
+There are three different security aspects within the protocol, one for addressing validation, one for forward secrecy, and one for packet encryption.  There are no new algorithms being created, only existing crypto libraries/systems are used for each of those three different aspects as defined in [Cipher Sets][].
 
 # Protocol Details
 
@@ -70,7 +70,7 @@ There is a conscious choice to use three different techniques within the protcol
   * **NAT**: A device/router that acts as a bridge to internal IPPs
     (Network Address Translation)
   * **Hashname**: The unique address of an individual application/instance
-    using Telehash
+    using Telehash, a 64 character hex string
   * **Packet**: A single message containing JSON and/or binary data sent between any two
     hashnames
   * **Switch**: The name of the software layer or service parsing
@@ -123,7 +123,7 @@ others by knowing only their hashname. By default there is a single global
 DHT to support this discovery and connectivity, but Telehash also supports applications creating their own private
 DHTs for other uses.
 
-The hashname is a 64-character hex string, formed by the [SHA-256][] digest of the fingerprints of a set of public keys that is generated the first time an application starts, an example hashname is `2dbf1ce81180d9ed9258e3e8729ba642c8ab2a31268d31cd2c7ffe8693e3a02e`.
+The hashname is a 64-character lower case hex string, formed by the [SHA-256][] digest of the fingerprints of a set of public keys that is generated the first time an application starts, an example hashname is `2dbf1ce81180d9ed9258e3e8729ba642c8ab2a31268d31cd2c7ffe8693e3a02e`.
 
 The details of how the hashname is calculated from the generated keys is described in the [Cipher Sets](cipher_sets.md#hashnames) document.
 
@@ -215,17 +215,13 @@ JSON must contain a `type` field with a string value of `open` or
 ### `open` - Establishing a Line
 
 A packet of `"type":"open"` is used to establish a temporary encrypted
-session between any two hashnames, this session is called a "line". You
-must know a public key of the recipient in order to send an
-`open` packet to them.
+session between any two hashnames, this session is called a "line". You must know a public key of the recipient in order to send an `open` packet to them. The detailed requirements to create/process open packets are defined by the [Cipher Set](cipher_sets.md) being used between two hashnames.
 
-The detailed requirements to create/process open packets are defined by the [Cipher Set](cipher_sets.md) being used between two hashnames, typically there will be additional JSON keys like `open`, `iv`, and `sig`.
-
-The BODY of the open packet will be a binary encrypted blob containing another packet. Once decrypted by the process defined in the Cipher Set that is being used, it will contain another packet. Here's an example of the JSON content of this inner packet before encryption:
+The BODY of the open packet will be a binary encrypted blob, once decrypted by the process defined in the Cipher Set that is being used, it will contain another "inner" packet. Here's an example of the JSON content of this inner packet before encryption:
 
 ```js
 {
-    "from":{"1":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"},
+    "from":{"2a":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"},
     "at":1375983687346,
     "line":"8b945f90f08940c573c29352d767fee4"
 }
@@ -234,14 +230,18 @@ The BODY of the open packet will be a binary encrypted blob containing another p
 The inner packet's required values are defined as:
 
    * `from` - the fingerprints of the public keys defining the sending hashname, called it's `parts`
-   * `line` - the unique id the recipient must use for sending any line packets, 16 random bytes hex encoded
+   * `line` - the unique id the recipient must use for sending any line packets, 16 random bytes lower case hex encoded
    * `at` - an integer timestamp of when the line was initiated, used to verify another incoming open request is newer based on the last received `at`
 
-The inner packet may also contain a BODY that is the `key` for the Cipher Set being used.
+The inner packet must also contain a BODY that is the binary `key` for the Cipher Set being used.
 
-An `open` is always triggered by the creation of a channel to a hashname, such that when a channel generates it's first packet the switch recognizes that a line doesn't exist yet or may be expired/invalid and attempts to create a new line.  The initiating channel logic is internally responsible for any retransmission of it's own packets, and those retransmissions are the source of re-triggering the sending of any `open` requests.
+An `open` is always triggered by the creation of a channel to a hashname, such that when a channel generates it's first packet the switch recognizes that a line doesn't exist yet.  The initiating channel logic is internally responsible for any retransmission of it's own packets, and those retransmissions are the source of re-triggering the sending of any `open` requests.
 
-When a new line is initiated the switch must also store a local timestamp at that time and send that same value as the `at` in any open request.  This enables the recipient to recognize retransmissions of the same line initiation request, as well as detect when an open is generated for a new line as it will have a newer `at` value relative to the existing one. Any subsequent opens with matching or older `at` values must be ignored.
+When a new line is initiated the switch must also store a local timestamp at that time and send that same value as the `at` in any subsequent open request for that line.  This enables the recipient to recognize retransmissions of the same line initiation request, as well as detect when an open is generated for a new line as it will have a newer `at` value relative to the existing one. Any subsequent opens with matching or older `at` values must be ignored.
+
+A switch may have an existing line but believe that the recipient might not have the line open anymore (such as if it reset, has been idle more than 60 seconds, or there's a new incoming `connect` from the other hashname, etc). In this state it should re-send the same open packet for the current line again, allowing the recipient to re-open the line if so.
+
+If a new open request is validated and there's an existing line, when the new open contains a new `line` id then the recipient must reset all existing channels and any session state for that hashname as it signifies a complete reset/restart.  If the new open contains the same/existing line id as a previous one, it is simply a request to recalculate the line encryption keys but not reset any existing channel state.
 
 <a name="line" />
 ### `line` - Packet Encryption
@@ -255,7 +255,7 @@ Once decrypted, the resulting value is a packet that must minimally contain a "c
 <a name="channels" />
 ## Channels - Content Transport
 
-All data sent between any two hashnames (inside a line packet) must contain a `c` parameter with a unique hex string identifier (max length 32, or 16 bytes) determined by the sender for each channel. See [conflict avoidance](#conflict) for details on generating channel IDs.
+All data sent between any two hashnames (inside a line packet) must be part of a `channel`. Every channel has an integer id included as the `c` parameter in the JSON. See [Channel IDs](#channelids) for details on how they are selected/handled.
 
 A channel may have only one outgoing initial packet, only one response to it, or it may be long-lived with many packets exchanged using the same "c" identifier (depending on the type of channel).  Channels are by default unreliable, they have no retransmit or ordering guarantees, and an `end` always signals the last packet for the channel with none in response.  When required, an app can also create a [reliable](reliable.md) channel that does provide ordering and retransmission functionality.
 
@@ -271,7 +271,7 @@ An example unreliable channel start packet JSON for a built-in channel:
 
 ```json
 {
-	"c":"ab945f90f08940c573c29352d767fee4",
+	"c":1,
 	"type":"seek",
 	"seek":"67a42f01"
 }
@@ -281,12 +281,21 @@ An example initial reliable channel request from an app:
 
 ```json
 {
-	"c":"ab945f90f08940c573c29352d767fee4",
+	"c":2,
   "seq":0,
 	"type":"_hello",
 	"_":{"custom":"values"}
 }
 ```
+
+<a name="channelid" />
+### Channel IDs
+
+A Channel ID is a positive (unsigned) integer and is determined by the sender and then used by both sides to send/receive packets on that channel.  In order to prevent two hashnames from picking the same `c` value they both use a simple rule when they initiate a new channel: sort both hashnames alphabetically and the lower/first sorted one uses only even numbers, while the higher/second one uses odd numbers.
+
+When a new channel is created, the ID must be higher than the last one the initiator used, they must always increment. Upon receiving a new channel request, the recipient must validate that it is higher than the last active channel (note: switches must still allow for two new channel requests to arrive out of order).
+
+When a new [line](#line) is estblished, it resets any stored channel state and sets the minimum required channel IDs back to 0.
 
 ## Built-In Channels
 
@@ -322,7 +331,7 @@ The initial request:
 
 ```json
 {
-  "c":"ab945f90f08940c573c29352d767fee4",
+  "c":1,
   "type":"link",
   "seed":true,
   "see":["c6db0918a767f00b9841f4366ade7ffc13c86541c40bf0a1612e939988fdefb0,1,184.96.145.75,59474"]
@@ -333,7 +342,7 @@ Initial response, accepting the link:
 
 ```json
 {
-  "c":"ab945f90f08940c573c29352d767fee4",
+  "c":1,
   "seed":false,
   "see":["9e5ecd193b14abaef376067f80f442be97f6f3110abb865398c2a6ec83a4ee9b,2"]
 }

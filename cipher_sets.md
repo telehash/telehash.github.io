@@ -36,13 +36,9 @@ var values = sorted.map(function(id){return parts[id.toString()]});
 var hashname = require("crypto").createHash("sha256").update(values.join("")).digest("hex");
 ```
 
-## CSID Matching
+## CSID Selection
 
 Two hashnames can only start communicating by using the same CSID, and that CSID must always be the "highest" one in alphanumeric sort order.  The CSIDs of "1", "1r", and "2" sort in that order and "2" is the highest, so two hashnames supporting all three must use CS2.
-
-## Opens
-
-An `open` packet can only be created when the sender already knows the recipients `parts` and has the the `key` for it's matching CSID.
 
 
 
