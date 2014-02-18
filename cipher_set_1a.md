@@ -26,9 +26,9 @@ The BODY of any open packet is binary and defined with the following byte sectio
 * `LINE KEY` - 40 bytes, the sender's temporary line public key (X+Y)
 * `INNER CIPHERTEXT` - the AES-128-CTR encrypted inner packet
 
-By performing ECDH with the sender's given line-key and the recipient's hashname-key, the resulting 20 byte secret is used to create the AES cipher and decode the inner packet. The first 16 bytes of the secret are the AES key, and the remaining 4 bytes are used as the IV (left-zero-padded).
+By performing ECDH with the sender's given line-key and the recipient's hashname-key, the resulting 20 byte secret is used to create the AES cipher and decode the inner packet. The first 16 bytes of the secret are the AES key, and the IV is "1" ("00000000000000000000000000000001" in hex).
 
-The inner packet then contains the sender's hashname-key and must be verified.  Using the hashname-key attached to the inner packet and ECDH with the recipients hashname-key, the shared secret is used as the input to the HMAC and verified against the original BODY after the HMAC (bytes 20+).
+The inner packet then contains the sender's hashname-key and must be verified.  Using the hashname-key attached to the inner packet and ECDH with the recipients hashname-key, the shared secret is used as the input to the HMAC (first 16 bytes for the key, and same IV as above) and verified against the original BODY after the HMAC (bytes 20+).
 
 ## Line
 
