@@ -13,12 +13,12 @@ Each CS contributes two values that are used within the protocol, a `fingerprint
 
 Two hashnames must always initiate a line to each other using the highest shared CSID between them.  Apps may choose which one or more CSIDs they want to support when they create a new hashname and know that a lower one will only ever be used to communicate with hashnames that only support that CS.
 
-Any CSID of "0*" ("00" through "0a") are reserved for special case custom Cipher Sets who's definitions are entirely app-specific.
+Any CSID of "0*" ("01" through "0a") are reserved for special case custom Cipher Sets who's definitions are entirely app-specific, "00" is not allowed to be used at all.
 
 <a name="hashnames" />
 ## Hashname Calculation
 
-A hashname is the [SHA-256][] of one or more public key fingerprints.  The set of fingerprints making up a hashname is called its `parts` and are required to calculate it.  A hashname may be created from just one CS or multiples of them, each contributing its string fingerprint.
+A hashname is the [SHA-256][] of one or more public key fingerprints.  The set of fingerprints making up a hashname is called its `parts` and are required to calculate it.  A hashname may be created from just one CS or up to 8 different ones, each contributing its string fingerprint.
 
 Here is an example JSON `parts` object composed of two Cipher Sets:
 
