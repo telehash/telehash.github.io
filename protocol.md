@@ -92,7 +92,7 @@ Telehash packets, known as a "switch".
 
 It is highly recommended to use an existing switch library or service
 for your environment, rather than creating one from scratch. This will
-help insure that the security, identity, and networking aspects are
+help ensure that the security, identity, and networking aspects are
 verified properly. If there isn't one which meets your needs, then we
 would love your help - pull requests to list them here are welcome!
 
