@@ -1,3 +1,13 @@
+# Network Transport
+
+Telehash can send packets over a variety of network transports, the preferred and most common of which is UDP since it is the most capable of enabling direct connections between peers.
+
+By default, only two types of packets are encoded on any untrusted network transport, an `open` and a `line`, both of which are encrypted by the selected [Cipher Set](cipher_sets.md) so that only the sender/recipient can read them.
+
+* [Open Packets](#open) - Request to initiate a new line
+* [Line Packets](#open) - Encrypted [Channel](channels.md) packets
+* [Network Paths](#paths) - JSON for describing network path details
+
 <a name="paths" />
 ### Network Paths
 
@@ -7,10 +17,10 @@ Every unique network sender/recipient is called a `path` and defined by a JSON o
 
 * `ipv4` - UDP, contains `ip` and `port`, default and most common path
 * `ipv6` - UDP, contains `ip` and `port`, preferred/upgraded when both sides support it
-* `http` - see [path_http][], also is the primary fallback when UDP is blocked
-* `webrtc` - see [path_webrtc][], preferred when possible
-* `relay` - contains `id` of the channel id to create a [relay](#relay) with
-* `bridge` - see [ext_bridge][], fallback when no other path works
+* `http` - see [path_http](ext/path_http.md), also is the primary fallback when UDP is blocked
+* `webrtc` - see [path_webrtc](ext/path_webrtc.md), preferred when possible
+* `relay` - contains `id` of the channel id to create a [relay](switch.md#relay) with
+* `bridge` - see [ext_bridge](ext/path_bridge.md), fallback when no other path works
 
 These paths are used often within the protocol to exchange network information, and frequently sent as an array, for example:
 
@@ -29,21 +39,12 @@ These paths are used often within the protocol to exchange network information, 
 }]
 ```
 
-## Packet types
-When a packet is being processed from the network initially, it's
-JSON must contain a `type` field with a string value of `open` or
-`line`, each of which determine how to process the BODY of the packet:
-
- * [`open`](#open) - this is a request to establish a new encrypted session
- * [`line`](#line) - this is an encrypted packet for an already established session
-
 <a name="open" />
-### `open` - Establishing a Line
+## `open` - Establishing a Line
 
-A packet of `"type":"open"` is used to establish a temporary encrypted
-session between any two hashnames, this session is called a "line". You must know a public key of the recipient in order to send an `open` packet to them. The detailed requirements to create/process open packets are defined by the [Cipher Set](cipher_sets.md) being used between two hashnames.
+A packet read from the network that has a HEAD of length 1 is always an `open`, with the single HEAD byte being the CSID used by the sender.
 
-The BODY of the open packet will be a binary encrypted blob, once decrypted by the process defined in the Cipher Set that is being used, it will contain another "inner" packet. Here's an example of the JSON content of this inner packet before encryption:
+The BODY is the encrypted binary that only that selected [Cipher Set](cipher_sets.md) can process into an "inner" packet. Here's an example of the JSON content of this decrypted inner packet:
 
 ```js
 {
@@ -70,10 +71,10 @@ A switch may have an existing line but believe that the recipient might not have
 If a new open request is validated and there's an existing line, when the new open contains a new `line` id then the recipient must reset all existing channels and any session state for that hashname as it signifies a complete reset/restart.  If the new open contains the same/existing line id as a previous one, it is simply a request to recalculate the line encryption keys but not reset any existing channel state.
 
 <a name="line" />
-### `line` - Packet Encryption
+## `line` - Packet Encryption
 
-As soon as any two hashnames have both send and received a valid `open` then a line is created between them. Since one part is always the initiator and sent the open as a result of needing to create a channel to the other hashname, immediately upon creating a `line` that initiator will then send line packets.
+A packet read from the network that has a HEAD of length 0 is a binary encrypted `line` packet.  The first 16 bytes are always the line ID, and only known line IDs are processed, any packet with an unknown ID is dropped.  The remaining bytes are encrypted and processed by the [Cipher Set](cipher_sets.md) used to create the line.
 
-Every `"type":"line"` packet is required to have a `line` parameter that matches the outgoing id sent in the open, unknown line ids are ignored/dropped.  The BODY is always an encrypted binary that is defined by the encryption/decryption used in the given [Cipher Set](cipher_sets.md).
+Once decrypted, the resulting value is always a [channel](channels.md) packet.
 
-Once decrypted, the resulting value is a packet that must minimally contain a "c" value as defined below to identify the channel the packet belongs to.
+Often a switch may be acting as a [bridge](ext/bridge.md) where it maps line IDs to other network destinations and doesn't attempt to process/decrypt them.

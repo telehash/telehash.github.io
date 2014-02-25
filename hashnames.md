@@ -2,7 +2,7 @@
 
 A Telehash address is called a `hashname` and is always either a 64 length lower case hex string or 32byte binary value result of a [SHA-256](http://en.wikipedia.org/wiki/SHA-2).  An example hashname is `2dbf1ce81180d9ed9258e3e8729ba642c8ab2a31268d31cd2c7ffe8693e3a02e`.
 
-Hashnames are always generated locally by an application instance from one or more private keys and are often used to create a [DHT](dht.md).  A hashname is not intended to be used by more than one running instance at the same time, and the private keys should never leave local storage.
+Hashnames are always generated locally by an application instance from one or more private keys and are often used to create a [DHT](dht.md).  A hashname is not intended to be used by more than one running instance at the same time (see [notes](implementors.md#simultaneous) for more discussion), and the private keys should never leave local storage.
 
 Applications should treat hashnames as an instance or reachable network address, not as a permanent or portable user identity, they should always map to a single install or device and may change due to a reinstall or storage reset.
 
