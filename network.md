@@ -1,43 +1,18 @@
 # Network Transport
 
-Telehash can send packets over a variety of network transports, the preferred and most common of which is UDP since it is the most capable of enabling direct connections between peers.
+Telehash can send packets over a variety of network transports, the preferred and most common of which is UDP since it is the most capable of enabling direct connections between peers.  All UDP messages map to a [packet](packet.md) 1:1 and can be sent/received over IPv4 or IPv6.
 
-By default, only two types of packets are encoded on any untrusted network transport, an `open` and a `line`, both of which are encrypted by the selected [Cipher Set](cipher_sets.md) so that only the sender/recipient can read them.
+There are extensions describing how to also use other network transports:
 
-* [Open Packets](#open) - Request to initiate a new line
-* [Line Packets](#open) - Encrypted [Channel](channels.md) packets
-* [Network Paths](#paths) - JSON for describing network path details
+* [HTTP](ext/path_http.md)
+* [WebRTC](ext/path_webrtc.md)
+* [Bluetooth](ext/path_bluetooth.md)
+* [802.15.4](ext/path_802.15.4.md)
+* [Local Area Network](ext/lan.md)
 
-<a name="paths" />
-### Network Paths
+By default there are only two required packet types on any untrusted network transport, an [open](#open) and a [line](#line), both of which are encrypted by the selected [Cipher Set](cipher_sets.md) so that only the sender/recipient can read them. Additional packet types may be supported on specific network transports relating to functionality in those networks such as broadcast discovery and routing.
 
-To enable the most direct P2P connectivity possible the default network transport between any two switches is UDP.  Additional transports are defined below for when UDP is not supported or as a fallback if it's blocked.  All UDP packets map 1:1 to a Telehash packet.
-
-Every unique network sender/recipient is called a `path` and defined by a JSON object that contains a `"type":"..."` to identify which type of network information it describes. The current path types defined are:
-
-* `ipv4` - UDP, contains `ip` and `port`, default and most common path
-* `ipv6` - UDP, contains `ip` and `port`, preferred/upgraded when both sides support it
-* `http` - see [path_http](ext/path_http.md), also is the primary fallback when UDP is blocked
-* `webrtc` - see [path_webrtc](ext/path_webrtc.md), preferred when possible
-* `relay` - contains `id` of the channel id to create a [relay](switch.md#relay) with
-* `bridge` - see [ext_bridge](ext/path_bridge.md), fallback when no other path works
-
-These paths are used often within the protocol to exchange network information, and frequently sent as an array, for example:
-
-```js
-[{
-  "type": "ipv4",
-  "ip": "127.0.0.1",
-  "port": 42424
-}, {
-  "type": "ipv6",
-  "ip": "fe80::2a37:37ff:fe02:3c22",
-  "port": 42424
-}, {
-  "type": "http",
-  "http": "http://127.0.0.1"
-}]
-```
+When working with multiple transports a switch often needs to send and receive current network addressing details. Each specific active network address is called a `path` and there is a common [JSON](#paths) format for exchanging paths.
 
 <a name="open" />
 ## `open` - Establishing a Line
@@ -78,3 +53,35 @@ A packet read from the network that has a HEAD of length 0 is a binary encrypted
 Once decrypted, the resulting value is always a [channel](channels.md) packet.
 
 Often a switch may be acting as a [bridge](ext/bridge.md) where it maps line IDs to other network destinations and doesn't attempt to process/decrypt them.
+
+<a name="paths" />
+### Network Paths
+
+To enable the most direct P2P connectivity possible the default network transport between any two switches is UDP.  Additional transports are defined below for when UDP is not supported or as a fallback if it's blocked.  All UDP packets map 1:1 to a Telehash packet.
+
+Every unique network sender/recipient is called a `path` and defined by a JSON object that contains a `"type":"..."` to identify which type of network information it describes. The current path types defined are:
+
+* `ipv4` - UDP, contains `ip` and `port`, default and most common path
+* `ipv6` - UDP, contains `ip` and `port`, preferred/upgraded when both sides support it
+* `http` - see [path_http](ext/path_http.md), also is the primary fallback when UDP is blocked
+* `webrtc` - see [path_webrtc](ext/path_webrtc.md), preferred when possible
+* `relay` - contains `id` of the channel id to create a [relay](switch.md#relay) with
+* `bridge` - see [ext_bridge](ext/path_bridge.md), fallback when no other path works
+
+These paths are used often within the protocol to exchange network information, and frequently sent as an array, for example:
+
+```js
+[{
+  "type": "ipv4",
+  "ip": "127.0.0.1",
+  "port": 42424
+}, {
+  "type": "ipv6",
+  "ip": "fe80::2a37:37ff:fe02:3c22",
+  "port": 42424
+}, {
+  "type": "http",
+  "http": "http://127.0.0.1"
+}]
+```
+
