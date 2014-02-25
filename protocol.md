@@ -206,7 +206,7 @@ The Telehash specification as well as other applications may use
 packets recursively, by embedding the (possibly encrypted) byte
 representation of an inner packet into the BODY of an outer one. As a
 result, switch implementations must be prepared to decode packets not
-just from UDP messagess, but from a BODY or after decryption.
+just from UDP messages, but from a BODY or after decryption.
 
 ## Cryptography
 
