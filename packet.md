@@ -8,7 +8,7 @@ When the JSON length is two or greater it must contain a UTF-8 encoded object or
 
 The format is thus:
 
-    <length><JSON>[BODY]
+    <length>[JSON][BODY]
 
 A simplified example of how to decode a packet, written in Node.js:
 
