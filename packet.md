@@ -1,44 +1,47 @@
 # Packet Format
 
-A packet can include JSON or raw binary data, and typically has both with JSON acting as the dynamic header.  Packets are generally synonymous with a UDP message so the total size of a packet is determined by the network transport and not part of the format. For encoding packets on other network transports see [HTTP](ext/path_http.md), [WebRTC](ext/path_webrtc.md), and [TCP](ext/path_tcp.md).
+A packet has two distinct parts, a HEAD and a BODY, both optional. The HEAD is typically parsed as JSON and the BODY is always binary. Packets are generally synonymous with a UDP message so the total size of a packet is determined by the network transport and not part of the format. For encoding packets on other network transports see [HTTP](ext/path_http.md), [WebRTC](ext/path_webrtc.md), and [TCP](ext/path_tcp.md).
 
-Every packet must begin with two bytes which form a network byte-order short unsigned integer. This integer represents the length in bytes of the JSON header that follows it and the remaining bytes in the packet are treated as raw binary and referenced as the 'BODY'.
-
-When the JSON length is two or greater it must contain a UTF-8 encoded object or array.  When it is zero the packet contains only a BODY, and when the length is one then it contains only a single unsigned byte that is mapped into a JSON object.
+Every packet must begin with two bytes which form a network byte-order short unsigned integer. This integer represents the length in bytes of the 'HEAD' that follows it, and the remaining bytes in the packet are treated as raw binary and referenced as the 'BODY'.
 
 The format is thus:
 
-    <length>[JSON][BODY]
+    <length>[HEAD][BODY]
 
 A simplified example of how to decode a packet, written in Node.js:
 
-``` js
+```js
 dgram.createSocket("udp4", function(msg){
-    var length = msg.readUInt16BE(0);
-    if(length) var js = (length == 1) ? {"#":msg.readUint8(2)} : JSON.parse(msg.toString("utf8", 2, length + 2));
-    var body = msg.slice(length + 2);
+    var head_length = msg.readUInt16BE(0);
+    var head = msg.slice(2, head_length + 2);
+    var body_length = msg.length - (head_length + 2);
+    var body = msg.slice(head_length + 2, body_length);
+    var json = (head_length >= 2) ? JSON.parse(head.toString("utf8")) : undefined;
 });
 ```
 
-It is only a parsing error when the JSON length is greater than the size of the packet and when the JSON parsing fails.  When successful, parsers must always return four values:
+When the HEAD length is two or greater, a parser must attempt to decode it as a UTF-8 JSON object or array.  When it is zero the packet contains only a BODY.
 
-* `JSON LENGTH` - 0 to packet length - 2
-* `JSON` - undefined, object, or array
-* `BODY LENGTH` - 0 to packet length - (2 + JSON LENGTH)
-* `BODY` - undefined or binary
+It is only a parsing error when the HEAD length is greater than the size of the packet or when the JSON decoding fails.  When successful, parsers must always return five values:
+
+* `HEAD LENGTH` - 0 to packet length - 2
+* `HEAD` - undefined/null or binary
+* `JSON` - undefined/null or decoded object or array
+* `BODY LENGTH` - 0 to packet length - (2 + HEAD LENGTH)
+* `BODY` - undefined/null or binary
 
 
-## JSON
+## HEAD
 
-A length of 0 means there is no JSON included and the packet is all binary (only BODY).
+A length of 0 means there is no HEAD included and the packet is all binary (only BODY).
 
-A length of 1 means there is a single byte value, which must be mapped into a JSON object with the key of "#" and the value an integer from 0 to 255.  For example, the byte "t" would be the object `{"#":116}`.
+A length of 1 means there is a single byte value that is not JSON.
 
-A length of 2+ means those bytes must be a UTF-8 encoded JSON object or array (not any bare string/bool/number value).  If the JSON parsing fails, the parser must return an error.
+A length of 2+ means the HEAD must be a UTF-8 encoded JSON object or array (not any bare string/bool/number value).  If the JSON parsing fails, the parser must return an error.
 
 ## BODY
 
-The optional BODY is always a raw binary of the remainder bytes between the packet's total length and that of the JSON. 
+The optional BODY is always a raw binary of the remainder bytes between the packet's total length and that of the HEAD. 
 
 Often packets are attached inside other packets as the BODY, enabling simple packet wrapping/relaying usage patterns.
 
