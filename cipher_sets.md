@@ -9,7 +9,7 @@ Each set is identified with a unique identifier (`CSID`) that represents the ove
 * [CS2a](cs/2a.md) - Original set from 2013 using RSA (2048), ECC (P-256), and AES (256)
 * [CS3a](cs/3a.md) - Modern set using [NaCl](http://nacl.cr.yp.to/)
 
-Each CS contributes two values that are used within the protocol, a `fingerprint` and a `key`.  The `fingerprint` is used to calculate the [hashname](hashname.md) (included in it's `parts`), and the `key` is the binary public key that is required in order to initiate an `open`.
+Each CS contributes two values that are used within the protocol, a `fingerprint` and a `key`.  The `fingerprint` is used to calculate the [hashname](hashnames.md) (included in it's `parts`), and the `key` is the binary public key that is required in order to initiate an `open`.
 
 Two hashnames must always initiate a `line` to each other using the highest shared CSID between them.  Apps may choose which one or more CSIDs they want to support when they create a new hashname and know that a lower one will only ever be used to communicate with hashnames that only support that CS.
 
