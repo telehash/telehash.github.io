@@ -1,4 +1,4 @@
-Telehash Protocol (v0.9)
+Telehash Protocol (v2.1)
 ========================
 
 Telehash is a new wire protocol that creates encrypted private communication links using a decentralized overlay mesh network.  It enables apps and devices to find, identify, and connect directly with each other using public-key security (PKI) and a distributed hash-table (DHT).
