@@ -41,6 +41,6 @@ It is usually used in all lower-case to re-affirm the long term vision of it bei
 
 # History
 
-The name and first version of the protocol was established in 2009 by [Jeremie Miller](http://en.wikipedia.org/wiki/Jeremie_Miller) and was a research project until 2013 when it was significantly updated with a privacy focus.
+The name and first version of the protocol was established in [2009](https://github.com/quartzjer/Telehash) by [Jeremie Miller](http://en.wikipedia.org/wiki/Jeremie_Miller) and was a research project until [2013 (v2)](https://github.com/telehash/telehash.org) when it was significantly updated with a privacy focus.
 
 See this [blog post](http://quartzjer.tumblr.com/post/71784515314/telehash-history) for some more history on it's development.
