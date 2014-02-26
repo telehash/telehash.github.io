@@ -1,5 +1,5 @@
-Telehash Protocol v0.9RC1
-=========================
+Telehash Protocol (v0.9)
+========================
 
 Telehash is a new wire protocol that creates encrypted private communication links using a decentralized overlay mesh network.  It enables apps and devices to find, identify, and connect directly with each other using public-key security (PKI) and a distributed hash-table (DHT).
 
@@ -29,7 +29,7 @@ It is highly recommended to use an existing implementation for your environment 
 <a name="protocol" />
 # Protocol
 
-This is a list of the terminology that should be familar when using telehash:
+This is a list of the terminology and index of the common concepts that telehash uses:
 
 * **[hashname](hashname.md)** - The unique address of an individual application/instance using telehash, a 64 character hex string.
 * **[packet](packet.md)** - A single message containing JSON and/or binary data sent between any two hashnames.
@@ -40,7 +40,7 @@ This is a list of the terminology that should be familar when using telehash:
 * **[DHT](dht.md)** - Distributed Hash Table, how hashname discovery and connectivity is enabled without any central authority.
 * **[paths](network.md)** - Packets can be sent over different networks paths, commonly UDP but also HTTP, WebRTC, and more.
 
-Since telehash is it's own networking stack layered above existing networks, it has mechanisms that parallel well known Internet ones and is easy to draw an analogy to:
+Since telehash is it's own networking stack layered above existing networks, it has mechanisms that parallel well known Internet ones and are easy to draw an analogy to:
 
 * `IP` - Addressing in telehash is based on a fingerprint of a public key generated locally by an app (called a `hashname`) instead of a centrally assigned number.
 * `Routing` - Hashnames are organized into a DHT that every peer helps maintain, there are no core routers or managed backbone.
@@ -49,7 +49,7 @@ Since telehash is it's own networking stack layered above existing networks, it 
 
 As an introduction to how the protocol works, an example startup flow from scratch would look like:
 
-1. create hashname
+1. create a hashname
 2. load a seed
 3. send an open
 4. create a line
