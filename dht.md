@@ -7,6 +7,8 @@ While [Wikipedia](http://en.wikipedia.org/wiki/Distributed_hash_table) has an ar
 
 The important part of any DHT is the ability to handle peers joining and leaving, and ensuring that no malicious peer can interfere with the queries and connectivity.  There have been many different solutions to these types of common DHT challenges, and for telehash these rules have been derived from a DHT named [Kademlia][].
 
+> Also see the [FAQ](faq.md#dht) for common questions and [Implementers Notes](implementers.mddhts) for help when implementing the DHT
+
 # Kademlia-Based Fundamentals
 
 Telehash adapts the [Kademlia][] Distributed Hash Table for it's peer discovery. A "peer" in this document is a single application instance, one unique hashname.

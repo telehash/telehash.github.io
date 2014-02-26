@@ -15,4 +15,4 @@ Two hashnames must always initiate a `line` to each other using the highest shar
 
 Any CSID of "0*" ("01" through "0a") are reserved for special case custom Cipher Sets who's definitions are entirely app-specific, "00" is not allowed to be used at all.
 
-Also see the [FAQ](faq.md#cs) for common questions and [Implementers Notes](implementers.md#cs) for help when implementing a Cipher Set.
+> Also see the [FAQ](faq.md#cs) for common questions and [Implementers Notes](implementers.md#cs) for help when implementing a Cipher Set.

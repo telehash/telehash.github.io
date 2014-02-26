@@ -5,7 +5,7 @@ Telehash is a new wire protocol that creates encrypted private communication lin
 
 For more background and history on telehash please see the [Introduction](background.md) and the [FAQ](faq.md).
 
-This document serves as an index to learn more about the [implementations](implementations.md), [protocol](#protocol), and [extensions](#extensions).  Collaboration on the development of telehash is open to anyone passionate about open communication systems and happens primarily through the protocol's [GitHub repo](https://github.com/telehash/telehash.org/blob/master/implementers.md).
+This document serves as an index to learn more about the [implementations](implementations.md), [protocol](#protocol), and [extensions](extensions.md).  Collaboration on the development of telehash is open to anyone passionate about open communication systems and happens primarily through the protocol's [GitHub repo](https://github.com/telehash/telehash.org/blob/master/implementers.md).
 
 ## Getting Started
 
@@ -42,14 +42,3 @@ As an introduction to how the protocol works, an example startup flow from scrat
 3. send an open
 4. create a line
 5. start a channel
-
-<a name="extensions" />
-# Extensions
-
-There are various stable and experimental extensions to the core protocol, from supporting different alternative network transports, to common channel data type patterns, and mapping existing protocols into telehash.  The categories below are general, and some extensions overlap multiples of them.
-
-### Patterns
-
-### Bindings
-
-### Networks
