@@ -5,26 +5,14 @@ Telehash is a new wire protocol that creates encrypted private communication lin
 
 For more background and history on telehash please see the [Introduction](background.md) and the [FAQ](faq.md).
 
-This document serves as an index to learn more about the [implementations](#switches), [protocol](#protocol), and [extensions](#extensions).  Collaboration on the development of telehash is open to anyone passionate about open communication systems and happens primarily through the protocol's [GitHub repo](https://github.com/telehash/telehash.org/blob/master/implementers.md).
+This document serves as an index to learn more about the [implementations](implementations.md), [protocol](#protocol), and [extensions](#extensions).  Collaboration on the development of telehash is open to anyone passionate about open communication systems and happens primarily through the protocol's [GitHub repo](https://github.com/telehash/telehash.org/blob/master/implementers.md).
 
-<a name="switches" />
-# Implementations
+## Getting Started
 
-In order to use telehash in an application, the application will need to include a software layer that talks to the network, handles the encryption, and processes packets.  This software is known as a "switch" and may come in the form of a library, module, or SDK depending on your language/platform.
-
-It is highly recommended to use an existing implementation for your environment rather than creating one from scratch. This will help ensure that the security, identity, and networking aspects are verified properly. If there isn't one which meets your needs, then please see the [Implementers Guide](implementers.md).
-
-* Node.js - [node-telehash](https://github.com/telehash/node-telehash)
-* D - [telehash.d](https://github.com/temas/telehash.d)
-* Python - [plinth](https://github.com/telehash/plinth)
-* Javascript (browser) [thjs](http://github.com/telehash/thjs)
-* C [telehash-c](http://github.com/quartzjer/telehash-c)
-* Ruby - [ruby-telehash](https://github.com/telehash/ruby-telehash)
-* Go - [gogotelehash](https://github.com/telehash/gogotelehash)
-* Java - [telehash-java](https://github.com/kubes/telehash-java)
-* ObjectiveC - [Objective-Telehash](https://github.com/jsmecham/Objective-Telehash)
-* PHP - [SwitchBox](https://github.com/jaytaph/switchbox)
-* Erlang - [relish](https://github.com/telehash/relish)
+usage patterns/concepts
+hashnames, keys
+channels, packets
+implementations
 
 <a name="protocol" />
 # Protocol

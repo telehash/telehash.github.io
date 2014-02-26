@@ -10,13 +10,19 @@ There isn't a mailing list, all collaboration is either via chat or GitHub.
 
 To contribute to the protocol, please either file an issue or fork and create pull requests for the main [documentation repo](https://github.com/telehash/telehash.org).
 
-To contribute to an existing [implementation](protocol.md#switches) please use it's repo, and to start a new one please add it to that implementation list.
+To contribute to an existing [implementation](implementations.md) please use it's repo, and to start a new one please add it to that implementation list.
+
+## API
+
+* Generating a hashname
+* Creating a switch
+* Starting and handling channels
 
 ## Defaults
 
 There are many configurable numbers within a switch, here's the list of all of them and the current best suggested defaults and minimums/maximums:
 
-| Name | Default | Minimum | Maximum
-| ---- | ------- | ------- | -------
-| [test]( "hover testing") |0|0|0
-||||
+| Name | Default | Minimum | Maximum | Notes
+| ---- | ------- | ------- | ------- | -----
+| [test]( "hover testing") |0|0|0|
+|||||
