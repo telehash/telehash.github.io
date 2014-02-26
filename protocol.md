@@ -1,64 +1,18 @@
-Telehash protocol draft
-=================
+Telehash Protocol v0.9RC1
+=========================
 
-document reorg in progress:
+Telehash is a new wire protocol that creates encrypted private communication links using a decentralized overlay mesh network.  It enables apps and devices to find, identify, and connect directly with each other using public-key security (PKI) and a distributed hash-table (DHT).
 
-* [Introduction](background.md)
-* [Hashname Definition](hashnames.md)
-* [Channel Definition](channels.md)
-* [FAQ](faq.md)
-* [Implementers Guide](implementers.md)
-* [Network Interface](network.md)
-* [Packet Format](packet.md)
-* [Switch Functionality](switch.md)
+For more background and history on telehash please see the [Introduction](background.md) and the [FAQ](faq.md).
 
-## Parallels
+This document serves as an index to learn more about the [implementations](#switches), [protocol](#protocol), and [extensions](#extensions).  Collaboration on the development of telehash is open to anyone passionate about open communication systems and happens primarily through the protocol's [GitHub repo](https://github.com/telehash/telehash.org/blob/master/implementers.md).
 
-Since Telehash is it's own networking stack layered above existing networks, it has mechanisms that parallel well known Internet ones and is easy to draw an analogy to:
+<a name="switches" />
+# Implementations
 
-* `IP` - Addressing in Telehash is based on a fingerprint of a public key generated locally by an app (called a `hashname`) instead of a centrally assigned number.
-* `Routing` - Hashnames are organized into a DHT that every peer helps maintain, there are no core routers or managed backbone.
-* `SSL` - Every hashname is it's own cryptographic identity, there are no central certificate authorites and all communications are always encrypted via a `line`.
-* `TCP/UDP` - Any two hashnames can create one or more channels between them to transfer content, each channel can either be reliable (everything is ordered/confirmed) or unreliable (lossy).
+In order to use telehash in an application, the application will need to include a software layer that talks to the network, handles the encryption, and processes packets.  This software is known as a "switch" and may come in the form of a library, module, or SDK depending on your language/platform.
 
-
-## Security
-
-The goal of Telehash isn't to invent new kinds of security, it's to simply use the best of existing solutions and apply them to a long-term decentralied system.  There isn't any single standard that can be adopted as-is for this type of usage, so the approach is to use and evolve sets of well known ciphers and algorithms with as minimal adaptation as is possible.
-
-There are three different security aspects within the protocol, one for addressing validation, one for forward secrecy, and one for packet encryption.  There are no new algorithms being created, only existing crypto libraries/systems are used for each of those three different aspects as defined in [Cipher Sets][].
-
-# Protocol Details
-
-## Glossary
-
-  * **DHT**: Distributed Hash Table (based on [Kademlia][])
-  * **NAT**: A device/router that acts as a bridge to internal IPPs
-    (Network Address Translation)
-  * **Hashname**: The unique address of an individual application/instance
-    using Telehash, a 64 character hex string
-  * **Packet**: A single message containing JSON and/or binary data sent between any two
-    hashnames
-  * **Switch**: The name of the software layer or service parsing
-    packets for one or more hashnames
-  * **Line**: When any two hashnames connect and exchange their identity
-    to form a temporary encrypted session (like a VPN tunnel between
-    them)
-  * **Channels**: Dynamic bi-directional transport that can transfer
-    reliable/ordered or lossy binary/JSON mixed content within any line
-  * **Seed**: A hashname that is acting as a seed for the DHT and will respond to search and introduction requests
-
-## Telehash Switches
-
-In order to use Telehash in an application, the application will need
-to include a software layer that talks to the Internet and processes
-Telehash packets, known as a "switch".
-
-It is highly recommended to use an existing switch library or service
-for your environment, rather than creating one from scratch. This will
-help insure that the security, identity, and networking aspects are
-verified properly. If there isn't one which meets your needs, then we
-would love your help - pull requests to list them here are welcome!
+It is highly recommended to use an existing implementation for your environment rather than creating one from scratch. This will help ensure that the security, identity, and networking aspects are verified properly. If there isn't one which meets your needs, then please see the [Implementers Guide](implementers.md).
 
 * Node.js - [node-telehash](https://github.com/telehash/node-telehash)
 * D - [telehash.d](https://github.com/temas/telehash.d)
@@ -72,12 +26,42 @@ would love your help - pull requests to list them here are welcome!
 * PHP - [SwitchBox](https://github.com/jaytaph/switchbox)
 * Erlang - [relish](https://github.com/telehash/relish)
 
-## Creating Applications
+<a name="protocol" />
+# Protocol
 
-In addition to using a switch library, each instance of an application must generate
-its own unique address as a set of cryptographic keys.  These keys are used to locate and verify other instances of the application on the network.
+This is a list of the terminology that should be familar when using telehash:
 
-An application must also bundle and optionally provide a mechanism to
-retrieve a list of "seeds" - well-known and accessible DHT members.
-This will be used to bootstrap and connect into the DHT the first time. The entries in
-this list will consist minimally of the public keys and network addresses of each seed. This format is described more in the [Seeds JSON](seeds.md).
+* **[hashname](hashname.md)** - The unique address of an individual application/instance using telehash, a 64 character hex string.
+* **[packet](packet.md)** - A single message containing JSON and/or binary data sent between any two hashnames.
+* **[switch](switch.md)** - The name of the software layer or service parsing packets for one or more hashnames.
+* **[line](cipher_sets.md)** - All data sent between hashnames goes over a `line` that is the encrypted session based on which `Cipher Set` is used between them.
+* **[channel](channels.md)** - Any `packet` sent over a `line` is part of a `channel`, channels allow simultaneous bi-directional transfer of reliable/ordered or lossy binary/JSON mixed content within any line.
+* **[seed](seeds.md)** - A hashname must initially start with one or more `seed` to help it discover/connect to other hashnames.
+* **[DHT](dht.md)** - Distributed Hash Table, how hashname discovery and connectivity is enabled without any central authority.
+* **[paths](network.md)** - Packets can be sent over different networks paths, commonly UDP but also HTTP, WebRTC, and more.
+
+Since telehash is it's own networking stack layered above existing networks, it has mechanisms that parallel well known Internet ones and is easy to draw an analogy to:
+
+* `IP` - Addressing in telehash is based on a fingerprint of a public key generated locally by an app (called a `hashname`) instead of a centrally assigned number.
+* `Routing` - Hashnames are organized into a DHT that every peer helps maintain, there are no core routers or managed backbone.
+* `SSL` - Every hashname is it's own cryptographic identity, there are no central certificate authorites and all communications are always encrypted via a `line`.
+* `TCP/UDP` - Any two hashnames can create one or more channels between them to transfer content, each channel can either be reliable (everything is ordered/confirmed) or unreliable (lossy).
+
+As an introduction to how the protocol works, an example startup flow from scratch would look like:
+
+1. create hashname
+2. load a seed
+3. send an open
+4. create a line
+5. start a channel
+
+<a name="extensions" />
+# Extensions
+
+There are various stable and experimental extensions to the core protocol, from supporting different alternative network transports, to common channel data type patterns, and mapping existing protocols into telehash.  The categories below are general, and some extensions overlap multiples of them.
+
+### Patterns
+
+### Bindings
+
+### Networks
