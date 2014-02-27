@@ -1,4 +1,4 @@
-Telehash Protocol (v2.1)
+Telehash Protocol (v2.1-pre)
 ========================
 
 The telehash protocol enables any app or device to establish private communication channels over a network. The following combination of features in telehash offers distinctive advantages to application developers:
