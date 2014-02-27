@@ -27,20 +27,26 @@ Since telehash is it's own networking stack layered above existing networks, it 
 
 All addresses in telehash are called `hashnames` and are self-generated from one or more public `keys`, which are used to verify the hashname and establish encrypted connections between different hashnames.  Those connections are called `lines` and carry encrypted `packets` that are all grouped into one or more `channels`.
 
-> Diagram goes here
+This diagram illustrates the structural relationships between the components of the protocol:
+
+![stack](./stack.png =500x)
+
+Telehash is used as an overlay network, connecting hashnames together through various different types of network transports and providing uniform discovery and bridging across them.  This diagram is a simple example of different places any hashname can exist:
+
+![peers](./peers.png =500x)
 
 <a name="protocol" />
-# Protocol Overview
+# Protocol Index
 
-This is a list of the terminology and index of the common concepts that telehash uses:
+This is a list of the terminology and index of the common concepts that make up the telehash protocol.  Each one of these is broken into their own document, all of which are required components to implement/use telehash:
 
 * **[hashname](hashname.md)** - The unique address of an individual application/instance using telehash, a 64 character hex string.
-* **[packet](packet.md)** - A single message containing JSON and/or binary data sent between any two hashnames.
-* **[switch](switch.md)** - The name of the software layer or service parsing packets for one or more hashnames.
-* **[line](cipher_sets.md)** - All data sent between hashnames goes over a `line` that is the encrypted session based on which `Cipher Set` is used between them.
-* **[channel](channels.md)** - Any `packet` sent over a `line` is part of a `channel`, channels allow simultaneous bi-directional transfer of reliable/ordered or lossy binary/JSON mixed content within any line.
-* **[seed](seeds.md)** - A hashname must initially start with one or more `seed` to help it discover/connect to other hashnames.
-* **[DHT](dht.md)** - Distributed Hash Table, how hashname discovery and connectivity is enabled without any central authority.
+* **[packet](packet.md)** - A single message containing JSON and/or binary data sent between any two *hashnames*.
+* **[switch](switch.md)** - The software layer or service that manages *channels* and provides the core functionality.
+* **[line](cipher_sets.md)** - All *packets* sent between hashnames go over a *line* that is the encrypted session based on which `Cipher Set` is used between them.
+* **[channel](channels.md)** - Any *packet* sent over a *line* is part of a *channel*, channels allow simultaneous bi-directional transfer of reliable/ordered or lossy binary/JSON mixed content within any line.
+* **[seed](seeds.md)** - A *hashname* must initially start with one or more `seed` to help it discover/connect to other hashnames.
+* **[DHT](dht.md)** - Distributed Hash Table, how *hashname* discovery and connectivity is enabled without any central authority.
 * **[paths](network.md)** - Packets can be sent over different networks paths, commonly UDP but also HTTP, WebRTC, and more.
 
 

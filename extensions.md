@@ -15,7 +15,6 @@ There are four primary categories of extensions:
 <a name="channels" />
 # Channels
 
-* **[bridge](ext/bridge.md)** - Any use of common channel types or patterns of how to use a channel
 * **[pool](ext/pool.md)** - Creating "pools" of shared resources, basically how to form miniature DHTs
 * **[buffer](ext/buffer.md)** - Simple lightweight shared key/value storage service
 * **[verb](ext/verb.md)** - Version information/negotiation

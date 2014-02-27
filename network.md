@@ -1,5 +1,7 @@
 # Network Transport
 
+![peers](./peers.png =500x)
+
 Telehash can send packets over a variety of network transports, the preferred and most common of which is UDP since it is the most capable of enabling direct connections between peers.  All UDP messages map to a [packet](packet.md) 1:1 and can be sent/received over IPv4 or IPv6.
 
 There are extensions describing how to also use other network transports:
@@ -52,7 +54,7 @@ A packet read from the network that has a HEAD of length 0 is a binary encrypted
 
 Once decrypted, the resulting value is always a [channel](channels.md) packet.
 
-Often a switch may be acting as a [bridge](ext/bridge.md) where it maps line IDs to other network destinations and doesn't attempt to process/decrypt them.
+Often a switch may be acting as a [bridge](switch.md#bridge) where it maps line IDs to other network destinations and doesn't attempt to process/decrypt them.
 
 <a name="paths" />
 ### Network Paths
@@ -66,7 +68,7 @@ Every unique network sender/recipient is called a `path` and defined by a JSON o
 * `http` - see [path_http](ext/path_http.md), also is the primary fallback when UDP is blocked
 * `webrtc` - see [path_webrtc](ext/path_webrtc.md), preferred when possible
 * `relay` - contains `id` of the channel id to create a [relay](switch.md#relay) with
-* `bridge` - see [ext_bridge](ext/path_bridge.md), fallback when no other path works
+* `bridge` - see [ext_bridge](switch.md#bridge), fallback when no other path works
 
 These paths are used often within the protocol to exchange network information, and frequently sent as an array, for example:
 

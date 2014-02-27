@@ -1,6 +1,6 @@
 # `"type":"pool"` - Tracking Resource Providers
 
-In a distributed architecture there are frequently shared resources that are unevenly distributed, such as the [bridge](ext_bridge.md) and [buffer](ext_buffer.md) extensions. The `pool` extension is a tool that enables any switch to create and maintain an active pool of hashnames that can provide specific resources as well as help provide coordination between the resource providers.
+In a distributed architecture there are frequently shared resources that are unevenly distributed, such as `bridge` support and the [buffer](buffer.md) extension. The `pool` extension is a tool that enables any switch to create and maintain an active pool of hashnames that can provide specific resources as well as help provide coordination between the resource providers.
 
 Pools are organized by the identical Kademlia-based DHT mechanism as the core hashname routing for Telehash, such that any hashname that is a member of (providing resources for) a pool must maintain a list of buckets for the other active members of that pool.
 

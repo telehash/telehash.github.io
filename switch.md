@@ -101,9 +101,38 @@ When a hashname detects that it cannot connect directly with another (there are 
 
 A `relay` channel is very simple, every packet must contain a `"to":"..."` of the hashname to relay to, and that hashname must be one that the receiving switch already has an open line to.  Each packet must also contain the `"type":"relay"` such that the sending/receiving switches don't need to maintain state and every packet can be processed alone. The relay packets are then sent as-is over the line to the recipient, and any/all packets sent from either side are then relay'd as-is to the other. The channel is unreliable and the relayed packets must not contain any reliability information.
 
-To prevent abuse, all switches must limit the volume of relay packets from any hashname to no more than five per second.  Any packets over that rate MUST be dropped/discarded. This is a fast enough rate for any two hashnames to negotiate additional connectivity (like using a [bridge](ext/bridge.md)) and do basic DHT queries.
+To prevent abuse, all switches must limit the volume of relay packets from any hashname to no more than five per second.  Any packets over that rate MUST be dropped/discarded. This is a fast enough rate for any two hashnames to negotiate additional connectivity (like using a [bridge](#bridge)) and do basic DHT queries.
 
 Switches must also prevent double-relaying, sending packets coming in via a relay outgoing via another relay, a relay is only a one-hop utility and two hashnames must negotiate alternate paths for additional needs. Any `peer` requests coming in via a relay must also not have a relay included in their paths.
+
+<a name="bridge" />
+### `"type":"bridge"` - Shared Bandwidth
+
+The bridge channel is used to enable other hashnames (either anyone, or just specific trusted ones) to proxy the traffic for a single line through the hosting switch when the two parties of the line cannot communicate directly (NATs, firewalls, different network types, etc).  The supporting switch will receive the line packets and immediately send them all to a different destination instead of processing them.
+
+A `bridge` packet looks like:
+
+```json
+{
+	"c":"ab945f90f08940c573c29352d767fee4",
+	"type":"bridge",
+  "to":"be22ad779a631f63336fe051d5aa2ab2",
+  "path":{"type":"ipv4", "ip":"1.2.3.4", "port":5678},
+  "from":"69ab427ec49862739b6449e1fcd77b27"
+}
+```
+
+The `to` value is the incoming line id, when any packet comes in with that id the packet is sent to the specified `path` (same format as `paths` entries).  It is the responsibility of the bridge creator to ensure the path is valid, as the bridge will provide no feedback as to status.
+
+When any line id coming into the switch matches the `from` value it's resent to the network path that the bridge was created from.  Bridges should be persisted until the hashname that created it goes offline.
+
+This enables a supporting switch to do essentially no work in bridging packets as it can process them outside any encryption.  To prevent circular loops, all bridged packets must have a hash calculated and temporary cache of the values stored to detect any repeat packets that should be dropped.
+
+#### Connect Path
+
+Since a bridge only works when the requestor knows the network path it wants to create a bridge to, and there are times when it may not have that information such as when both hashnames are connected via private paths to the bridge (like via http).
+
+When a hashname that is receiving a `peer` and sending out a `connect` recognizes that neither the sender or recipient has a public network path (ipv4 or ipv6), it may insert a `{"type":"bridge","id":"uniqueid",...}` in the paths array which specifies a custom bridge path that can be sent back to it in a `bridge` request to create one directly to the sender of the peer.  Otherwise, the two may have no way of connecting directly outside of a temporary `relay`.
 
 <a name="path" />
 ### `"type":"path"` - Network Path Information
@@ -130,18 +159,32 @@ An established path is one that comes from the network interface, the actual enc
 <a name="connecting" />
 ## Connection Flows
 
-> NOTE: this section is being added and a work in progress
+> NOTE: this section is being added and a work in progress, each section needs a sequence chart
+
+![peers](./peers.png =500x)
 
 ### Direct (no DHT)
 
-A shares seed info (no NAT), B uses seed info to send an open.
+A shares [seed info](seeds.md) (and is not behind a NAT), B uses seed info to send an open directly.
 
 ### Meshing
 
-To be reachable, every hashname must minimally mesh.  Uses `link`.
+To be reachable, every hashname must minimally mesh.  Uses [link](#link).
 
-### Seek (no NAT)
-### Seek (NAT)
-### Seek (broken NAT, relay only)
+### Seek
+
+Required with or without NAT, B always initiates open.
+
+Seek, peer, connect, open
+
+### Seek (failed direct)
+
+When a UDP direct connection is not possible or fails, exchange paths to look for alternative ones.
+
+Seek, peer, connect, relay, open, path
+
 ### Seek (bridge)
 
+When no paths are available, create and use a [bridge](#bridge).
+
+Seek, peer, connect, relay, open, bridge
