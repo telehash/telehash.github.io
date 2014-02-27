@@ -12,13 +12,15 @@ To contribute to the protocol, please either file an issue or fork and create pu
 
 To contribute to an existing [implementation](implementations.md) please use it's repo, and to start a new one please add it to that implementation list.
 
+<a name="api" />
 ## API
 
 * Generating a hashname
 * Creating a switch
 * Starting and handling channels
 
-## Defaults
+<a name="defaults" />
+## Default Configuration Values
 
 There are many configurable numbers within a switch, here's the list of all of them and the current best suggested defaults and minimums/maximums:
 
