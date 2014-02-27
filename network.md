@@ -1,6 +1,6 @@
 # Network Transport
 
-![peers](./peers.png =500x)
+<img src="peers.png" width="500" />
 
 Telehash can send packets over a variety of network transports, the preferred and most common of which is UDP since it is the most capable of enabling direct connections between peers.  All UDP messages map to a [packet](packet.md) 1:1 and can be sent/received over IPv4 or IPv6.
 

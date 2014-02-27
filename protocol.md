@@ -29,11 +29,11 @@ All addresses in telehash are called `hashnames` and are self-generated from one
 
 This diagram illustrates the structural relationships between the components of the protocol:
 
-![stack](./stack.png =500x)
+<img src="stack.png" width="500" />
 
 Telehash is used as an overlay network, connecting hashnames together through various different types of network transports and providing uniform discovery and bridging across them.  This diagram is a simple example of different places any hashname can exist:
 
-![peers](./peers.png =500x)
+<img src="peers.png" width="500" />
 
 <a name="protocol" />
 # Protocol Index

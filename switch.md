@@ -161,7 +161,7 @@ An established path is one that comes from the network interface, the actual enc
 
 > NOTE: this section is being added and a work in progress, each section needs a sequence chart
 
-![peers](./peers.png =500x)
+<img src="peers.png" width="500" />
 
 ### Direct (no DHT)
 
