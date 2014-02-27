@@ -29,7 +29,6 @@ All addresses in telehash are called `hashnames` and are self-generated from one
 
 > Diagram goes here
 
-
 <a name="protocol" />
 # Protocol Overview
 
