@@ -44,9 +44,9 @@ This is a list of the terminology and index of the common concepts that make up 
 * **[hashname](hashnames.md)** - The unique address of an individual application/instance using telehash, a 64 character hex string.
 * **[packet](packet.md)** - A single message containing JSON and/or binary data sent between any two *hashnames*.
 * **[channel](channels.md)** - A *channel* is a series of one or more *packets* grouped together, multiple channels can exist simultaneously to allow bi-directional transfer of reliable/ordered or lossy binary/JSON mixed content.
-* **[line](cipher_sets.md)** - All *channels* are encrypted as part of a *line* using a common `Cipher Set` between two hashnames.
+* **[line](cipher_sets.md)** - All *channels* are encrypted as part of a *line* using a common [Cipher Set](cipher_sets.md) between two hashnames.
 * **[switch](switch.md)** - The software layer or service that manages *channels* and provides the core functionality.
-* **[seed](seeds.md)** - A *hashname* must initially start with one or more *seed* to help it discover/connect to other hashnames.
+* **[seed](seeds.md)** - A *hashname* usually starts with one or more *seed* to help it discover/connect to other hashnames.
 * **[DHT](dht.md)** - Distributed Hash Table, how *hashname* discovery and connectivity is enabled without any central authority.
 * **[paths](network.md)** - Any encrypted *line* data can be sent over different networks paths, commonly UDP but also HTTP, WebRTC, and more.
 
