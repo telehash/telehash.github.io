@@ -21,6 +21,7 @@ Like Kademlia, telehash measures distance with a bitwise XOR metric which divide
 
 The two protocol elements for interacting with the telehash DHT are [seek](switch.md#seek) and [link](switch.md#link) channels.  The `seek` channel allows asking any peer for a list of closer hashnames, and the `link` channel is how peers signal to each other that they are actively participating in the DHT.
 
+<a name="distance" />
 ## XOR - Calculating distance
 Distance calculation is a 2-step process:
 

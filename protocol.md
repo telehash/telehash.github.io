@@ -40,21 +40,29 @@ Telehash is used as an overlay network, connecting hashnames together through va
 
 This is a list of the terminology and index of the common concepts that make up the telehash protocol.  Each one of these is broken into their own document, all of which are required components to implement/use telehash:
 
-* **[hashname](hashname.md)** - The unique address of an individual application/instance using telehash, a 64 character hex string.
+* **[hashname](hashnames.md)** - The unique address of an individual application/instance using telehash, a 64 character hex string.
 * **[packet](packet.md)** - A single message containing JSON and/or binary data sent between any two *hashnames*.
 * **[switch](switch.md)** - The software layer or service that manages *channels* and provides the core functionality.
 * **[line](cipher_sets.md)** - All *packets* sent between hashnames go over a *line* that is the encrypted session based on which `Cipher Set` is used between them.
 * **[channel](channels.md)** - Any *packet* sent over a *line* is part of a *channel*, channels allow simultaneous bi-directional transfer of reliable/ordered or lossy binary/JSON mixed content within any line.
-* **[seed](seeds.md)** - A *hashname* must initially start with one or more `seed` to help it discover/connect to other hashnames.
+* **[seed](seeds.md)** - A *hashname* must initially start with one or more *seed* to help it discover/connect to other hashnames.
 * **[DHT](dht.md)** - Distributed Hash Table, how *hashname* discovery and connectivity is enabled without any central authority.
 * **[paths](network.md)** - Packets can be sent over different networks paths, commonly UDP but also HTTP, WebRTC, and more.
 
 
-As an introduction to how the protocol works, an example startup flow from scratch would look like:
+As a quick introduction to how the protocol works, an example startup flow from scratch for a [switch](implementations.md) would look like:
 
-1. create a hashname by generating public/private keypairs
-2. load one or more seeds to bootstrap from
-3. send an open request to a seed
-4. receive an open response and create an encrypted line
-5. start a channel over that line
-6. send/receive packets over that channel
+1. **create a hashname** - generate public/private keypairs, results in the parts/keys that make up a new [hashname](hashnames.md)
+2. **load seeds** - use a bundled [seeds.json](seeds.md) file to load information about one or more seeds to bootstrap from
+3. **send an open** - compose a new encrypted [open](network.md#open) request to a seed, the handshake to create a line
+4. **receive an open** - process the response open, decrypt it, and use the handshake and create a new [line](network.md#line)
+5. **start a link channel** - to join the [DHT](dht.md) via this seed, start a new [channel](channels.md) of type [link](switch.md#link) which is sent over the encrypted line
+
+That is the minimum for a hashname to be online, in order to connect to another hashname from this point, an example flow would look like:
+
+1. **seek the hashname** - send a new [seek](switch.md#seek) request to the [closest](dht.md#distance) connected seed (one with an active link channel)
+2. **process the see response** - check the response for the hashname, recursively send seeks until found
+3. **send a connect** - when the hashname is returned in a see response send a [connect](switch.md#connect) request to the seed, and if there's any IP/port send an empty packet to it to NAT hole punch
+4. **seed sends peer** - the seed will process the connect and send a [peer](switch.md#peer) to the given hashname
+5. **open sent** - the given hashname will process the peer, and send an [open](network.md#open) back to create the line
+6. **line created** - once the open is received, send one back to create a line, and continue sending any new [channel](channels.md) packets
