@@ -21,11 +21,11 @@ The telehash protocol has been in development for several years. It is being act
 
 Since telehash is its own networking stack layered above existing networks, it has mechanisms that parallel well known Internet ones and are easy to draw an analogy to:
 
-* `IP` - Addressing in telehash uses a fingerprint of a public key generated locally by an app (called a `hashname`) instead of a centrally assigned number.
-* `Routing` - Hashnames are organized into a DHT that every peer helps maintain, there is no backbone or core routers.
-* `SSL` - Every hashname is it's own cryptographic identity, there are no central certificate authorites and all communications are always encrypted via a `line`.
-* `TCP/UDP` - Any two hashnames can create one or more channels between them to transfer content (like ports), each channel can either be reliable (everything is ordered/confirmed like TCP) or unreliable (lossy, like UDP).
-* `Host` - An online instance and the software that is managing it (sometimes called the "network stack") is called a `switch`, the software that is processing raw packets.
+* `IP` - Addressing in telehash uses a fingerprint of a public key generated locally by an app (called a *hashname*) instead of a centrally assigned number.
+* `Routing` - Hashnames are organized into a *DHT* that every peer helps maintain, there is no backbone or core routers.
+* `SSL` - Every hashname is it's own cryptographic identity, there are no central certificate authorites and all communications are always encrypted via a *line*.
+* `TCP/UDP` - Any two hashnames can create one or more *channels* between them to transfer content (like ports), each channel can either be reliable (everything is ordered/confirmed like TCP) or unreliable (lossy, like UDP).
+* `Host` - An online instance and the software that is managing it (sometimes called the "network stack") is called a *switch*, the generic name for the software that is processing raw packets.
 
 All addresses in telehash are called `hashnames` and are self-generated from one or more public `keys`, which are used to verify the hashname and establish encrypted connections between different hashnames.  Those connections are called `lines` and carry encrypted `packets` that are all grouped into one or more `channels`.  Everything is being run/managed by a software instance called a `switch`.
 
@@ -33,7 +33,7 @@ This diagram illustrates the structural relationships between the components of 
 
 <img src="stack.png" width="500" />
 
-Telehash is used as an overlay network, connecting hashnames together through various different types of network transports and providing uniform discovery and bridging across them.  This diagram is a simple example of different places any hashname can exist:
+Telehash is used as an overlay network, connecting hashnames together through various different types of network transports and providing uniform discovery and bridging across them.  This diagram is a simple example of different places a hashname can exist:
 
 <img src="peers.png" width="500" />
 
@@ -52,7 +52,7 @@ This is a list of the terminology and index of the common concepts that make up 
 * **[paths](network.md)** - Any encrypted *line* data can be sent over different networks paths, commonly UDP but also HTTP, WebRTC, and more.
 
 
-As a quick introduction to how the protocol works, an example startup flow from scratch for a [switch](implementations.md) would look like:
+As a quick introduction to how the protocol works, an example startup flow for a [switch](implementations.md) would look like:
 
 1. **create a hashname** - generate public/private keypairs, results in the parts/keys that make up a new [hashname](hashnames.md)
 2. **load seeds** - use a bundled [seeds.json](seeds.md) file to load information about one or more seeds to bootstrap from
@@ -60,7 +60,7 @@ As a quick introduction to how the protocol works, an example startup flow from 
 4. **receive an open** - process the response open, decrypt it, and use the handshake and create a new [line](network.md#line)
 5. **start a link channel** - to join the [DHT](dht.md) via this seed, start a new [channel](channels.md) of type [link](switch.md#link) which is sent over the encrypted line
 
-That is the minimum for a hashname to be online, in order to connect to another hashname from this point, an example flow would look like:
+In order to connect to another hashname from this point, an example flow would look like:
 
 1. **seek the hashname** - send a new [seek](switch.md#seek) request to the [closest](dht.md#distance) connected seed (one with an active link channel)
 2. **process the see response** - check the response for the hashname, recursively send seeks until found
