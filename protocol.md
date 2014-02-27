@@ -62,7 +62,7 @@ That is the minimum for a hashname to be online, in order to connect to another 
 
 1. **seek the hashname** - send a new [seek](switch.md#seek) request to the [closest](dht.md#distance) connected seed (one with an active link channel)
 2. **process the see response** - check the response for the hashname, recursively send seeks until found
-3. **send a connect** - when the hashname is returned in a see response send a [connect](switch.md#connect) request to the seed, and if there's any IP/port send an empty packet to it to NAT hole punch
-4. **seed sends peer** - the seed will process the connect and send a [peer](switch.md#peer) to the given hashname
+3. **send a peer** - when the hashname is returned in a see response send a [peer](switch.md#peer) request to the seed, and if there's any IP/port send an empty packet to it to NAT hole punch
+4. **seed sends connect** - the seed will process the peer and send a [connect](switch.md#connect) to the given hashname
 5. **open sent** - the given hashname will process the peer, and send an [open](network.md#open) back to create the line
 6. **line created** - once the open is received, send one back to create a line, and continue sending any new [channel](channels.md) packets
