@@ -4,9 +4,9 @@ Telehash Protocol (v2.1)
 The telehash protocol enables any app or device to establish private communication channels over a network. The following combination of features in telehash offers distinctive advantages to application developers:
 
 * all channels are encrypted all the time - there is no unencrypted mode
-* because each application instance or device generates its own public/private keypair, security is not dependent on certificate authorities
+* because each application instance or device generates its own public/private keypair, they cannot be impersonated and security is not dependent on trust in certificate authorities
 * addresses are generated from public key fingerprints, not centrally managed as with IP addresses
-* routing is based on a globally distributed hash table (DHT), not the hierarchical Domain Name System (DNS)
+* routing is based on a globally distributed hash table (DHT), no central authority or managed heirarchy
 * the dual JSON/binary packet format is extremely flexible while remaining developer-friendly
 * channels can be reliable (like TCP) or unreliable (like UDP), and make use of HTTP, WebRTC, and other existing technologies
 * existing application protocols such as NNTP and XMPP can re-use telehash as a secure transport layer
@@ -43,12 +43,12 @@ This is a list of the terminology and index of the common concepts that make up 
 
 * **[hashname](hashnames.md)** - The unique address of an individual application/instance using telehash, a 64 character hex string.
 * **[packet](packet.md)** - A single message containing JSON and/or binary data sent between any two *hashnames*.
+* **[channel](channels.md)** - A *channel* is a series of one or more *packets* grouped together, multiple channels can exist simultaneously to allow bi-directional transfer of reliable/ordered or lossy binary/JSON mixed content.
+* **[line](cipher_sets.md)** - All *channels* are encrypted as part of a *line* using a common `Cipher Set` between two hashnames.
 * **[switch](switch.md)** - The software layer or service that manages *channels* and provides the core functionality.
-* **[line](cipher_sets.md)** - All *packets* sent between hashnames go over a *line* that is the encrypted session based on which `Cipher Set` is used between them.
-* **[channel](channels.md)** - Any *packet* sent over a *line* is part of a *channel*, channels allow simultaneous bi-directional transfer of reliable/ordered or lossy binary/JSON mixed content within any line.
 * **[seed](seeds.md)** - A *hashname* must initially start with one or more *seed* to help it discover/connect to other hashnames.
 * **[DHT](dht.md)** - Distributed Hash Table, how *hashname* discovery and connectivity is enabled without any central authority.
-* **[paths](network.md)** - Packets can be sent over different networks paths, commonly UDP but also HTTP, WebRTC, and more.
+* **[paths](network.md)** - Any encrypted *line* data can be sent over different networks paths, commonly UDP but also HTTP, WebRTC, and more.
 
 
 As a quick introduction to how the protocol works, an example startup flow from scratch for a [switch](implementations.md) would look like:
