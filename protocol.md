@@ -60,11 +60,11 @@ As a quick introduction to how the protocol works, an example startup flow for a
 4. **receive an open** - process the response open, decrypt it, and use the handshake and create a new [line](network.md#line)
 5. **start a link channel** - to join the [DHT](dht.md) via this seed, start a new [channel](channels.md) of type [link](switch.md#link) which is sent over the encrypted line
 
-In order to connect to another hashname from this point, an example flow would look like:
+In order for a switch to connect to another hashname from this point, an example flow would look like:
 
 1. **seek the hashname** - send a new [seek](switch.md#seek) request to the [closest](dht.md#distance) connected seed (one with an active link channel)
-2. **process the see response** - check the response for the hashname, recursively send seeks until found
-3. **send a peer** - when the hashname is returned in a see response send a [peer](switch.md#peer) request to the seed, and if there's any IP/port send an empty packet to it to NAT hole punch
-4. **seed sends connect** - the seed will process the peer and send a [connect](switch.md#connect) to the given hashname
-5. **open sent** - the given hashname will process the peer, and send an [open](network.md#open) back to create the line
+2. **process the response** - check the response for the hashname, recursively send seeks until found
+3. **send a peer request** - when the hashname is returned in a seek response send a [peer](switch.md#peer) request to the seed, and if there's any IP/port send an empty packet to it to NAT hole punch
+4. **seed sends connect request** - the seed will process the peer request and send a [connect](switch.md#connect) to the given hashname
+5. **open sent** - the given hashname will process the connect, and send an [open](network.md#open) back to create the line
 6. **line created** - once the open is received, send one back to create a line, and continue sending any new [channel](channels.md) packets
