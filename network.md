@@ -50,7 +50,7 @@ If a new open request is validated and there's an existing line, when the new op
 <a name="line" />
 ## `line` - Packet Encryption
 
-A packet read from the network that has a HEAD of length 0 is a binary encrypted `line` packet.  The first 16 bytes are always the line ID, and only known line IDs are processed, any packet with an unknown ID is dropped.  The remaining bytes are encrypted and processed by the [Cipher Set](cipher_sets.md) used to create the line.
+A packet read from the network that has a HEAD of length 0 is a binary encrypted `line` packet.  The first 16 bytes are always the line ID, and only known line IDs are processed, any packet with an unknown ID is dropped.  The remaining bytes are encrypted and processed by the [Cipher Set](cipher_sets.md) used to create the line, the 16 byte ID should always be added/removed before being processed by any Cipher Set.
 
 Once decrypted, the resulting value is always a [channel](channels.md) packet.
 
