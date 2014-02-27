@@ -25,8 +25,9 @@ Since telehash is its own networking stack layered above existing networks, it h
 * `Routing` - Hashnames are organized into a DHT that every peer helps maintain, there is no backbone or core routers.
 * `SSL` - Every hashname is it's own cryptographic identity, there are no central certificate authorites and all communications are always encrypted via a `line`.
 * `TCP/UDP` - Any two hashnames can create one or more channels between them to transfer content (like ports), each channel can either be reliable (everything is ordered/confirmed like TCP) or unreliable (lossy, like UDP).
+* `Host` - An online instance and the software that is managing it (sometimes called the "network stack") is called a `switch`, the software that is processing raw packets.
 
-All addresses in telehash are called `hashnames` and are self-generated from one or more public `keys`, which are used to verify the hashname and establish encrypted connections between different hashnames.  Those connections are called `lines` and carry encrypted `packets` that are all grouped into one or more `channels`.
+All addresses in telehash are called `hashnames` and are self-generated from one or more public `keys`, which are used to verify the hashname and establish encrypted connections between different hashnames.  Those connections are called `lines` and carry encrypted `packets` that are all grouped into one or more `channels`.  Everything is being run/managed by a software instance called a `switch`.
 
 This diagram illustrates the structural relationships between the components of the protocol:
 
