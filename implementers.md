@@ -36,6 +36,9 @@ There are many configurable numbers within a switch, here's the list of all of t
 
 | Name | Default | Minimum | Maximum | Notes
 | ---- | ------- | ------- | ------- | -----
-| [csids]( "which CSIDs to use by default") |1a, 2a, 3a|||
-| [test]( "hover testing") |0|0|0|
-|||||
+|`csids`|1a, 2a, 3a|||which CSIDs to use by default when generating new hashname
+|`k`|8|2|100|[DHT](dht.md#k)
+|`link-max`|256|8|*|[DHT](dht.md#link-max)
+|`link-ping`|55|||[seconds](dht.md#maintenance)
+|`link-timeout`|120|||[seconds](dht.md#maintenance)
+|``||||
