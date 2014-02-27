@@ -15,28 +15,32 @@ There are four primary categories of extensions:
 <a name="channels" />
 # Channels
 
-* **[Bridge](ext/bridge.md)** - Any use of common channel types or patterns of how to use a channel
-* **[](ext/.md)** - 
-* **[](ext/.md)** - 
-* **[](ext/.md)** - 
+* **[bridge](ext/bridge.md)** - Any use of common channel types or patterns of how to use a channel
+* **[pool](ext/pool.md)** - Creating "pools" of shared resources, basically how to form miniature DHTs
+* **[buffer](ext/buffer.md)** - Simple lightweight shared key/value storage service
+* **[verb](ext/verb.md)** - Version information/negotiation
+* **[tickets](ext/tickets.md)** - Temporary portable signed permission/grant packets
 
 <a name="networks" />
 # Networks
 
-* **[](ext/.md)** - 
-* **[](ext/.md)** - 
-* **[](ext/.md)** - 
-* **[](ext/.md)** - 
-* **[](ext/.md)** - 
-* **[](ext/.md)** - 
+* **[HTTP](ext/path_http.md)** - Using HTTP as a network transport (for when UDP isn't available)
+* **[WebRTC](ext/path_webrtc.md)** - For switches in browsers, they can still use telehash P2P via WebRTC Data
+* **[Bluetooth/BTLE](ext/path_bluetooth.md)** - How to send/bridge telehash over Bluetooth and use BTLE for discovery
+* **[LAN](ext/.md)** - Local Area Network seed discovery
+* **[TCP](ext/.md)** - Sending packets over TCP instead of UDP, very limited/special case utility
+* **[802.15.4](ext/.md)** - Using telehash for device/sensor RF mesh networks
 
 <a name="bindings" />
 # Bindings
 
+* **[TeleSocket](ext/telesocket.md)** - Implementing the WebSocket simplified interaction over telehash
 * **[XMPP](ext/bind_xmpp.md)** - How XMPP clients can use telehash for direct messaging and media with end-to-end encryption
 * **[HTTP](ext/bind_http.md)** - Running HTTP over telehash
 * **[NTP](ext/bind_ntp.md)** - Using NTP for time sync between hashnames
 * **[IP](ext/bind_ip.md)** - Tunneling IP traffic over telehash
+* **[Socket](ext/bind_socket.md)** - Minimal TCP socket mapping
+* **[Serial](ext/bind_serial.md)** - Mapping a serial port interface into a channel
 
 <a name="core" />
 # Core
