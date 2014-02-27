@@ -24,7 +24,7 @@ Since telehash is its own networking stack layered above existing networks, it h
 * `IP` - Addressing in telehash uses a fingerprint of a public key generated locally by an app (called a `hashname`) instead of a centrally assigned number.
 * `Routing` - Hashnames are organized into a DHT that every peer helps maintain, there is no backbone or core routers.
 * `SSL` - Every hashname is it's own cryptographic identity, there are no central certificate authorites and all communications are always encrypted via a `line`.
-* `TCP/UDP` - Any two hashnames can create one or more channels between them to transfer content, each channel can either be reliable (everything is ordered/confirmed) or unreliable (lossy).
+* `TCP/UDP` - Any two hashnames can create one or more channels between them to transfer content (like ports), each channel can either be reliable (everything is ordered/confirmed like TCP) or unreliable (lossy, like UDP).
 
 All addresses in telehash are called `hashnames` and are self-generated from one or more public `keys`, which are used to verify the hashname and establish encrypted connections between different hashnames.  Those connections are called `lines` and carry encrypted `packets` that are all grouped into one or more `channels`.
 
