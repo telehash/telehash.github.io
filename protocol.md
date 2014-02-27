@@ -12,13 +12,13 @@ The telehash protocol enables any app or device to establish private communicati
 * existing application protocols such as NNTP and XMPP can re-use telehash as a secure transport layer
 * although telehash apps can run over the current Internet, bindings to Bluetooth, IEEE 802.15.4, and other low-layer transports are also on the way
 
-The telehash protocol has been under development for several years and is actively being [implemented](implementations.md) in multiple progamming languages, collaboration on it's development happens primarily through the protocol's [GitHub repo](https://github.com/telehash/telehash.org/blob/master/implementers.md).
+The telehash protocol has been under development for several years and is actively being [implemented](implementations.md) in multiple progamming languages, collaboration on the development happens primarily through the protocol's [GitHub repo](https://github.com/telehash/telehash.org/blob/master/implementers.md).
 
 > Also see the [background](background.md) and [FAQ](faq.md).
 
 ## Getting Started
 
-Since telehash is it's own networking stack layered above existing networks, it has mechanisms that parallel well known Internet ones and are easy to draw an analogy to:
+Since telehash is its own networking stack layered above existing networks, it has mechanisms that parallel well known Internet ones and are easy to draw an analogy to:
 
 * `IP` - Addressing in telehash is based on a fingerprint of a public key generated locally by an app (called a `hashname`) instead of a centrally assigned number.
 * `Routing` - Hashnames are organized into a DHT that every peer helps maintain, there are no core routers or managed backbone.

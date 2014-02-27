@@ -1,7 +1,7 @@
 Distributed Hash Table
 ======================
 
-A Distributed Hash Table (DHT) has become a common solution for decentralized routing in both large online networks and multi-server cloud database systems.  It is used within telehash to provide connectivity for hashnames, the ability to ask the network about a hashname and reliably be connected to it if it's available.
+A Distributed Hash Table (DHT) has become a common solution for decentralized routing in both large online networks and multi-server cloud database systems.  It is used within telehash to provide connectivity for hashnames, the ability to ask the network about a hashname and reliably be connected to it if it is available.
 
 While [Wikipedia](http://en.wikipedia.org/wiki/Distributed_hash_table) has an article describing the concept in more detail, it is fundamentally very simple: a set of computed hashes (SHA-256 in telehash) are mapped to all of the peers supporting the DHT by a simple rule, and those peers maintain their list of hashes and respond to queries about them.
 
@@ -11,7 +11,7 @@ The important part of any DHT is the ability to handle peers joining and leaving
 
 # Kademlia-Based Fundamentals
 
-Telehash adapts the [Kademlia][] Distributed Hash Table for it's peer discovery. A "peer" in this document is a single application instance, one unique hashname.
+Telehash adapts the [Kademlia][] Distributed Hash Table for its peer discovery. A "peer" in this document is a single application instance, one unique hashname.
 
 Unlike the original Kademlia paper that was a key-value store, there is no arbitrary data stored in the DHT. Peers query the DHT purely to locate other peers, independent of IP or other transient network identifiers. Telehash also departs from Kademlia by using SHA2 256-bit hashes (rather than SHA1 160-bit hashes).
 
