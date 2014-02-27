@@ -25,7 +25,7 @@ There are four primary categories of extensions:
 
 * **[HTTP](ext/path_http.md)** - Using HTTP as a network transport (for when UDP isn't available)
 * **[WebRTC](ext/path_webrtc.md)** - For switches in browsers, they can still use telehash P2P via WebRTC Data
-* **[Bluetooth/BTLE](ext/path_bluetooth.md)** - How to send/bridge telehash over Bluetooth and use BTLE for discovery
+* **[Bluetooth/BLE](ext/path_bluetooth.md)** - How to send/bridge telehash over Bluetooth and use BLE for discovery
 * **[LAN](ext/.md)** - Local Area Network seed discovery
 * **[TCP](ext/.md)** - Sending packets over TCP instead of UDP, very limited/special case utility
 * **[802.15.4](ext/.md)** - Using telehash for device/sensor RF mesh networks
