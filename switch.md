@@ -114,7 +114,7 @@ A `bridge` packet looks like:
 
 ```json
 {
-	"c":"ab945f90f08940c573c29352d767fee4",
+	"c":1,
 	"type":"bridge",
   "to":"be22ad779a631f63336fe051d5aa2ab2",
   "path":{"type":"ipv4", "ip":"1.2.3.4", "port":5678},

@@ -8,7 +8,7 @@ The `peek` unreliable channel is a simple signalling for any switch to determine
 
 ```json
 {
-  "c":"ab945f90f08940c573c29352d767fee4",
+  "c":1,
   "type":"peek",
   "pool":"bridge"
 }
@@ -22,7 +22,7 @@ A peek response is one packet identical to a `seek`:
 
 ```json
 {
-  "c":"ab945f90f08940c573c29352d767fee4",
+  "c":1,
   "see":[
     "c6db0918a767f00b9841f4366ade7ffc13c86541c40bf0a1612e939988fdefb0,184.96.145.75,59474",
     "9e5ecd193b14abaef376067f80f442be97f6f3110abb865398c2a6ec83a4ee9b"
