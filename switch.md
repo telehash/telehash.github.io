@@ -1,4 +1,11 @@
-## Built-In Channels
+Switch Core Channels
+====================
+
+A telehash switch must implement the channels defined here in order to fully support the protocol.  These channels are the essential connectivity foundation, including the [DHT](dht.md) basics and NAT hole punching techniques.
+
+To understand how these channels are used and interact with each other, jump to the [Connection Flows](#connecting) for examples of all of the ways one hashname connects to another.
+
+## Core Channels
 
 The following values for `type` are for unreliable channels that are used by switches to provide and maintain connectivity between instances. They are part of the core spec, and must be implemented internally by all switches:
 
@@ -13,20 +20,20 @@ The following values for `type` are for unreliable channels that are used by swi
 <a name="seek" />
 ### `"type":"seek"` - Finding Hashnames (DHT)
 
-The core of Telehash is a basic Kademlia-based DHT, the bulk of the logic is in the rules around maintaining a mesh of lines and calculating distance explained [here](kademlia.md). When one hashname wants to connect to another, it recursively sends `seek` requests to find closer and closer peers until it's discovered or there are none closer. The seek request contains a `"seek":"hex-value"` that is always a prefix of the hashname that it is trying to connect to.
+The core of Telehash is a basic [Kademlia-based DHT](dht.md), the bulk of the logic is in the rules around maintaining a mesh of lines and calculating distance explained there. When one hashname wants to connect to another, it recursively sends `seek` requests to find closer and closer peers until it's discovered or there are none closer. The seek request contains a `"seek":"hex-value"` that is always a prefix of the hashname that it is trying to connect to.
 
 When initating a new connection, the first seek requests should always be sent to the closest hashnames with active [links](#link).  Then the switch recursively sends seeks to the closest hashnames to the target until it discovers it or cannot find any closer.  It is suggested that this recursive seeking process should have at least three threads running in parallel to optmize for non-responsive nodes and round-trip time.  If no closer nodes are being discovered, the connection process should fail after the 9 closest nodes have been queried or timed-out.
 
 Only the prefix hex value is sent in each seek request to reduce the amount of information being shared about who's seeking who. The value then is only the bytes of the hashname being saught that match the distance to the recipient plus one more byte in order for the recipient to determine closer hashnames.  So if a seek is being sent to  "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c" for the hashname "171042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6" the value would be `"seek":"1710"`.
 
-The response is a compact `"see":[...]` array of addresses that are closest to the hash value (based on the [kademlia][] rules).  The addresses are a compound comma-delimited string containing the "hash,cs,ip,port" (these are intentionally not JSON as the verbosity is not helpful here), for example "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c,1a,123.45.67.89,10111". The "cs" is the [Cipher Set][] ID and is required. The ip and port parts are optional and only act as hints for NAT hole punching.
+The response is a compact `"see":[...]` array of addresses that are closest to the hash value (based on the [DHT](dht.md) rules).  The addresses are a compound comma-delimited string containing the "hash,cs,ip,port" (these are intentionally not JSON as the verbosity is not helpful here), for example "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c,1a,123.45.67.89,10111". The "cs" is the [Cipher Set](cipher_sets.md) ID and is required. The ip and port parts are optional and only act as hints for NAT hole punching.
 
 Only hashnames with an active `link` may be returned in the `see` response, and it must always include an `"end":true`.  Only other seeds will be returned unless the seek hashname matches exactly, then it will also be included in the response even if it isn't seeding.
 
 <a name="link" />
 ### `"type":"link"` - Enabling Discovery (DHT)
 
-In order for any hashname to be returned in a `seek` it must have a link channel open.  This channel is the only mechanism enabling one hashname to store another in it's list of [buckets](kademlia.md) for the DHT.  It is bi-directional, such that any hashname can request to add another to it's buckets but both sides must agree/maintain that relationship.
+In order for any hashname to be returned in a `seek` it must have a link channel open.  This channel is the only mechanism enabling one hashname to store another in it's list of [buckets](dht.md) for the DHT.  It is bi-directional, such that any hashname can request to add another to it's buckets but both sides must agree/maintain that relationship.
 
 The initial request:
 
@@ -64,7 +71,7 @@ Details describing the distance logic, maintenance, and limits can be found in [
 
 For any hashname to send an open to another it must first have one of it's public keys, so all new opens must be "introduced" via an existing line. This introduction is a two step process starting with a peer request to an intermediary. Since new hashnames are discovered only from another one in the `see` values, the one returning the see is tracked as a "via" so that they can be sent a `peer` request when a connection is being made to a hashname they sent. This also serves as a workaround if any NAT exists, so that the two hashnames can send a packet to each other to make sure the path between them is open, this is called "hole punching." 
 
-A peer request requires a `"peer":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"` where the value is the hashname the sender is trying to reach. The BODY of the peer request must contain the binary public key of the sender, whichever key is the highest matching [Cipher Set][] as signalled in the original `see`.  The recipient of the peer request must then send a connect (below) to the target hashname (that it already must have an open line to).
+A peer request requires a `"peer":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"` where the value is the hashname the sender is trying to reach. The BODY of the peer request must contain the binary public key of the sender, whichever key is the highest matching [Cipher Set](cipher_sets.md) as signalled in the original `see`.  The recipient of the peer request must then send a connect (below) to the target hashname (that it already must have an open line to).
 
 These requests are always sent with a `"end":true` and no response is generated.
 
@@ -73,7 +80,7 @@ If a sender has multiple known public network paths back to it, it should includ
 <a name="connect" />
 ### `"type":"connect"` - Connect to a hashname
 
-The connect request is an immediate result of a `peer` request and must always attach/forward the same original BODY it as well as a [paths](#paths) array identifying possible network paths to it.  It must also attach a `"from":{...}` that is the [Cipher Set][] keys of the peer sender, identical format as to what is sent as part of an `open`.
+The connect request is an immediate result of a `peer` request and must always attach/forward the same original BODY it as well as a [paths](#paths) array identifying possible network paths to it.  It must also attach a `"from":{...}` that is the [Cipher Set](cipher_sets.md) keys of the peer sender, identical format as to what is sent as part of an `open`.
 
 The recipient can use the given public key to send an open request to the target via the possible paths.  If a NAT is suspected to exist, the target should have already sent a packet to ensure their side has a path mapped through the NAT and the open should then make it through.
 
@@ -94,7 +101,7 @@ When a hashname detects that it cannot connect directly with another (there are 
 
 A `relay` channel is very simple, every packet must contain a `"to":"..."` of the hashname to relay to, and that hashname must be one that the receiving switch already has an open line to.  Each packet must also contain the `"type":"relay"` such that the sending/receiving switches don't need to maintain state and every packet can be processed alone. The relay packets are then sent as-is over the line to the recipient, and any/all packets sent from either side are then relay'd as-is to the other. The channel is unreliable and the relayed packets must not contain any reliability information.
 
-To prevent abuse, all switches must limit the volume of relay packets from any hashname to no more than five per second.  Any packets over that rate MUST be dropped/discarded. This is a fast enough rate for any two hashnames to negotiate additional connectivity (like using a [ext_bridge][]) and do basic DHT queries.
+To prevent abuse, all switches must limit the volume of relay packets from any hashname to no more than five per second.  Any packets over that rate MUST be dropped/discarded. This is a fast enough rate for any two hashnames to negotiate additional connectivity (like using a [bridge](ext/bridge.md)) and do basic DHT queries.
 
 Switches must also prevent double-relaying, sending packets coming in via a relay outgoing via another relay, a relay is only a one-hop utility and two hashnames must negotiate alternate paths for additional needs. Any `peer` requests coming in via a relay must also not have a relay included in their paths.
 
@@ -118,4 +125,23 @@ A [paths](#paths) array should be sent with every new path channel containing al
 There are two states of network paths, `possible` and `established`.  A possible path is one that is suggested from an incoming `connect` or one that is listed in an `paths` array, as the switch only knows the network information from another source than that network interface itself.  Possible paths should only be used once on request and not trusted as a valid destination for a hashname beyond that.
 
 An established path is one that comes from the network interface, the actual encoded details of the sender information.  When any `open` or `line` is received from any network, the sender's path is considerd established and should be stored by the switch as such so that it can be used as a validated destination for any outgoing packets.  When a switch detects that a path may not be working, it may also redundantly send the hashname packets on any other established path.
+
+
+<a name="connecting" />
+## Connection Flows
+
+> NOTE: this section is being added and a work in progress
+
+### Direct (no DHT)
+
+A shares seed info (no NAT), B uses seed info to send an open.
+
+### Meshing
+
+To be reachable, every hashname must minimally mesh.  Uses `link`.
+
+### Seek (no NAT)
+### Seek (NAT)
+### Seek (broken NAT, relay only)
+### Seek (bridge)
 
