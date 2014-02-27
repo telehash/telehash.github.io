@@ -1,29 +1,27 @@
 Distributed Hash Table
 ======================
 
-# Introduction
+A Distributed Hash Table (DHT) has become a common solution for decentralized routing in both large online networks and multi-server cloud database systems.  It is used within telehash to provide connectivity for hashnames, the ability to ask the network about a hashname and reliably be connected to it if it is available.
 
-Telehash adapts the [Kademlia][] Distributed Hash Table for simple
-peer discovery. A "peer" in this document is a single application instance, one unique hashname.
-Unlike the original Kademlia paper that was a key-value store, there is no arbitrary data
-stored in the DHT. Peers query the DHT purely to locate other peers,
-independent of IP or other transient network identifiers. Telehash
-also departs from Kademlia by using SHA2 256-bit hashes (rather than
-SHA1 160-bit hashes).
+While [Wikipedia](http://en.wikipedia.org/wiki/Distributed_hash_table) has an article describing the concept in more detail, it is fundamentally very simple: a set of computed hashes (SHA-256 in telehash) are mapped to all of the peers supporting the DHT by a simple rule, and those peers maintain their list of hashes and respond to queries about them.
 
-Like any DHT, Telehash peers cooperatively store all network
-information while minimizing per-peer costs. Derived from Kademlia's hash-based addressing and distance calculations, 
-the average number of "nearby" peers will grow logarithmically
-compared to the total global number of peers. Peers then attempt to keep
-track of all of the closest peers, and progressively fewer of the
-farther away peers. This pattern minimizes "degrees of separation"
-between peers while also minimizing the number of other peers each
-indidivual peer must keep track of.
+The important part of any DHT is the ability to handle peers joining and leaving, and ensuring that no malicious peer can interfere with the queries and connectivity.  There have been many different solutions to these types of common DHT challenges, and for telehash these rules have been derived from a DHT named [Kademlia][].
 
-Like Kademlia, Telehash measures distance with a bitwise XOR metric which divides the address space into 256 possible partitions, also called `k-buckets`.  Every peer when compared will have a `bucket` value based on the bit that differs, if the first bit is different the bucket would be 255, and if the entire first byte is the same the bucket for that peer would be 247.
+> Also see the [FAQ](faq.md#dht) for common questions and [Implementers Notes](implementers.mddhts) for help when implementing the DHT
 
-The two protocol elements for interacting with the Telehash DHT are [seek](protocol.md#seek) and [link](protocol.md#link) channels.  The `seek` channel allows asking any peer for a list of closer hashnames, and the `link` channel is how peers signal to each other that they are actively participating in the DHT.
+# Kademlia-Based Fundamentals
 
+Telehash adapts the [Kademlia][] Distributed Hash Table for its peer discovery. A "peer" in this document is a single application instance, one unique hashname.
+
+Unlike the original Kademlia paper that was a key-value store, there is no arbitrary data stored in the DHT. Peers query the DHT purely to locate other peers, independent of IP or other transient network identifiers. Telehash also departs from Kademlia by using SHA2 256-bit hashes (rather than SHA1 160-bit hashes).
+
+Like any DHT, telehash peers cooperatively store all network information while minimizing per-peer costs. Derived from Kademlia's hash-based addressing and distance calculations, the average number of "nearby" peers will grow logarithmically compared to the total global number of peers. Peers then attempt to keep track of all of the closest peers, and progressively fewer of the farther away peers. This pattern minimizes "degrees of separation" between peers while also minimizing the number of other peers each indidivual peer must keep track of.
+
+Like Kademlia, telehash measures distance with a bitwise XOR metric which divides the address space into 256 possible partitions, also called `k-buckets`.  Every peer when compared will have a `bucket` value based on the bit that differs, if the first bit is different the bucket would be 255, and if the entire first byte is the same the bucket for that peer would be 247.
+
+The two protocol elements for interacting with the telehash DHT are [seek](switch.md#seek) and [link](switch.md#link) channels.  The `seek` channel allows asking any peer for a list of closer hashnames, and the `link` channel is how peers signal to each other that they are actively participating in the DHT.
+
+<a name="distance" />
 ## XOR - Calculating distance
 Distance calculation is a 2-step process:
 

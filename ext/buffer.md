@@ -8,7 +8,7 @@ The request to create a buffer channel looks like:
 
 ```json
 {
-	"c":"ab945f90f08940c573c29352d767fee4",
+	"c":1,
 	"type":"buffer",
   "store":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6",
   "expire":3600,

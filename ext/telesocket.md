@@ -8,7 +8,7 @@ The reliable channel type used to create a TS is just `ts` and the only required
 
 ```json
 {
-  "c":"ab945f90f08940c573c29352d767fee4",
+  "c":1,
   "type":"ts",
   "path":"/",
   "seq":0
@@ -19,7 +19,7 @@ If the receiving hashname supports TS on the given path, it responds with:
 
 ```json
 {
-  "c":"ab945f90f08940c573c29352d767fee4",
+  "c":1,
   "open":true,
   "seq":0,
   "ack":0

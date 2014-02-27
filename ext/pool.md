@@ -1,6 +1,6 @@
 # `"type":"pool"` - Tracking Resource Providers
 
-In a distributed architecture there are frequently shared resources that are unevenly distributed, such as the [bridge](ext_bridge.md) and [buffer](ext_buffer.md) extensions. The `pool` extension is a tool that enables any switch to create and maintain an active pool of hashnames that can provide specific resources as well as help provide coordination between the resource providers.
+In a distributed architecture there are frequently shared resources that are unevenly distributed, such as `bridge` support and the [buffer](buffer.md) extension. The `pool` extension is a tool that enables any switch to create and maintain an active pool of hashnames that can provide specific resources as well as help provide coordination between the resource providers.
 
 Pools are organized by the identical Kademlia-based DHT mechanism as the core hashname routing for Telehash, such that any hashname that is a member of (providing resources for) a pool must maintain a list of buckets for the other active members of that pool.
 
@@ -8,7 +8,7 @@ The `peek` unreliable channel is a simple signalling for any switch to determine
 
 ```json
 {
-  "c":"ab945f90f08940c573c29352d767fee4",
+  "c":1,
   "type":"peek",
   "pool":"bridge"
 }
@@ -22,7 +22,7 @@ A peek response is one packet identical to a `seek`:
 
 ```json
 {
-  "c":"ab945f90f08940c573c29352d767fee4",
+  "c":1,
   "see":[
     "c6db0918a767f00b9841f4366ade7ffc13c86541c40bf0a1612e939988fdefb0,184.96.145.75,59474",
     "9e5ecd193b14abaef376067f80f442be97f6f3110abb865398c2a6ec83a4ee9b"
