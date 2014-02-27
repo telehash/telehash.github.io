@@ -1,7 +1,18 @@
 Telehash Protocol (v2.1)
 ========================
 
-Telehash is a new wire protocol that creates encrypted private communication links using a decentralized overlay mesh network.  It enables apps and devices to find, identify, and connect directly with each other using public-key security (PKI) and a distributed hash-table (DHT).
+The telehash protocol enables any app or device to establish private communication channels over a network. The following combination of features in telehash offers distinctive advantages to application developers:
+
+* all channels are encrypted all the time - there is no unencrypted mode
+* because each application instance or device generates its own public/private keypair, security is not dependent on certificate authorities
+* addresses are generated from public key fingerprints, not centrally managed as with IP addresses
+* routing is based on a globally distributed hash table (DHT), not the hierarchical Domain Name System (DNS)
+* the dual JSON/binary packet format is extremely flexible while remaining developer-friendly
+* channels can be reliable (like TCP) or unreliable (like UDP), or even re-use HTTP, WebRTC, and other web technologies
+* existing application protocols such as NNTP and XMPP can re-use telehash as a secure transport layer
+* although telehash apps can run over the current Internet, bindings to Bluetooth, IEEE 802.15.4, and other low-layer transports are also on the way
+
+The telehash protocol has been under development for several years and is actively being [implemented](implementations.md) in multiple progamming languages. Check the project's [GitHub repo](https://github.com/telehash/telehash.org) for more detailed information about how to contribute.
 
 For more background and history on telehash please see the [Introduction](background.md) and the [FAQ](faq.md). Collaboration on the development of telehash is open to anyone passionate about open communication systems and happens primarily through the protocol's [GitHub repo](https://github.com/telehash/telehash.org/blob/master/implementers.md).
 
