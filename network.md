@@ -33,13 +33,13 @@ The BODY is the encrypted binary that only that selected [Cipher Set](cipher_set
 
 The inner packet's required values are defined as:
 
-   * `from` - the fingerprints of the public keys defining the sending hashname, called it's `parts`
+   * `from` - the fingerprints of the public keys defining the sending hashname, called its `parts`
    * `line` - the unique id the recipient must use for sending any line packets, 16 random bytes lower case hex encoded
    * `at` - an integer timestamp of when the line was initiated, used to verify another incoming open request is newer based on the last received `at`
 
 The inner packet must also contain a BODY that is the binary `key` for the Cipher Set being used.
 
-An `open` is always triggered by the creation of a channel to a hashname, such that when a channel generates it's first packet the switch recognizes that a line doesn't exist yet.  The initiating channel logic is internally responsible for any retransmission of it's own packets, and those retransmissions are the source of re-triggering the sending of any `open` requests.
+An `open` is always triggered by the creation of a channel to a hashname, such that when a channel generates its first packet the switch recognizes that a line doesn't exist yet.  The initiating channel logic is internally responsible for any retransmission of its own packets, and those retransmissions are the source of re-triggering the sending of any `open` requests.
 
 When a new line is initiated the switch must also store a local timestamp at that time and send that same value as the `at` in any subsequent open request for that line.  This enables the recipient to recognize retransmissions of the same line initiation request, as well as detect when an open is generated for a new line as it will have a newer `at` value relative to the existing one. Any subsequent opens with matching or older `at` values must be ignored.
 

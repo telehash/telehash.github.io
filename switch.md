@@ -11,7 +11,7 @@ The following values for `type` are for unreliable channels that are used by swi
 
   * [`seek`](#seek) - given a hashname, return any pointers to other hashnames closer to it (DHT)
   * [`link`](#link) - request/enable another hashname to return the other in a `seek` request (DHT)
-  * [`peer`](#peer) - ask the recipient to make an introduction to one of it's peers
+  * [`peer`](#peer) - ask the recipient to make an introduction to one of its peers
   * [`connect`](#connect) - a request asking to try to open a connection to a given hashname (result of a `peer`)
   * [`relay`](#relay) - the capability for a switch to help two peers exchange connectivity information
   * [`path`](#path) - how two switches prioritize and monitor network path information
@@ -33,7 +33,7 @@ Only hashnames with an active `link` may be returned in the `see` response, and 
 <a name="link" />
 ### `"type":"link"` - Enabling Discovery (DHT)
 
-In order for any hashname to be returned in a `seek` it must have a link channel open.  This channel is the only mechanism enabling one hashname to store another in it's list of [buckets](dht.md) for the DHT.  It is bi-directional, such that any hashname can request to add another to it's buckets but both sides must agree/maintain that relationship.
+In order for any hashname to be returned in a `seek` it must have a link channel open.  This channel is the only mechanism enabling one hashname to store another in its list of [buckets](dht.md) for the DHT.  It is bi-directional, such that any hashname can request to add another to its buckets but both sides must agree/maintain that relationship.
 
 The initial request:
 
@@ -62,14 +62,14 @@ In the initial response or at any point an `end` or `err` can be sent to cancel 
 
 The link channel requires a keepalive at least once a minute in both directions, and after two minutes of no incoming activity it is considered errored and cancelled.  When one side sends the keepalive, the other should immediately respond with one to keep the link alive as often only one side is maintaining the link.  Links initiated without seeding must be maintained by the requestor.
 
-The keepalive requires only the single key/value of `"seed":true` or `"seed":false` to be included to indicate it's seeding status. This keepalive timing is primarily due to the prevalance of NATs with 60 second activity timeouts, but it also serves to keep only responsive hashnames returned for the DHT.
+The keepalive requires only the single key/value of `"seed":true` or `"seed":false` to be included to indicate its seeding status. This keepalive timing is primarily due to the prevalance of NATs with 60 second activity timeouts, but it also serves to keep only responsive hashnames returned for the DHT.
 
 Details describing the distance logic, maintenance, and limits can be found in [DHT](dht.md) reference.
 
 <a name="peer" />
 ### `"type":"peer"` - Introductions to new hashnames
 
-For any hashname to send an open to another it must first have one of it's public keys, so all new opens must be "introduced" via an existing line. This introduction is a two step process starting with a peer request to an intermediary. Since new hashnames are discovered only from another one in the `see` values, the one returning the see is tracked as a "via" so that they can be sent a `peer` request when a connection is being made to a hashname they sent. This also serves as a workaround if any NAT exists, so that the two hashnames can send a packet to each other to make sure the path between them is open, this is called "hole punching." 
+For any hashname to send an open to another it must first have one of its public keys, so all new opens must be "introduced" via an existing line. This introduction is a two step process starting with a peer request to an intermediary. Since new hashnames are discovered only from another one in the `see` values, the one returning the see is tracked as a "via" so that they can be sent a `peer` request when a connection is being made to a hashname they sent. This also serves as a workaround if any NAT exists, so that the two hashnames can send a packet to each other to make sure the path between them is open, this is called "hole punching." 
 
 A peer request requires a `"peer":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"` where the value is the hashname the sender is trying to reach. The BODY of the peer request must contain the binary public key of the sender, whichever key is the highest matching [Cipher Set](cipher_sets.md) as signalled in the original `see`.  The recipient of the peer request must then send a connect (below) to the target hashname (that it already must have an open line to).
 
@@ -139,13 +139,13 @@ When a hashname that is receiving a `peer` and sending out a `connect` recognize
 
 Any switch may have multiple network interfaces, such as on a mobile device both cellular and wifi may be available simutaneously or be transitioning between them, and for a local network there may be a public IP via the gateway/NAT and an internal LAN IP. A switch should always try to discover and be aware of all of the networks it has available to send on (ipv4 and ipv6 for instance), as well as what network paths exist between it and any other hashname. 
  
-An unreliable channel of `"type":"path"` is the mechanism used to discover, share, prioritize and test any/all network paths available.  For each known/discovered network path to another hashname a `path` is sent over that network interface including an optional `"priority":1` (any positive integer, defaults to 0) representing it's preference for that network to be the default.  The responding hashname upon receiving any `path` must return a packet with `"end":true` and include an optional `"priority":1` with it's own priority for that network interface is to receive packets via.
+An unreliable channel of `"type":"path"` is the mechanism used to discover, share, prioritize and test any/all network paths available.  For each known/discovered network path to another hashname a `path` is sent over that network interface including an optional `"priority":1` (any positive integer, defaults to 0) representing its preference for that network to be the default.  The responding hashname upon receiving any `path` must return a packet with `"end":true` and include an optional `"priority":1` with its own priority for that network interface is to receive packets via.
 
 Every path request/response must also contain a `"path":{...}` where the value is the specific path information this request is being sent to. The sending switch may also time the response speed and use that to break a tie when there are multiple paths with the same priority.
 
-A switch should send path requests to it's seeds whenever it comes online or detects that it's local network information has changed in order to discover it's current public IP/Port from the response `path` value in case it's behind a NAT.
+A switch should send path requests to its seeds whenever it comes online or detects that its local network information has changed in order to discover its current public IP/Port from the response `path` value in case it's behind a NAT.
 
-Additional path requests only need to be sent when a switch detects more than one (potential) network path between itself and another hashname, such as when it's public IP changes (moving from wifi to cellular), when line packets come in from different IP/Ports, when it has two network interfaces itself, etc.  The sending and return of priority information will help reset which paths are then used by default.
+Additional path requests only need to be sent when a switch detects more than one (potential) network path between itself and another hashname, such as when its public IP changes (moving from wifi to cellular), when line packets come in from different IP/Ports, when it has two network interfaces itself, etc.  The sending and return of priority information will help reset which paths are then used by default.
 
 A [paths](#paths) array should be sent with every new path channel containing all of the sender's paths that they would like the recipient to use. Upon receiving a path request containing an `paths`, the array should be processed to look for new/unknown possible paths and those should individually be sent a new path request in return to validate and send any priority information.
 
