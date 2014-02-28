@@ -40,4 +40,4 @@ A Channel ID is a positive (unsigned) integer and is determined by the sender an
 
 When a new channel is created, the ID must be higher than the last one the initiator used, they must always increment. Upon receiving a new channel request, the recipient must validate that it is higher than the last active channel (note: switches must still allow for two new channel requests to arrive out of order).
 
-When a new [line](#line) is estblished, it resets any stored channel state and sets the minimum required channel IDs back to 0.
+When a new [line](#line) is established, it resets any stored channel state and sets the minimum required channel IDs back to 0.
