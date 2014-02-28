@@ -7,6 +7,8 @@ These are questions that come up often, to add new ones please [file an issue](h
 
 * **How does telehash compare to X?** - There are a [great many](https://github.com/redecentralize/alternative-internet) efforts that have some similarity to telehash, it's not possible to maintain a comparison to all of them as most are constantly evolving.  Many of the telehash developers help on multiple projects and believe that this is a collective effort, frequently combining and sharing solutions to move everyone ahead.
 
+* <a name="simultaneous" />**Can one hashname be used in two places at once?** - As two completely distinct/decoupled entities, no, it would cause conflicting line handshakes depending on whichever hashname responded first.  If implemented so that there is some shared private state/storage mechanism between the instances where line information is held and coordinated, then yes a hashname can be available at many different network locations.  For example, one hashname can be used from many datacenters simultaneously as long as they all use the same distributed database for line state.
+
 <a name="dht" />
 ## Distributed Hash Table
 
