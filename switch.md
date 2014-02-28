@@ -132,7 +132,7 @@ This enables a supporting switch to do essentially no work in bridging packets a
 
 Since a bridge only works when the requestor knows the network path it wants to create a bridge to, and there are times when it may not have that information such as when both hashnames are connected via private paths to the bridge (like via http).
 
-When a hashname that is receiving a `peer` and sending out a `connect` recognizes that neither the sender or recipient has a public network path (ipv4 or ipv6), it may insert a `{"type":"bridge","id":"uniqueid",...}` in the paths array which specifies a custom bridge path that can be sent back to it in a `bridge` request to create one directly to the sender of the peer.  Otherwise, the two may have no way of connecting directly outside of a temporary `relay`.
+When a hashname that is receiving a `peer` and sending out a `connect` recognizes that neither the sender nor recipient has a public network path (ipv4 or ipv6), it may insert a `{"type":"bridge","id":"uniqueid",...}` in the paths array which specifies a custom bridge path that can be sent back to it in a `bridge` request to create one directly to the sender of the peer.  Otherwise, the two may have no way of connecting directly outside of a temporary `relay`.
 
 <a name="path" />
 ### `"type":"path"` - Network Path Information
