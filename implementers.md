@@ -42,3 +42,16 @@ There are many configurable numbers within a switch, here's the list of all of t
 |`link-ping`|55|||[seconds](dht.md#maintenance)
 |`link-timeout`|120|||[seconds](dht.md#maintenance)
 |``||||
+
+<a name="update" />
+## v2.0 to v2.1-pre
+
+This is a summary changes for v2 implementations when updating to v2.1-pre
+
+* The [packet](packet.md) format added the ability to return a HEAD length of 1
+* The [hashname](hashnames.md) is calculated differently now, requires a `parts` instead of a DER key
+* The [network](network.md) open and line packets are all binary now
+* Crypto is split into [Cipher Sets](cipher_sets.md), which changes key generation, switch initialization, and open/line handling
+* The [open](network.md#open) handling of the `at` value is better defined, and opens should be cached/resent for the same line
+* The v2 AES switched to [GCM](cs/2a.md).
+* A [channel](channels.md) ID is now a number.
