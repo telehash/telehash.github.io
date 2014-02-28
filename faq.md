@@ -16,6 +16,8 @@ These are questions that come up often, to add new ones please [file an issue](h
 
 * **Can I create a private DHT?** - The DHT in telehash is designed to be a single unified one, but for special circumstances it is possible to create a completely separate/private one by using a fixed/managed set of seeds.  Every seed must know the hashnames of the other seeds and never form a link with any outside of that list.  Apps must then use only one or more of those hashnames in their seeds to bootstrap from.
 
+* **How will it survive a DDOS?** - There are two aspects that contribute to being DDOS resistant, one is that there is nothing in the protocol that amplifies, where any one packet can be turned into two or more, so sending telehash packets has no advantage over sending just random data.  The other is that seeds are only used to bootstrap on first boot, every switch should save out a [hints](hints.md) file after it starts so that it doesn't depend on a fixed list of seeds (that would be a DDOS target).
+
 <a name="security" />
 ## Security
 
