@@ -36,8 +36,8 @@ An example initial reliable channel request from an app:
 <a name="channelid" />
 ### Channel IDs
 
-A Channel ID is a positive (unsigned) integer and is determined by the sender and then used by both sides to send/receive packets on that channel.  In order to prevent two hashnames from picking the same `c` value they both use a simple rule when they initiate a new channel: sort both hashnames alphabetically and the lower/first sorted one uses only even numbers, while the higher/second one uses odd numbers.
+A Channel ID is a *positive* (unsigned) integer and is determined by the sender and then used by both sides to send/receive packets on that channel.  In order to prevent two hashnames from picking the same `c` value they both use a simple rule when they initiate a new line: sort both hashnames alphabetically and the lower/first sorted one uses only even numbers (2 or greater), while the higher/second one uses odd numbers (1 or greater).
 
 When a new channel is created, the ID must be higher than the last one the initiator used, they must always increment. Upon receiving a new channel request, the recipient must validate that it is higher than the last active channel (note: switches must still allow for two new channel requests to arrive out of order).
 
-When a new [line](network.md#line) is established, it resets any stored channel state and sets the minimum required channel IDs back to 0.
+When a new [line](network.md#line) is established, it resets any stored channel state and sets the minimum required channel IDs back to being greater than 0.
