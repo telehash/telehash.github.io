@@ -13,6 +13,6 @@ Each CS contributes two values that are used within the protocol, a `fingerprint
 
 Two hashnames must always initiate a `line` to each other using the highest shared CSID between them.  Apps may choose which one or more CSIDs they want to support when they create a new hashname and know that a lower one will only ever be used to communicate with hashnames that only support that CS.
 
-Any CSID of "0*" ("01" through "0a") are reserved for special case custom Cipher Sets who's definitions are entirely app-specific, "00" is not allowed to be used at all.
+Any CSID of "0*" ("01" through "0a") are reserved for special case custom Cipher Sets whose definitions are entirely app-specific, "00" is not allowed to be used at all.
 
 > Also see the [FAQ](faq.md#cs) for common questions and [Implementers Notes](implementers.md#cs) for help when implementing a Cipher Set.
