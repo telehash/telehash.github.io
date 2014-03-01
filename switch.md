@@ -13,7 +13,7 @@ The following values for `type` are for unreliable channels that are used by swi
   * [`link`](#link) - request/enable another hashname to return the other in a `seek` request (DHT)
   * [`peer`](#peer) - ask the recipient to make an introduction to one of its peers
   * [`connect`](#connect) - a request asking to try to open a connection to a given hashname (result of a `peer`)
-  * [`relay`](#relay) - the capability for a switch to help two peers exchange connectivity information
+  * [`bridge`](#bridge) - how a switch can proxy traffic for two hashnames to enable full connectivity
   * [`path`](#path) - how two switches prioritize and monitor network path information
 
 
@@ -66,6 +66,8 @@ The keepalive requires only the single key/value of `"seed":true` or `"seed":fal
 
 Details describing the distance logic, maintenance, and limits can be found in [DHT](dht.md) reference.
 
+When either side of the link is willing to [bridge](#bridge) packets for the other, it must include a `"bridge":["ipv4","ipv6"]` of the network types that it supports bridging for.  This acts as an idicator to the recipient that it can make bridge requests for that network path type when needed.
+
 <a name="peer" />
 ### `"type":"peer"` - Introductions to new hashnames
 
@@ -73,7 +75,7 @@ For any hashname to send an open to another it must first have one of its public
 
 A peer request requires a `"peer":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"` where the value is the hashname the sender is trying to reach. The BODY of the peer request must contain the binary public key of the sender, whichever key is the highest matching [Cipher Set](cipher_sets.md) as signalled in the original `see`.  The recipient of the peer request must then send a connect (below) to the target hashname (that it already must have an open line to).
 
-These requests are always sent with a `"end":true` and no response is generated.
+The peer channel that is created remains active and serves as a path for tunneled packes to/from the requested hashname, those tunneled packets will always be attached as the raw BODY on any subsequent sent/received peer channel packets.
 
 If a sender has multiple known public network paths back to it, it should include an [paths](#paths) array with those paths, such as when it has a valid public ipv6 address.  Any internal paths (local area network addresses) must not be included in a peer request, only known public address information can be sent here.  Internal paths must only be sent in a [path](#path) request since that is private over a line and not exposed to any third party (like the peer/connect flow is).
 
@@ -84,33 +86,20 @@ The connect request is an immediate result of a `peer` request and must always a
 
 The recipient can use the given public key to send an open request to the target via the possible paths.  If a NAT is suspected to exist, the target should have already sent a packet to ensure their side has a path mapped through the NAT and the open should then make it through.
 
-When generating a connect, the switch must always verify the sending path is included in the paths array, and if not insert it in. This ensures that the recipient has at least one valid path, and when there were others it included it speeds up path discovery since no additional [`path`](#path) round trip such as for an IPv6 one.
+When generating a connect, the switch must always verify the sending path is included in the paths array, and if not insert it in if it's a public path. This ensures that the recipient has at least one valid path and speeds up path discovery since no additional [`path`](#path) round trip such as for an IPv6 one.
 
 When there's multiple paths the processing of them must only send an open per *type* to prevent spamming of fake entries triggering unsolicited outgoing packets.  For "ipv4" and "ipv6" there may be two of each sent, one for a public IP and one for a private IP of each type.  Also to minimize unsolicited opens, no more than one connect per second should be processed for a given hashname.
 
-These requests are also sent with a `"end":true` and no response is generated.
+The generated `open` should always be attached as a BODY and sent back in response on the new connect channel as well, which relays it back to the original `peer` request to guarantee connectivity.  Subsequent packets on the connect channel work identically to the peer one, acting as a tunnel with the BODY being the raw tunneled packet.
 
-<a name="relay" />
-### `"type":"relay"` - Guaranteed Connectivity
-
-There are a number of situations where two different hashnames will be unable to connect directly to each other, and while these are not very common, the protocol must ensure that any two hashnames have the ability to securely exchange information.
-
-The two most common cases are with combinations of certain NATs where at least one dynamically maps external ports such that the sending hashname has no way to detect it (often called symmetric NATs), and the other is when two hashnames are on the same local network and their shared NAT doesn't allow them to send public data to each other. Typical solutions in other protocols involve using a shared/trusted third party to relay the data via (TURN), and exchanging internal network addresses via a third party. There are additional cases that will become more common in the future as well, such as when there are diverse networks and two hashnames are on different ones entirely (one is ip based and the other bluetooth) connected only by a hashname that handles both.
-
-When a hashname detects that it cannot connect directly with another (there are different detection techniques for the various cases), it sends a `peer` that also includes a relay path in the [paths](#paths) array. Upon receiving a `connect` with the relay path in it, that hashname must additionally open a `relay` channel, include the `id` from the relay path, and send the identical `open` packet over the relay as well as sending it to the included ip/port info in the connect. If the relay is the only connectivity established, the subsequent `line` packets may be sent over it.
-
-A `relay` channel is very simple, every packet must contain a `"to":"..."` of the hashname to relay to, and that hashname must be one that the receiving switch already has an open line to.  Each packet must also contain the `"type":"relay"` and original `"id":"..."` such that the sending/receiving switches don't need to maintain state and every packet can be processed alone. The relay packets are then sent as-is over the line to the recipient, and any/all packets sent from either side are then relay'd as-is to the other. The channel is unreliable and the relayed packets must not contain any reliability information.
-
-To prevent abuse, all switches must limit the volume of relay packets from any hashname to no more than five per second.  Any packets over that rate MUST be dropped/discarded. This is a fast enough rate for any two hashnames to negotiate additional connectivity (like using a [bridge](#bridge)) and do basic DHT queries.
-
-Switches must also prevent double-relaying, sending packets coming in via a relay outgoing via another relay, a relay is only a one-hop utility and two hashnames must negotiate alternate paths for additional needs. Any `peer` requests coming in via a relay must also not have a relay included in their paths.
+The switch acting as the relay between a `peer` and `connect` must limit the rate of tunneled packets to no more than 5 per second in either direction, and never have more than one peer-connect pair active between two hashnames.  This enables the two hashnames to privately negotiate other connectivity, but not use it's bandwidth as an open bridge.  If this switch is willing to act as a bridge, as soon as it has detected a tunneled [line](network.md#line) in both directions it should internally set up a [bridge](#bridge) and always include a `"bridge":true` on every tunneled packet thereafter.  Either side of the tunnel when seeing this flag should then treat the channel's sending path as that of the tunneled packet.
 
 <a name="bridge" />
 ### `"type":"bridge"` - Shared Bandwidth
 
 The bridge channel is used to enable other hashnames (either anyone, or just specific trusted ones) to proxy the traffic for a single line through the hosting switch when the two parties of the line cannot communicate directly (NATs, firewalls, different network types, etc).  The supporting switch will receive the line packets and immediately send them all to a different destination instead of processing them.
 
-A `bridge` packet looks like:
+A `bridge` request looks like:
 
 ```json
 {
@@ -122,17 +111,12 @@ A `bridge` packet looks like:
 }
 ```
 
-The `to` value is the incoming line id, when any packet comes in with that id the packet is sent to the specified `path` (same format as `paths` entries).  It is the responsibility of the bridge creator to ensure the path is valid, as the bridge will provide no feedback as to status.
+The `to` value is the incoming line id, when any packet is received by the bridge switch with that id the packet is sent to the specified [path](network.md#paths).  When the request is confirmed the channel will be ended without an error, otherwise an `"err":"reason"` will be returned.
 
 When any line id coming into the switch matches the `from` value it's resent to the network path that the bridge was created from.  Bridges should be persisted until the hashname that created it goes offline.
 
 This enables a supporting switch to do essentially no work in bridging packets as it can process them outside any encryption.  To prevent circular loops, all bridged packets must have a hash calculated and temporary cache of the values stored to detect any repeat packets that should be dropped.
 
-#### Connect Path
-
-Since a bridge only works when the requestor knows the network path it wants to create a bridge to, and there are times when it may not have that information such as when both hashnames are connected via private paths to the bridge (like via http).
-
-When a hashname that is receiving a `peer` and sending out a `connect` recognizes that neither the sender nor recipient has a public network path (ipv4 or ipv6), it may insert a `{"type":"bridge","id":"uniqueid",...}` in the paths array which specifies a custom bridge path that can be sent back to it in a `bridge` request (as the `id` field) to create one directly to the sender of the peer.  Otherwise, the two may have no way of connecting directly outside of a temporary `relay`.
 
 <a name="path" />
 ### `"type":"path"` - Network Path Information

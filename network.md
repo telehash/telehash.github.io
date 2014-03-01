@@ -69,8 +69,6 @@ Every unique network sender/recipient is called a `path` and defined by a JSON o
 * `ipv6` - UDP, contains `ip` and `port`, preferred/upgraded when both sides support it
 * `http` - see [HTTP](ext/path_http.md), also is the primary fallback when UDP is blocked
 * `webrtc` - see [WebRTC](ext/path_webrtc.md), preferred when possible
-* `relay` - contains `id` of the channel id to create a [relay](switch.md#relay) with
-* `bridge` - see [bridge](switch.md#bridge), fallback when no other path works
 
 These paths are used often within the protocol to exchange network information, and frequently sent as an array, for example:
 
