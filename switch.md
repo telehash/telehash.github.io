@@ -66,7 +66,7 @@ The keepalive requires only the single key/value of `"seed":true` or `"seed":fal
 
 Details describing the distance logic, maintenance, and limits can be found in [DHT](dht.md) reference.
 
-When either side of the link is willing to [bridge](#bridge) packets for the other, it must include a `"bridge":["ipv4","ipv6"]` of the network types that it supports bridging for.  This acts as an idicator to the recipient that it can make bridge requests for that network path type when needed.
+When either side of the link is willing to [bridge](#bridge) packets for the other, it must include a `"bridges":["ipv4","ipv6"]` of the network types that it supports bridging for.  This acts as an idicator to the recipient that it can make bridge requests for that network path type when needed.
 
 <a name="peer" />
 ### `"type":"peer"` - Introductions to new hashnames
