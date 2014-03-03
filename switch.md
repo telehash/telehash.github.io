@@ -66,7 +66,18 @@ The keepalive requires only the single key/value of `"seed":true` or `"seed":fal
 
 Details describing the distance logic, maintenance, and limits can be found in [DHT](dht.md) reference.
 
-When either side of the link is willing to [bridge](#bridge) packets for the other, it must include a `"bridges":["ipv4","ipv6"]` of the network types that it supports bridging for.  This acts as an idicator to the recipient that it can make bridge requests for that network path type when needed.
+#### Advertising Bridge Capacity
+
+When either side of the link is willing to [bridge](#bridge) packets for the other, it must include a `"bridges":["ipv4","ipv6"]` of the network types that it supports bridging for.  This acts as an idicator to the recipient that it can make bridge requests for that network path type when needed. Bridges can be advertised or updated at any time, an empty array cancels any bridge advertisements.
+
+```json
+{
+  "c":1,
+  "seed":true,
+  "bridge":["ipv4","ipv6","http"]
+}
+```
+
 
 <a name="peer" />
 ### `"type":"peer"` - Introductions to new hashnames
@@ -79,6 +90,16 @@ The peer channel that is created remains active and serves as a path for tunnele
 
 If a sender has multiple known public network paths back to it, it should include an [paths](#paths) array with those paths, such as when it has a valid public ipv6 address.  Any internal paths (local area network addresses) must not be included in a peer request, only known public address information can be sent here.  Internal paths must only be sent in a [path](#path) request since that is private over a line and not exposed to any third party (like the peer/connect flow is).
 
+```json
+{
+  "c":10,
+  "type":"peer",
+  "peer":"ed1a50bdd08846ee9ed504ba59469a843b234dc9e6e56470b76ff8839b08039c",
+  "paths":[{"type":"ipv4","ip":"12.14.16.18","port":24242}]
+}
+BODY: ...sender's binary public key...
+```
+
 <a name="connect" />
 ### `"type":"connect"` - Connect to a hashname
 
@@ -88,11 +109,17 @@ The recipient can use the given public key to send an open request to the target
 
 When generating a connect, the switch must always verify the sending path is included in the paths array, and if not insert it in if it's a public path. This ensures that the recipient has at least one valid path and speeds up path discovery since no additional [`path`](#path) round trip such as for an IPv6 one.
 
-When there's multiple paths the processing of them must only send an open per *type* to prevent spamming of fake entries triggering unsolicited outgoing packets.  For "ipv4" and "ipv6" there may be two of each sent, one for a public IP and one for a private IP of each type.  Also to minimize unsolicited opens, no more than one connect per second should be processed for a given hashname.
+#### Connect Handling
+
+The recipient of a connect is being asked to establish a line with the included hashname by a third party, and must be wary of the validity of such requests, both checking the included BODY against the `from` info to verify the hashname and matching CSID, as well as tracking the frequency of these requests to reduce outgoing unsolicited requests. There must be no more than one open packet sent per destination host per second.
 
 The generated `open` should always be attached as a BODY and sent back in response on the new connect channel as well, which relays it back to the original `peer` request to guarantee connectivity.  Subsequent packets on the connect channel work identically to the peer one, acting as a tunnel with the BODY being the raw tunneled packet.
 
-The switch acting as the relay between a `peer` and `connect` must limit the rate of tunneled packets to no more than 5 per second in either direction, and never have more than one peer-connect pair active between two hashnames.  This enables the two hashnames to privately negotiate other connectivity, but not use it's bandwidth as an open bridge.  If this switch is willing to act as a bridge, as soon as it has detected a tunneled [line](network.md#line) in both directions it should internally set up a [bridge](#bridge) and always include a `"bridge":true` on every tunneled packet thereafter.  Either side of the tunnel when seeing this flag should then treat the channel's sending path as that of the tunneled packet.
+The switch acting as the relay between a `peer` and `connect` must limit the rate of tunneled packets to no more than 5 per second in either direction, and never have more than one peer-connect pair active between two hashnames.  This enables the two hashnames to privately negotiate other connectivity, but not use it's bandwidth as an open bridge.
+
+#### Auto-Bridge
+
+If this switch is willing to act as a bridge, as soon as it has detected a tunneled [line](network.md#line) in both directions it should internally set up a [bridge](#bridge) and always include a `"bridge":true` on every tunneled packet thereafter.  Either side of the tunnel when seeing this flag should then treat the channel's sending path as that of the tunneled packet, and subsequent line packets to that destination will be bridged to the other source.
 
 <a name="bridge" />
 ### `"type":"bridge"` - Shared Bandwidth
@@ -149,7 +176,7 @@ An established path is one that comes from the network interface, the actual enc
 
 ### Direct (no DHT)
 
-A shares [seed info](seeds.md) (and is not behind a NAT), B uses seed info to send an open directly.
+`A` shares [seed info](seeds.md) (and is not behind a NAT), `B` uses seed info to send an open directly.
 
 ### Meshing
 
@@ -157,18 +184,45 @@ To be reachable, every hashname must minimally mesh.  Uses [link](#link).
 
 ### Seek
 
-Required with or without NAT, B always initiates open.
+`A` is seeking `B` via `C`.
 
-Seek, peer, connect, open
+* seek `A->C` with `B` info returned
+* peer `A->C` for `B`, and empty packet `A->B` for possible NAT
+* connect `C->B` with `A` info
+* open `B->A` directly and `A->B` in response
 
 ### Seek (failed direct)
 
 When a UDP direct connection is not possible or fails, exchange paths to look for alternative ones.
 
-Seek, peer, connect, relay, open, path
+* seek `A->C` with `B` info returned
+* peer `A->C` for `B`, and empty packet `A->B` for possible NAT
+* connect `C->B` with `A` info
+* open `B->C` back over the connect
+* relay open `C->A` back over the peer, and `A->C->B` in response
+* path over the `C` relay to look for direct network info
 
-### Seek (bridge)
+### Seek (bridge via relay)
 
-When no paths are available, create and use a [bridge](#bridge).
+When no paths are available, `C` can offer to directly bridge all line packets.
 
-Seek, peer, connect, relay, open, bridge
+* seek `A->C` with `B` info returned
+* peer `A->C` for `B`, and empty packet `A->B` for possible NAT
+* connect `C->B` with `A` info
+* open `B->C` back over the connect
+* relay open `C->A` back over the peer, and `A->C->B` in response
+* the `C` signals to `"bridge":true` on the relay'd packets
+* `A` and `B` use the network path for `C` as the one for each other directly
+
+### Seek (general bridge)
+
+When no paths are available, elect a [bridge](#bridge).
+
+* seek `A->C` with `B` info returned
+* peer `A->C` for `B`, and empty packet `A->B` for possible NAT
+* connect `C->B` with `A` info
+* open `B->C` back over the connect
+* relay open `C->A` back over the peer, and `A->C->B` in response
+* path over the `C` relay to look for direct network info
+* `A` or `B` fail to find a supported or working network path, create a bridge
+

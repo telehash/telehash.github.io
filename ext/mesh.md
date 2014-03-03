@@ -1,6 +1,6 @@
 # Physical Mesh Networks
 
-Telehash has most of the functionality built in to facilitate the needs of a physical (geographical) mesh network, where the content transmission itself must be routed over specific nodes in order to reach the destination. When using `relay` and `bridge` it's possible to accomplish full end-to-end transmission as the primary mesh routing protocol.
+Telehash has most of the functionality built in to facilitate the needs of a physical (geographical) mesh network, where the content transmission itself must be routed over specific nodes in order to reach the destination. When using `bridge` it's possible to accomplish full end-to-end transmission as the primary mesh routing protocol.
 
 A telehash mesh network is always created and operated by a set of core mesh routers for the given mesh, and each router acts as a gateway to anyone that can reach it to any other hashname connected to any router on that mesh. The routers always maintain a line to every other router in the mesh, and always support bridging to each other or any hashname connected to the mesh.
 
