@@ -43,6 +43,44 @@ There are many configurable numbers within a switch, here's the list of all of t
 |`link-timeout`|120|||[seconds](dht.md#maintenance)
 |``||||
 
+<a name="networking" />
+## Network Paths
+
+> rough notes
+
+A switch implementation should be designed with the actual network interface(s) as distinct from the processing logic, such that the logic is agnostic to incoming network paths/types.  All path info created by the networking layer must be bi-directional, an incoming path object should contain the info to be a destination/response path.
+
+When packets are generated to a type of path that there is no local delivery for or when there's been no response, the switch should automatically attempt to create a [bridge](switch.md#bridge) for that given type/path.
+
+#### Local Addresses
+
+All switches must track if the source/destination host info is local or not and be careful to never share local paths to non-local hashnames.
+
+Here's an example function:
+
+```js
+function isLocalIP(ip)
+{
+  // ipv6 ones
+  if(ip.indexOf(":") >= 0)
+  {
+    if(ip.indexOf("::") == 0) return true; // localhost
+    if(ip.indexOf("fc00") == 0) return true;
+    if(ip.indexOf("fe80") == 0) return true;
+    return false;
+  }
+  
+  var parts = ip.split(".");
+  if(parts[0] == "0") return true;
+  if(parts[0] == "127") return true; // localhost
+  if(parts[0] == "10") return true;
+  if(parts[0] == "192" && parts[1] == "168") return true;
+  if(parts[0] == "172" && parts[1] >= 16 && parts[1] <= 31) return true;
+  if(parts[0] == "169" && parts[1] == "254") return true; // link local
+  return false;
+}
+```
+
 <a name="update" />
 ## v2.0 to v2.1-pre
 
@@ -55,3 +93,4 @@ This is a summary changes for v2 implementations when updating to v2.1-pre
 * The [open](network.md#open) handling of the `at` value is better defined, and opens should be cached/resent for the same line
 * The v2 AES switched to [GCM](cs/2a.md).
 * A [channel](channels.md) ID is now a number.
+* The [peer](switch.md#peer) and [connect](switch.md#connect) have been updated to include CSID info and act as a built-in relay.
