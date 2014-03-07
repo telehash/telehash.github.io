@@ -32,7 +32,7 @@ Accept: */*
 
 Becomes:
 
-```
+```json
 {
   "http":1.1,
   "get":"/",
@@ -40,6 +40,8 @@ Becomes:
   "host":"fooo.com",
   "accept":"*/*",
 }
+```
+```
 BODY: empty
 ```
 
@@ -65,7 +67,7 @@ Location: http://www.fooooo.com/
 
 Becomes:
 
-```
+```json
 {
   "http":1.1,
   "status":301,
@@ -75,6 +77,8 @@ Becomes:
   "content-length":178,
   "location":"http://www.fooooo.com/"
 }
+```
+```
 BODY:
 <html>
 <head><title>301 Moved Permanently</title></head>
