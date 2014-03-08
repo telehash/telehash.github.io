@@ -8,6 +8,7 @@ Full example:
 ```js
 {
   "46fe53c258bbc1984fb5ab02ca1494eccdd54e9688dbbc2c882c8713f1cc4cf3":{
+    "admin":"http://github.com/quartzjer",
     "paths":[{"type":"ipv4","ip": "127.0.0.1","port": 42424},{"type":"http","http":"http://127.0.0.1"}],
     "keys":{
       "1a":"04dfeae020ffd00fa264e4b0a8504dcadb68bbc168db936a497f03149973f844428466d019b3f397c9",
@@ -25,6 +26,7 @@ None of the fields are necessarily required, but at least `parts`, `paths` and o
 
 Definitions:
 
+* `admin`: A URL to identify the admin for the seed
 * `keys`: The binary public keys for each cipher set used, in base64
 * `parts`: The fingerprints of each included public key
 * `paths`: Array of path objects, as defined in [paths](network.md#paths).
