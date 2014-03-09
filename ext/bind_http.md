@@ -92,22 +92,36 @@ BODY:
 
 ## THTP Channels
 
-A new THTP request is initiated by creating a reliable channel of type `THTP`, multiples can be created simultaneously. In the request, the HTTP method is included as a lower-case key along with up to as much of the path as there is capacity for in the packet as the value, and any remaining space in the channel packet is used to include in the BODY as much of the THTP packet as possible.  This information is used by the recipient to determine if they want to accept the full request if it's larger than a single packet.
+A new THTP request is initiated by creating a reliable channel of type `THTP`, multiples can be created simultaneously. In the request, the HTTP method is included as a lower-case value of the "method" key along with the `"path":"..."` normalized string value, truncated if needed if it is too large for the channel packet. Any remaining space in that packet is used to include in the BODY as much of the THTP request packet as possible.  This information is used by the recipient to determine if they want to continue accepting the full request in subsequent packets if it's larger than the single one.
 
 ```json
 {
   "c":1,
   "seq":0,
-  "type":"THTP",
+  "type":"thtp",
   "size":1234,
-  "get":"/path/resource.ext"
+  "method":"get",
+  "path":"/path/resource.ext"
 }
+BODY: ...
 ```
 
-If the request is accepted, an empty packet is sent back acknowledge the request and any remaining bytes of the THTP request are sent as the BODY in subsequent packets.  When the final one finishes the full THTP packet it will include a `"done":true`. Only one THTP packet can be sent on a channel until there's a response.
+If the request is accepted, an empty packet is sent back acknowledge the request (as defined by a reliable channel) and any remaining bytes of the THTP request are sent as the BODY in subsequent packets.  When the final one finishes the full THTP packet it will include a `"done":true`. Only one THTP packet can be sent on a channel until there's a response.
 
-The response is the same pattern, a packet of the JSON headers and content bytes as the BODY, terminated by a `"done":true`.
+The response is the same pattern, but starting with a channel packet containing a "size" and a "status" with the status code, along with the BODY a THTP response packet continuing in subsequent packets until a `"done":true`.
+
+```json
+{
+  "c":1,
+  "seq":1,
+  "type":"thtp",
+  "size":101,
+  "status":404,
+  "done":true
+}
+BODY: ...
+```
 
 The channel can be re-used for additional requests/responses (like HTTP keepalive), or those can be sent in parallel as their own channels.  To continue using the same channel the same pattern is used, a packet containing the size and the method:path keys is sent as a request along with as much of the THTP request will fit in the BODY, and once that packet is acknowledged, the full request/response can proceed.
 
-If the initial request has a `"size":0` it is a *simple* request and there is no more information other than the given method and path.  The recipient should immediately return a normal THTP packet response.
+If a channel packet has a `"size":0` it is a *simple* request/response and there is no more information other than the given method/path or status.  These packets must always also contain a `"done":true`.
