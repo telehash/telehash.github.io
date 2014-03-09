@@ -92,7 +92,9 @@ BODY:
 
 ## THTP Channels
 
-A new THTP request is initiated by creating a reliable channel of type `THTP`, multiples can be created simultaneously. In the request, the HTTP method is included as a lower-case value of the "method" key along with the `"path":"..."` normalized string value, truncated if needed if it is too large for the channel packet. Any remaining space in that packet is used to include in the BODY as much of the THTP request packet as possible.  This information is used by the recipient to determine if they want to continue accepting the full request in subsequent packets if it's larger than the single one.
+A new THTP request is initiated by creating a reliable channel of type `thtp`, multiples can be created simultaneously. These channels are always in one direction, the hashname sending the first packet can only send THTP requests over it, and the receiving side can only send responses.  If the receiving needs to make requests, it can start a THTP channel in the other direction at any point.
+
+In the request the HTTP method is included as a lower-case value of a `"method":"get"` along with the `"path":"..."` normalized string value, truncated if needed if it is too large for the channel packet. Any remaining space in that packet is used to include in the BODY as much of the THTP request packet as possible.  This information is used by the recipient to determine if they want to continue accepting the full request in subsequent packets if it's larger than the single one.
 
 ```json
 {
