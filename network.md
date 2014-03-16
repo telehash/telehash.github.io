@@ -25,7 +25,8 @@ The BODY is the encrypted binary that only that selected [Cipher Set](cipher_set
 
 ```js
 {
-    "from":{"2a":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"},
+    "from":{"2a":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6",
+            "1a": "a5c8b5c8a630c84dc01f92d2e5af6aa41801457a"},
     "at":1375983687346,
     "line":"8b945f90f08940c573c29352d767fee4"
 }
