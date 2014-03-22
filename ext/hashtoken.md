@@ -3,7 +3,7 @@ Hash Tokens
 
 A hashtoken is a combination of a partial hashname and a token, such that they can be used to find, validate, and connect to any hashname.
 
-The format is very simple: the first 16 bytes of the generator hashname, 8 bytes of random, and the first 8 bytes of the SHA-256 hash of the full hashname concatenated with the 8 random bytes.  This results in 32 bytes, usually expressed as 64 lower case hex characters.
+The format is very simple: the first 16 bytes of the generator hashname, 8 bytes of random, and the first 8 bytes of the SHA-256 hash of the full 32 byte hashname concatenated with the 8 random bytes.  This results in 32 bytes, usually expressed as 64 lower case hex characters.
 
 Any token can be used by any hashname to seek the DHT for it, and once it finds a hashname that matches the first 16 bytes, it can validate the token to be sure it has the correct hashname and then open a `token` channel to that hashname and pass in the token to notify the app that the token has been used:
 
