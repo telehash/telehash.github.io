@@ -31,4 +31,3 @@ Definitions:
 * `parts`: The fingerprints of each included public key
 * `paths`: Array of path objects, as defined in [paths](network.md#paths).
 * `pools`: Array of string names of what [pools](ext/pool.md) it supports.
-* `bridge`: true/false if this seed supports bridging
