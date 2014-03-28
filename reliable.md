@@ -7,7 +7,7 @@ Reliability is requested on a channel with the very first packet (that contains 
 
 ## `seq` - Sequenced Data
 
-The principle requirement of a reliable channel is always including a simple `"seq":0` integer value on every packet that contains any content (including the `end`). All `seq` values start at 0 and increment per packet sent when that packet contains any data to be processed.
+The principle requirement of a reliable channel is always including a simple `"seq":0` integer value on every packet that contains any content (including the `end`). All `seq` values start at 0 and increment per packet sent when that packet contains any data to be processed, with a maximum value of 4,294,967,295 (a 32-bit unsigned integer)
 
 A buffer of these packets must be kept keyed by the seq value until the receiving switch has responded
 confirming them in a `ack` (below). The maximum size of this buffer and the number of outgoing packets that can be sent before being acknowledged is currently 100, but this is very much just temporary to ease early implementations and handling it's size will be defined in it's own document.
