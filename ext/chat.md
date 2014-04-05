@@ -24,18 +24,15 @@ The roster and individual messages can be fetched asynchronously using [THTP](bi
 
 The following URLs are valid for the chat id `foo@851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6`:
 
-  thtp://851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6/chat/80fdbf31/roster
-  
-  * `851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6` the originator of the chat
-  * `80fdbf31` the 32-bit [murmurhash3](http://en.wikipedia.org/wiki/MurmurHash) of the chat id
-  * `roster` request to return the raw JSON of the roster
-
-  thtp://4449fdac8562db31af3c45585a8dded840e9551062a6348489be2fa8d0f8d0b7/chat/80fdbf31/id/431b7ae2,1000
-  
-  * `4449fdac8562db31af3c45585a8dded840e9551062a6348489be2fa8d0f8d0b7` the hashname of a participant in a chat
-  * `80fdbf31` the 32-bit [murmurhash3](http://en.wikipedia.org/wiki/MurmurHash) of the chat id
-  * `id` request to return a message sent by this participant
-  * `431b7ae2,1000` the id of the message to return as a raw telehash packet
+* `thtp://851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6/chat/80fdbf31/roster`
+  * **851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6** the originator of the chat
+  * **80fdbf31** the 32-bit [murmurhash3](http://en.wikipedia.org/wiki/MurmurHash) of the chat id
+  * **roster** request to return the raw JSON of the roster
+* `thtp://4449fdac8562db31af3c45585a8dded840e9551062a6348489be2fa8d0f8d0b7/chat/80fdbf31/id/431b7ae2,1000`
+  * **4449fdac8562db31af3c45585a8dded840e9551062a6348489be2fa8d0f8d0b7** the hashname of a participant in a chat
+  * **80fdbf31** the 32-bit [murmurhash3](http://en.wikipedia.org/wiki/MurmurHash) of the chat id
+  * **id** request to return a message sent by this participant
+  * **431b7ae2,1000** the id of the message to return as a raw telehash packet
 
 ## Chat
 
