@@ -17,8 +17,8 @@ There are four primary categories of extensions:
 
 * **[pool](ext/pool.md)** - Creating "pools" of shared resources, basically how to form miniature DHTs
 * **[buffer](ext/buffer.md)** - Simple lightweight shared key/value storage service
-* **[verb](ext/verb.md)** - Version information/negotiation
-* **[tickets](ext/tickets.md)** - Temporary portable signed permission/grant packets
+* **[verb](ext/verb.md)** - Version information/negotiation, capabilities detection
+* **[chat](ext/chat.md)** - Chat/Messaging, 1:1, small groups, public and private
 
 <a name="networks" />
 # Networks
