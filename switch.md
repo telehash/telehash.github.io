@@ -86,7 +86,7 @@ For any hashname to send an open to another it must first have one of its public
 
 A peer request requires a `"peer":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"` where the value is the hashname the sender is trying to reach. The BODY of the peer request must contain the binary public key of the sender, whichever key is the highest matching [Cipher Set](cipher_sets.md) as signalled in the original `see`.  The recipient of the peer request must then send a connect (below) to the target hashname (that it already must have an open line to).
 
-The peer channel that is created remains active and serves as a path for tunneled packes to/from the requested hashname, those tunneled packets will always be attached as the raw BODY on any subsequent sent/received peer channel packets.
+The peer channel that is created remains active and serves as a path for [tunneled](#relay) packes to/from the requested hashname, those tunneled packets will always be attached as the raw BODY on any subsequent sent/received peer channel packets.
 
 If a sender has multiple known public network paths back to it, it should include an [paths](#paths) array with those paths, such as when it has a valid public ipv6 address.  Any internal paths (local area network addresses) must not be included in a peer request, only known public address information can be sent here.  Internal paths must only be sent in a [path](#path) request since that is private over a line and not exposed to any third party (like the peer/connect flow is).
 
@@ -113,9 +113,18 @@ When generating a connect, the switch must always verify the sending path is inc
 
 The recipient of a connect is being asked to establish a line with the included hashname by a third party, and must be wary of the validity of such requests, both checking the included BODY against the `from` info to verify the hashname and matching CSID, as well as tracking the frequency of these requests to reduce outgoing unsolicited requests. There must be no more than one open packet sent per destination host per second.
 
-The generated `open` should always be attached as a BODY and sent back in response on the new connect channel as well, which relays it back to the original `peer` request to guarantee connectivity.  Subsequent packets on the connect channel work identically to the peer one, acting as a tunnel with the BODY being the raw tunneled packet.
+The generated `open` should always be attached as a BODY and sent back in response on the new connect channel as well, which relays it back to the original `peer` request to guarantee connectivity (see below).
+
+<a name="relay" />
+### `peer <relay> connect` - Tunneling Packets
+
+Over any established `peer` and `connect` channel all subsequent packets are tunneled between the two, with the BODY being received on one channel and attached verbatim as the BODY on a packet sent on the other channel.  This allows any two hashnames that are being introduced to have guaranteed connectivity for exchanging open packets to establish a line and any subsequent line packets to negotiate additional path information privately.
+
+#### Rate Limit
 
 The switch acting as the relay between a `peer` and `connect` must limit the rate of tunneled packets to no more than 5 per second in either direction, and never have more than one peer-connect pair active between two hashnames.  This enables the two hashnames to privately negotiate other connectivity, but not use it's bandwidth as an open bridge.
+
+When any packets are being dropped the sender should be notified with a packet containing a `"warn":"..."` that includes a message meant only for logging and debugging of connection issues during development and testing.
 
 #### Auto-Bridge
 
