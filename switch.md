@@ -28,7 +28,7 @@ Only the prefix hex value is sent in each seek request to reduce the amount of i
 
 The response is a compact `"see":[...]` array of addresses that are closest to the hash value (based on the [DHT](dht.md) rules).  The addresses are a compound comma-delimited string containing the "hash,cs,ip,port" (these are intentionally not JSON as the verbosity is not helpful here), for example "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c,1a,123.45.67.89,10111". The "cs" is the [Cipher Set](cipher_sets.md) ID and is required. The ip and port parts are optional and only act as hints for NAT hole punching.
 
-Only hashnames with an active `link` may be returned in the `see` response, and it must always include an `"end":true`.  Only other seeds will be returned unless the seek hashname matches exactly, then it will also be included in the response even if it isn't seeding.
+Only hashnames with an active `link` may be returned in the `see` response, and it must always include an `"end":true`.  Only other seeds will be returned unless the seek hashname matches exactly, then it will also be included in the response even if it isn't seeding.  The first entry in the see array is the one the sender recommends, which may not be the closest but can be considered a redirect/shortcut to possibly accelerate the seeking process.
 
 <a name="link" />
 ### `"type":"link"` - Enabling Discovery (DHT)
