@@ -15,8 +15,7 @@ To cache a ticket:
 BODY: ticket bytes
 ```
 
-Upon success just an `"end":true` is returned and the attached ticket will replace any previous one from the sending hashname, otherwise an `"err":"reason"` is sent back to end the channel.  The `store` value along with the `BODY` must be stored for the sending hashname.  An empty BODY is a request to delete any already cached ticket.
-
+Upon success just an `"end":true` is returned and the attached ticket will replace any previous one from the sending hashname, otherwise an `"err":"reason"` is sent back to end the channel.  The `store` value along with the `BODY` must be stored for the sending hashname.  An empty BODY is a request to delete any already cached ticket.  
 To retrieve a cached ticket:
 
 ```json
@@ -29,4 +28,4 @@ To retrieve a cached ticket:
 ```
 The `from` must match a stored ticket and the `read` value is 32 bytes (64 hex) that when SHA-256'd must match the `store` value for the ticket. Upon success the response will have an `"end":true` and the cached ticket attached as the BODY, if any. The cached ticket can be removed 10 seconds after sending (to allow for re-sending).
 
-Both caching and retrieveing can be done in the same request.
+Both caching and retrieveing can be done in the same request. All store requests are rate-limited to no more than once every 10 seconds.
