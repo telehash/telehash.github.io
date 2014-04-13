@@ -1,10 +1,10 @@
 # `"type":"pool"` - Tracking Resource Providers
 
-In a distributed architecture there are frequently shared resources that are unevenly distributed, such as `bridge` support and the [buffer](buffer.md) extension. The `pool` extension is a tool that enables any switch to create and maintain an active pool of hashnames that can provide specific resources as well as help provide coordination between the resource providers.
+In a distributed architecture there are frequently shared resources that are unevenly distributed, such as `bridge` support and the [buffer](buffer.md)/[hashbook](hashbook.md) extensions. Any switch can create and maintain an active `pool` of hashnames that can provide specific resources as well as help provide coordination between the resource providers.
 
 Pools are organized by the identical Kademlia-based DHT mechanism as the core hashname routing for Telehash, such that any hashname that is a member of (providing resources for) a pool must maintain a list of buckets for the other active members of that pool.
 
-The `peek` unreliable channel is a simple signalling for any switch to determine membership in and request more members from any pool:
+The `peek` unreliable channel is the parallel of a `seek` enabling queries of any pool:
 
 ```json
 {
@@ -14,9 +14,9 @@ The `peek` unreliable channel is a simple signalling for any switch to determine
 }
 ```
 
-The `pool` value must be a string, any application-defined pool names must always be prefixed with an underscore in their name (like "_namedex" for instance).
+The `pool` value must be a string, any application-defined pool names must always be prefixed with an underscore in their name (like "_namedex" for instance).  The response should contain any hashname that is part of and actively providing resources to the given pool.
 
-The `peek` may contain an optional `"for":"hex"` with any hex string value to provide a specific distance selector sort on the result, just like a `seek` request.  This enables any app to create their own custom DHT and do arbitrary queries against it.
+The request may contain an optional `"peek":"hex"` with any hex string value to provide a specific distance selector sort on the result, just like a `seek` request.  This enables any app to create their own custom DHT and do arbitrary queries against it.
 
 A peek response is one packet identical to a `seek`:
 
@@ -31,10 +31,10 @@ A peek response is one packet identical to a `seek`:
 }
 ```
 
-The recipient returns a set of hashnames that it knows are actively a member of the specified pool (possibly including itself), sorted either by the given optional `peek` distance or by whichever members are the most stable and responsive (a quality metric).
+The recipient returns a set of hashnames that it knows are actively a member of the specified pool (possibly including itself), sorted either by the given optional `peek` distance or by whichever members are the most stable and responsive (a quality metric).  The first response is always the highest recommended entry.
 
 The response addresses can then be used for the sender to initiate new connections to those hashnames to request additional members from them if it needs to "fill" it's pool or in order to maintain the pool's buckets.
 
 A pool should be of a fixed size as set by the application (large enough to ensure adequate resources for it's purpose), and pool requests should only be made when the given pool is not full (in order to fill it) and to optionally maintain the state of the pool ensuring it has the closest ones to a `for` if used.
 
-Pools should always be seeded by the app or included in the initial seeds information, otherwise a switch may make pool requests to every hashname it encounters in order to find an initial member.
+Any switch that is a member of one or more pools should include the list of pools in all of it's `link` packets as an array of `"pools":["buffer","hb"]` to broadcast support to any connected hashname.
