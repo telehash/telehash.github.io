@@ -103,7 +103,30 @@ BODY: ...sender's binary public key...
 <a name="connect" />
 ### `"type":"connect"` - Connect to a hashname
 
-The connect request is an immediate result of a `peer` request and must always attach/forward the same original BODY it as well as a [paths](#paths) array identifying possible network paths to it.  It must also attach a `"from":{...}` that is the [Cipher Set](cipher_sets.md) keys of the peer sender, identical format as to what is sent as part of an `open`.
+The connect request is an immediate result of a `peer` request and must always attach/forward the same original BODY it as well as a [paths](#paths) array identifying possible network paths to it.  It must also attach a `"from":{...}` that is the [Cipher Set](cipher_sets.md) keys of the peer sender, identical format as to what is sent as part of an `open`:
+
+```json
+{
+    "type": "connect",
+    "c": 11,
+    "from": {
+        "1a": "21ebcb592e577c8499004bdf50a407dd70534261",
+        "2a": "ed1db9404bf03baa5f2939ced6ccae4d36eed5eee91c333f699a94ec6ba807ee",
+        "3a": "6dbc18961b45f026eb14c6606c1d6f71ce31040aae4f96a6bd0f3a84fce9af39"
+    },
+    "paths": [
+        {
+            "http": "http://192.168.0.36:53158",
+            "type": "http"
+        },
+        {
+            "ip": "192.168.0.36",
+            "port": 61300,
+            "type": "ipv4"
+        }
+    ]
+}
+```
 
 The recipient can use the given public key to send an open request to the target via the possible paths.  If a NAT is suspected to exist, the target should have already sent a packet to ensure their side has a path mapped through the NAT and the open should then make it through.
 
