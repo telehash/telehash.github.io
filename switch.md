@@ -26,7 +26,7 @@ When initating a new connection, the first seek requests should always be sent t
 
 Only the prefix hex value is sent in each seek request to reduce the amount of information being shared about who's seeking who. The value then is only the bytes of the hashname being saught that match the distance to the recipient plus one more byte in order for the recipient to determine closer hashnames.  So if a seek is being sent to  "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c" for the hashname "171042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6" the value would be `"seek":"1710"`.
 
-The response is a compact `"see":[...]` array of addresses that are closest to the hash value (based on the [DHT](dht.md) rules).  The addresses are a compound comma-delimited string containing the "hash,cs,ip,port" (these are intentionally not JSON as the verbosity is not helpful here), for example "1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c,1a,123.45.67.89,10111". The "cs" is the [Cipher Set](cipher_sets.md) ID and is required. The ip and port parts are optional and only act as hints for NAT hole punching.
+The response is a compact `"see":[...]` array of addresses that are closest to the hash value (based on the [DHT](dht.md) rules).  The addresses are a compound comma-delimited string containing the "hash,cs,ip,port" (these are intentionally not JSON as the verbosity is not helpful here), for example `1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c,1a,123.45.67.89,10111` or just `1700b2d3081151021b4338294c9cec4bf84a2c8bdf651ebaa976df8cff18075c,1a`. The "cs" is the [Cipher Set](cipher_sets.md) ID and is required.  The "ip,port" is optional and only acts as a hint for NAT hole punching by sending an empty packet to that address simultaneously to sending a `peer`.
 
 Only hashnames with an active `link` may be returned in the `see` response, and it must always include an `"end":true`.  Only other seeds will be returned unless the seek hashname matches exactly, then it will also be included in the response even if it isn't seeding.  The first entry in the see array is the one the sender recommends, which may not be the closest but can be considered a redirect/shortcut to possibly accelerate the seeking process.
 
@@ -35,7 +35,7 @@ Only hashnames with an active `link` may be returned in the `see` response, and 
 
 In order for any hashname to be returned in a `seek` it must have a link channel open.  This channel is the only mechanism enabling one hashname to store another in its list of [buckets](dht.md) for the DHT.  It is bi-directional, such that any hashname can request to add another to its buckets but both sides must agree/maintain that relationship.
 
-The initial request:
+It may pro-actively include already known nearby hashnames in a `see` value (the same address format as the `seek` response, the ",ip,port" is an optional hint) in the initial request:
 
 ```json
 {
@@ -56,7 +56,7 @@ Initial response, accepting the link:
 }
 ```
 
-The `see` value is the same format as the `seek` response and pro-actively sends other seeds to help both sides establish a full mesh.  The see addresses should all be closer to the recipient, but if there are none then further addresses may be sent to help bootstrap.  The `seed` value indicates wether the sender/recipient wants to act as a seed and be included in `seek` requests, otherwise it will only be included in the see response when it matches the seek exactly.
+Any see addresses should all be closer to the recipient, but if there are none then further addresses may be sent to help bootstrap enough links to form a mesh.  The `seed` value indicates wether the sender/recipient wants to act as a seed and be included in `seek` requests, otherwise it will only be included in the see response when it matches the seek exactly.
 
 In the initial response or at any point an `end` or `err` can be sent to cancel the link, at which point both sides must remove the corresponding ones from their DHT.
 
