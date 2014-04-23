@@ -207,6 +207,7 @@ When there's no `id` it indicates the sender's activity state (based on [XEP-008
 
 Recipient states when there's an `id` that references an existing chat message:
 
+* received - message was received and processed/queued/notified
 * read - text was displayed
 * seen - any embedded references were displayed (media)
 * logged - chat was saved to external storage
