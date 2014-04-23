@@ -9,6 +9,8 @@ These are questions that come up often, to add new ones please [file an issue](h
 
 * <a name="simultaneous" />**Can one hashname be used in two places at once?** - As two completely distinct/decoupled entities, no, it would cause conflicting line handshakes depending on whichever hashname responded first.  If implemented so that there is some shared private state/storage mechanism between the instances where line information is held and coordinated, then yes a hashname can be available at many different network locations.  For example, one hashname can be used from many datacenters simultaneously as long as they all use the same distributed database for line state.
 
+* **How are other identities mapped to hashnames?** - When "Alice wants to send a message to Bob" then Alice and Bob need to both be using software on a device that has generated it's own unique hashname for that software+device instance.  Then either Alice or Bob must one-time exchange the hashname of their instance via another mechanism where they can trust/identify the sender/recipient.  The hashnames are not private/secret so typically this is done as a link sent via an existing system that Alice/Bob are already using such as email, chat, or a social network, or can be done in person via a QR code or local network discovery/pairing.
+
 <a name="dht" />
 ## Distributed Hash Table
 
@@ -22,6 +24,8 @@ These are questions that come up often, to add new ones please [file an issue](h
 
 <a name="security" />
 ## Security
+
+* <a name="threat" />**What is the threat model?** - The protocol is designed to first provide privacy and resiliency across one or more untrusted networks, to ensure that the network cannot see or understand any content being sent across it.  A hashname address always resolves to it's current network (IP) address so it isn't designed to be an anonymous personal identity, but there are designs in progress to create an anonymity service atop the private networking.
 
 * **Can the DHT see traffic?** - The short answer is *no*, all content is always encrypted and nothing ever has the ability to read it.  The longer answer is that while nothing is visible, it's possible for the physical network and at least one seed on the DHT to see that two endpoints have connected to each other.  There's no way to know *why* they connected or what they're sending each other, and due to the DHT meshing such connections are very common and random. There is a [proposed extension](ext/ort.md) in development for when physical network location must be hidden, and another [discussion](ext/shaping.md) around packet obfuscation.
 
