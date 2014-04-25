@@ -10,11 +10,11 @@ The request to ask any hashname to actively verify their agency:
 {
   "c":1,
   "type":"agent",
-  "agent":"be22ad779a631f63336fe051d5aa2ab2"
+  "trace":"be22ad779a631f63336fe051d5aa2ab2"
 }
 ```
 
-The receiving hashname must pass the `agent` and requesting hashname to it's one or more agencies to generate a new ticket.  Any returned one or more tickets are opaque and attached as the BODY on the same channel:
+The receiving hashname must pass the `trace` and requesting hashname to it's one or more agencies to generate a new ticket.  Any returned one or more tickets are opaque and attached as the BODY on the same channel:
 
 ```json
 {
@@ -25,3 +25,14 @@ BODY: ticket from agency
 ```
 
 Upon receiving a valid ticket from a trusted agency, the initial action that triggered the agent request may continue and/or the sending hashname may be stored as a trusted agent.
+
+## Agency Tickets
+
+The inner packet for an agent validation ticket contains only the returned trace string, and the hashname to be trusted as an agent for it.
+
+```json
+{
+  "trace":"be22ad779a631f63336fe051d5aa2ab2"
+  "agent":"c6db0918a767f00b9841f4366ade7ffc13c86541c40bf0a1612e939988fdefb0"
+}
+```
