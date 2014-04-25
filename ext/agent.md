@@ -32,7 +32,7 @@ The inner packet for an agent validation ticket contains only the returned trace
 
 ```json
 {
-  "trace":"be22ad779a631f63336fe051d5aa2ab2"
+  "trace":"be22ad779a631f63336fe051d5aa2ab2",
   "agent":"c6db0918a767f00b9841f4366ade7ffc13c86541c40bf0a1612e939988fdefb0"
 }
 ```
