@@ -15,7 +15,7 @@ Here is an example JSON `parts` object composed of two Cipher Sets:
 ```json
 {
   "2a": "bf6e23c6db99ed2d24b160e89a37c9cd183fb61afeca40c4bc378cf6e488bebe",
-  "1a": "a5c8b5c8a630c84dc01f92d2e5af6aa41801457a"
+  "1a": "a5a741fa09b05baaead17fa9932e13cdafc7bcd39db1153fc6bbfe4614c063f3"
 }
 ```
 
@@ -23,18 +23,18 @@ To calculate the hashname the parts are hashed in ascending order by their CSID,
 
 ```js
 hash = sha256("1a")
-hash = sha256(hash + "a5c8b5c8a630c84dc01f92d2e5af6aa41801457a")
+hash = sha256(hash + "a5a741fa09b05baaead17fa9932e13cdafc7bcd39db1153fc6bbfe4614c063f3")
 hash = sha256(hash + "2a")
 hash = sha256(hash + "bf6e23c6db99ed2d24b160e89a37c9cd183fb61afeca40c4bc378cf6e488bebe")
 print hex(hash)
-"825df574f77ebe1380640a314b745ed761d4ec286f0208838bfc14e288b126c0"
+"0b0137a6b38d00780686207b6f4b19e8731e68c6f76b435c85faf77100851451"
 ```
 
 Here is a working example in node.js to do the calculation:
 
 ```js
 var crypto = require("crypto");
-var parts = {"2a":"bf6e23c6db99ed2d24b160e89a37c9cd183fb61afeca40c4bc378cf6e488bebe","1a":"a5c8b5c8a630c84dc01f92d2e5af6aa41801457a"};
+var parts = {"2a":"bf6e23c6db99ed2d24b160e89a37c9cd183fb61afeca40c4bc378cf6e488bebe","1a":"a5a741fa09b05baaead17fa9932e13cdafc7bcd39db1153fc6bbfe4614c063f3"};
 var rollup = new Buffer(0);
 Object.keys(parts).sort().forEach(function(id){
   rollup = crypto.createHash("sha256").update(Buffer.concat([rollup,new Buffer(id)])).digest();
