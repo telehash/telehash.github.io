@@ -33,7 +33,7 @@ Any `ping` is responded to with a simple `pong` that is formatted very similarly
 {
   "type": "pong",
   "from": {
-    "1a": "f3619eed19a7a71c0efca06bbd0a692309cac398"
+    "1a": "a5a741fa09b05baaead17fa9932e13cdafc7bcd39db1153fc6bbfe4614c063f3"
   },
   "trace": "e220ae0ce106986d"
 }

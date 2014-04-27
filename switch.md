@@ -110,8 +110,8 @@ The connect request is an immediate result of a `peer` request and must always a
     "type": "connect",
     "c": 11,
     "from": {
-        "1a": "21ebcb592e577c8499004bdf50a407dd70534261",
-        "2a": "ed1db9404bf03baa5f2939ced6ccae4d36eed5eee91c333f699a94ec6ba807ee",
+        "1a": "851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6",
+        "2a": "a5a741fa09b05baaead17fa9932e13cdafc7bcd39db1153fc6bbfe4614c063f3",
         "3a": "6dbc18961b45f026eb14c6606c1d6f71ce31040aae4f96a6bd0f3a84fce9af39"
     },
     "paths": [
