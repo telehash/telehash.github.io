@@ -5,9 +5,9 @@ A Cipher Set (`CS`) is a group of crypto algrithms that are used to implement th
 
 Each set is identified with a unique identifier (`CSID`) that represents the overall selection priority. The CSID is a single byte, represented in lower case hex. The CSIDs are always sorted from lowest to highest preference.
 
-* [CS1a](cs/1a.md) - Minimum lightweight set designed for use with embedded devices and low resource environments using ECC (160r1) and AES (128)
-* [CS2a](cs/2a.md) - Original set from 2013 using RSA (2048), ECC (P-256), and AES (256)
-* [CS3a](cs/3a.md) - Modern set using [NaCl](http://nacl.cr.yp.to/)
+* [CS1a](cs/1a.md) - (legacy) Minimum lightweight set designed for use with embedded devices and low resource environments using ECC (160r1) and AES (128)
+* [CS2a](cs/2a.md) - (legacy) Original set from 2013 using RSA (2048), ECC (P-256), and AES (256)
+* [CS3a](cs/3a.md) - (preferred) Modern set using [NaCl](http://nacl.cr.yp.to/)
 
 Each CS contributes two values that are used within the protocol, a `fingerprint` and a `key`.  The `fingerprint` is used to calculate the [hashname](hashnames.md) (included in its `parts`), and the `key` is the binary public key that is required in order to initiate an `open`.
 
