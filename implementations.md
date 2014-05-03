@@ -6,17 +6,44 @@ It is highly recommended to use an existing implementation for your environment 
 
 Please update this list through a [pull request](https://github.com/telehash/telehash.org) for any new implementations:
 
-* Node.js - [node-telehash](https://github.com/telehash/node-telehash)
-* D - [telehash.d](https://github.com/temas/telehash.d)
-* Python - [plinth](https://github.com/telehash/plinth)
-* Javascript (browser) [thjs](http://github.com/telehash/thjs)
-* C [telehash-c](http://github.com/quartzjer/telehash-c)
+* Node.js - [node-telehash][]
+* Javascript (generic) [thjs][]
+* Objective-C - [objc][]
+* C [telehash-c][]
+* Java - [telehash-java][]
 * Ruby - [ruby-telehash](https://github.com/telehash/ruby-telehash)
+* Haskell - [htelehash](https://github.com/alanz/htelehash)
+* Python - [plinth](https://github.com/telehash/plinth)
+* D - [telehash.d](https://github.com/temas/telehash.d)
 * Go - [gogotelehash](https://github.com/telehash/gogotelehash)
-* Java - [telehash-java](https://github.com/simmons/telehash-java-simmons)
-* ObjectiveC - [telehash-objc](https://github.com/telehash/objc)
 * PHP - [SwitchBox](https://github.com/jaytaph/switchbox)
 * Erlang - [relish](https://github.com/telehash/relish)
+
+## Feature Support Matrix
+
+Any implementation not listed here is in alpha/development state, please add them to the table as soon as they support sending/receiving open and line packets.
+
+| Feature       | [Node][] | [Browser][] | [C][] | [ObjC][] | [Java][] |
+|---------------|:--------:|:-----------:|:-----:|:--------:|:--------:|
+| [CS1a][]      |      yes |         yes |   yes |          |          |
+| [CS2a][]      |      yes |         yes |   yes |      yes |      yes |
+| [CS3a][]      |      yes |             |   yes |      yes |          |
+| [IPv4][]      |      yes |             |   yes |      yes |      yes |
+| [IPv6][]      |      yes |             |   yes |      yes |      yes |
+| [HTTP][]      |      yes |         yes |       |          |          |
+| [WebRTC][]    |          |         yes |       |          |          |
+| [discovery][] |      yes |             |  some |          |          |
+| [seek][]      |      yes |         yes |  send |      yes |     send |
+| [link][]      |      yes |         yes |  send |      yes |          |
+| [peer][]      |      yes |         yes |  send |          |          |
+| [connect][]   |      yes |         yes |   yes |      yes |          |
+| [bridge][]    |      yes |         yes |       |          |          |
+| [path][]      |      yes |         yes |       |      yes |          |
+| [thtp][]      |      yes |         yes |   yes |          |          |
+| [tsocket][]   |      yes |         yes |       |          |          |
+| [tickets][]   |      yes |         yes |       |          |          |
+|               |          |             |       |          |          |
+
 
 ## App Developer Overview
 
@@ -27,4 +54,31 @@ Each switch implementation will have an [API](implementers.md#api) that varies b
 * **switch startup** - for a normal startup, initialize a switch with a created/saved hashname and list of seeds
 * **listen for incoming channels** - any hashname can receive a channel request anytime, most switches provide some kind of callback/event mechanism to be triggered when a new channel is started
 * **start a new outgoing channel** - every switch should enable an app to start a new channel to another hashname and send/receive packets over it
+
+[node]: https://github.com/telehash/node-telehash
+[node-telehash]: https://github.com/telehash/node-telehash
+[thjs]: http://github.com/telehash/thjs
+[browser]: http://github.com/telehash/thjs
+[objc]: https://github.com/telehash/objc
+[c]: https://github.com/telehash/telehash-c
+[telehash-c]: https://github.com/telehash/telehash-c
+[java]: https://github.com/telehash/telehash-java
+[telehash-java]: https://github.com/telehash/telehash-java
+[cs1a]: cs/1a.md
+[cs2a]: cs/2a.md
+[cs3a]: cs/3a.md
+[ipv4]: network.md
+[ipv6]: network.md
+[http]: ext/path_http.md
+[webrtc]: ext/path_webrtc.md
+[discovery]: ext/discovery.md
+[seek]: switch.md#seek
+[link]: switch.md#link
+[peer]: switch.md#peer
+[connect]: switch.md#connect
+[bridge]: switch.md#bridge
+[path]: switch.md#path
+[thtp]: ext/bind_http.md
+[tsocket]: ext/telesocket.md
+[tickets]: ext/tickets.md
 
