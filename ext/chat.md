@@ -135,6 +135,8 @@ When fetched via THTP, the roster is a JSON object:
 
 The roster hash is calculated by alphabetically concatening all of the hashnames and their values with a "," and hashing it, so the above would become the string "*,block,4449fdac8562db31af3c45585a8dded840e9551062a6348489be2fa8d0f8d0b7,invited,46fe53c258bbc1984fb5ab02ca1494eccdd54e9688dbbc2c882c8713f1cc4cf3,invited,851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6,0dee880e,1000" and hashed to `af4b4779`;
 
+The joining participant should try to initiate connections to the other participants via the originator (send a `peer` request directly to the originator for each participant), since they are connected already it should be faster than looking them up and connecting via the DHT.
+
 ## Messages
 
 Each message is a telehash packet containing a JSON object, these are common fields:
