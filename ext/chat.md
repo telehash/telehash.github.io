@@ -16,7 +16,7 @@ A `chat` is a container of one or more `messages` from one or more participants.
 
 The simplest form of a `chat` between two `hashnames` is a single channel sending/receiving `messages` bi-directionally on that channel. 
 
-Every chat is identified by a unique `endpoint@originator`.  The originator is always the hashname that first created the chat, and the endpoint is up to 32 lower case alphanumeric word characters (ASCII `[a-z0-9_]`) in length.  The endpoint is typically automatically generated on demand to be unique and not visible.
+Every chat is identified by a unique `endpoint@originator`.  The originator is always the hashname that first created the chat, and the endpoint is up to 32 lower case alphanumeric word characters (ASCII `[a-z0-9_]`) in length.  The endpoint is typically automatically generated on demand to be unique and not visible. If the originator is not present it is implicitly the hashname of the current switch.
 
 ## THTP
 
