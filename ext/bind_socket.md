@@ -1,7 +1,10 @@
 # `sock` - Socket Proxy
 
-A stream of "type":"sock" is a socket proxy request for the stream to become a simple raw TCP socket proxy. The value is set to any "IP:PORT" and the receiving hashname should carefully decide if it wants to support the destination IP to prevent accidental abuse.  If the socket couldn't open or is closed at any point by either side an `end` of true is sent and any informative `err` string value can be included.
+A stream of `"type":"sock"` is a reliable channel request for the stream to become a simple raw TCP socket wrapper.  The BODY in either direction is the sequential bytes from the TCP socket.
 
-As soon as a `sock` is sent it is considered open by the sender until it receives an `end` telling it otherwise, the stream will inherently only send so much data without any confirmation from the recipient that it's open/reading.
+The support and usage of this channel is application dependent, every app using a `sock` channel should have it's own validation mechanism either outside of the request (trusted hashnames), included in the initial channel request (additional JSON headers), or within the socket data itself (the BODY data has authentication).
 
-When a new `sock` is accepted by a switch, it then opens a traditional TCP connection to the given IP:PORT value and streams all data between it and the stream, including any errors connecting and when it closes.
+If the application supports acting as a generic socket proxy, the `sock` channel can be used for this when the JSON accompanying a socket request contains a `"port":5667` to be proxied to localhost or an optional `"ip":1.2.3.4`.
+
+The response to a sock can be either simple acknowldegements, additonal response BODY binary data, or at any time an `"end":true` to close the socket or `"err":"message"` to signal it errored/failed.
+
