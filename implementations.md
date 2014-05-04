@@ -23,26 +23,26 @@ Please update this list through a [pull request](https://github.com/telehash/tel
 
 Any implementation not listed here is in alpha/development state, please add them to the table as soon as they support sending/receiving open and line packets.
 
-| Feature       | [Node][] | [Browser][] | [C][] | [ObjC][] | [Java][] |
-|---------------|:--------:|:-----------:|:-----:|:--------:|:--------:|
-| [CS1a][]      |      yes |         yes |   yes |          |          |
-| [CS2a][]      |      yes |         yes |   yes |      yes |      yes |
-| [CS3a][]      |      yes |             |   yes |      yes |          |
-| [IPv4][]      |      yes |             |   yes |      yes |      yes |
-| [IPv6][]      |      yes |             |   yes |      yes |      yes |
-| [HTTP][]      |      yes |         yes |       |          |          |
-| [WebRTC][]    |          |         yes |       |          |          |
-| [discovery][] |      yes |             |  some |          |          |
-| [seek][]      |      yes |         yes |  send |      yes |     send |
-| [link][]      |      yes |         yes |  send |      yes |          |
-| [peer][]      |      yes |         yes |  send |          |          |
-| [connect][]   |      yes |         yes |   yes |      yes |          |
-| [bridge][]    |      yes |         yes |       |          |          |
-| [path][]      |      yes |         yes |       |      yes |          |
-| [thtp][]      |      yes |         yes |   yes |          |          |
-| [tsocket][]   |      yes |         yes |       |          |          |
-| [tickets][]   |      yes |         yes |       |          |          |
-|               |          |             |       |          |          |
+| Feature       | [Node][] | [Browser][] | [C][] | [ObjC][] | [Java][] | Haskell     |
+|---------------|:--------:|:-----------:|:-----:|:--------:|:--------:|:-----------:|
+| [CS1a][]      |      yes |         yes |   yes |          |          |    yes      |
+| [CS2a][]      |      yes |         yes |   yes |      yes |      yes |             |
+| [CS3a][]      |      yes |             |   yes |      yes |          |             |
+| [IPv4][]      |      yes |             |   yes |      yes |      yes |    yes      |
+| [IPv6][]      |      yes |             |   yes |      yes |      yes |             |
+| [HTTP][]      |      yes |         yes |       |          |          |             |
+| [WebRTC][]    |          |         yes |       |          |          |             |
+| [discovery][] |      yes |             |  some |          |          |             |
+| [seek][]      |      yes |         yes |  send |      yes |     send |    send     |
+| [link][]      |      yes |         yes |  send |      yes |          |    send     |
+| [peer][]      |      yes |         yes |  send |          |          |    send     |
+| [connect][]   |      yes |         yes |   yes |      yes |          |     yes     |
+| [bridge][]    |      yes |         yes |       |          |          |             |
+| [path][]      |      yes |         yes |       |      yes |          |             |
+| [thtp][]      |      yes |         yes |   yes |          |          |             |
+| [tsocket][]   |      yes |         yes |       |          |          |             |
+| [tickets][]   |      yes |         yes |       |          |          |             |
+|               |          |             |       |          |          |             |
 
 
 ## App Developer Overview
