@@ -21,3 +21,23 @@ All bytes received should be appended to a buffer until all of the bytes have be
 | 802.15.4      |           127 |          20ms |
 | Serial        |            32 |          30ms |
 | TCP           |           N/A |           N/A |
+
+## API
+
+> this is just a draft/notes area
+
+```
+setFrag(1 to 256) to force fragmentation
+inByte
+inBlock(char,len)
+inFrag - returns true/false if fragment has been received, resets when called
+inPacket - returns next packet in buffer, if any
+
+outByte
+outBlock(buf, size) copies any in out buffer and advances up to size, depends on frag mode too
+outFrag - if bytes waiting in out buffer do nothing, else add next fragment bytes to outgoing buffer, or add empty chunk (null)
+outPacket
+
+Serial
+If inFrag, call outFrag
+```
