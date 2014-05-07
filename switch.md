@@ -60,9 +60,9 @@ Any see addresses should all be closer to the recipient, but if there are none t
 
 In the initial response or at any point an `end` or `err` can be sent to cancel the link, at which point both sides must remove the corresponding ones from their DHT.
 
-The link channel requires a keepalive at least once a minute in both directions, and after two minutes of no incoming activity it is considered errored and cancelled.  When one side sends the keepalive, the other should immediately respond with one to keep the link alive as often only one side is maintaining the link.  Links initiated without seeding must be maintained by the requestor.
+The link channel requires a keepalive at least once every 30 seconds in both directions, and after one minute of no incoming activity it is considered errored and cancelled.  When one side sends the keepalive, the other should immediately respond with one to keep the link alive as often only one side is maintaining the link.  Links initiated without seeding must be maintained by the requestor.
 
-The keepalive requires only the single key/value of `"seed":true` or `"seed":false` to be included to indicate its seeding status. This keepalive timing is primarily due to the prevalance of NATs with 60 second activity timeouts, but it also serves to keep only responsive hashnames returned for the DHT.
+The keepalive requires only the single key/value of `"seed":true` or `"seed":false` to be included to indicate its seeding status. This keepalive timing is primarily due to the prevalance of NATs with 30 second activity timeouts, but it also serves to keep only responsive hashnames returned for the DHT.
 
 Details describing the distance logic, maintenance, and limits can be found in [DHT](dht.md) reference.
 
@@ -86,7 +86,7 @@ For any hashname to send an open to another it must first have one of its public
 
 A peer request requires a `"peer":"851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6"` where the value is the hashname the sender is trying to reach. The BODY of the peer request must contain the binary public key of the sender, whichever key is the highest matching [Cipher Set](cipher_sets.md) as signalled in the original `see`.  The recipient of the peer request must then send a connect (below) to the target hashname (that it already must have an open line to).
 
-The peer channel that is created remains active and serves as a path for [tunneled](#relay) packes to/from the requested hashname, those tunneled packets will always be attached as the raw BODY on any subsequent sent/received peer channel packets.
+The peer channel that is created remains active and serves as a path for [tunneled](#relay) packes to/from the requested hashname, those tunneled packets will always be attached as the raw BODY on any subsequent sent/received peer channel packets.  The default inactivity timeout for a peer channel is the same as a connect, 30 seconds.
 
 If a sender has multiple known public network paths back to it, it should include an [paths](#paths) array with those paths, such as when it has a valid public ipv6 address.  Any internal paths (local area network addresses) must not be included in a peer request, only known public address information can be sent here.  Internal paths must only be sent in a [path](#path) request since that is private over a line and not exposed to any third party (like the peer/connect flow is).
 
@@ -131,6 +131,8 @@ The connect request is an immediate result of a `peer` request and must always a
 The recipient can use the given public key to send an open request to the target via the possible paths.  If a NAT is suspected to exist, the target should have already sent a packet to ensure their side has a path mapped through the NAT and the open should then make it through.
 
 When generating a connect, the switch must always verify the sending path is included in the paths array, and if not insert it in if it's a public path. This ensures that the recipient has at least one valid path and speeds up path discovery since no additional [`path`](#path) round trip such as for an IPv6 one.
+
+The connect channel is left open to act as a temporary limited packet relay. The default inactivity timeout for the channel is the same as a peer, 30 seconds.
 
 #### Connect Handling
 

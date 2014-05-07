@@ -83,7 +83,7 @@ When any new incoming `link` is requested this value is checked, and if the tota
 
 A small value will have the same impact as a small `k`, increasing the cost to search and be found on the DHT. Any single bucket should never fall below `k` even if the total links is greater than a small `link-max`.
 
-A large value increases the number of maintenance activity from all of the active links, with a minimum of one packet sent/received per link per minute, with a `link-max` of 600 active it would average 10 packets per second to maintain the DHT.
+A large value increases the number of maintenance activity from all of the active links, with a minimum of one packet sent/received per link per 30 seconds, with a `link-max` of 600 active it would average 20 packets per second to maintain the DHT.
 
 ## Knowing a lot about your neighbours
 If you add many peers to your buckets, you will notice that on average 50% of the peers will be stored in bucket 255, 25%
