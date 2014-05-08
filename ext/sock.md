@@ -1,6 +1,6 @@
-# `sock` - Socket Proxy
+# `sock` - Basic Read/Write Socket
 
-A stream of `"type":"sock"` is a reliable channel request for the stream to become a simple raw TCP socket wrapper.  The BODY in either direction is the sequential bytes from the TCP socket.
+A reliable channel of `"type":"sock"` is a request to create a single simple raw TCP-style socket to carry arbitrary binary data.  The BODY in either direction is the sequential bytes from the TCP socket.
 
 The support and usage of this channel is application dependent, every app using a `sock` channel should have it's own validation mechanism either outside of the request (trusted hashnames), included in the initial channel request (additional JSON headers), or within the socket data itself (the BODY data has authentication).
 
