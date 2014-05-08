@@ -20,7 +20,7 @@ Every chat is identified by a unique `endpoint@originator`.  The originator is a
 
 ## THTP
 
-The roster and individual messages can be fetched asynchronously using [THTP](bind_http.md). The roster should only ever be requested from the originator, and individual messages should only be requested from each participant.  The originator must always be able to return the join messages for every participant as well.
+The roster and individual messages can be fetched asynchronously using [THTP](thtp.md). The roster should only ever be requested from the originator, and individual messages should only be requested from each participant.  The originator must always be able to return the join messages for every participant as well.
 
 The following URLs are valid for the chat id `foo@851042800434dd49c45299c6c3fc69ab427ec49862739b6449e1fcd77b27d3a6`:
 

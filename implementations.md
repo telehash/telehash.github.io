@@ -41,7 +41,7 @@ Any implementation not listed here is in alpha/development state, please add the
 | [path][]      |      yes |         yes |       |      yes |          |             |
 | [thtp][]      |      yes |         yes |   yes |          |          |             |
 | [tsocket][]   |      yes |         yes |       |          |          |             |
-| [tickets][]   |      yes |         yes |       |          |          |             |
+| [messages][]  |      yes |         yes |       |          |          |             |
 |               |          |             |       |          |          |             |
 
 
@@ -78,7 +78,7 @@ Each switch implementation will have an [API](implementers.md#api) that varies b
 [connect]: switch.md#connect
 [bridge]: switch.md#bridge
 [path]: switch.md#path
-[thtp]: ext/bind_http.md
+[thtp]: ext/thtp.md
 [tsocket]: ext/telesocket.md
-[tickets]: ext/tickets.md
+[messages]: ext/messages.md
 

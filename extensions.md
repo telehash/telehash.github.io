@@ -30,14 +30,14 @@ There are four primary categories of extensions:
 * **[802.15.4](ext/.md)** - Using telehash for device/sensor RF mesh networks
 
 <a name="bindings" />
-# Bindings
+# Bindings/Mappings
 
 * **[TeleSocket](ext/telesocket.md)** - Implementing the WebSocket simplified interaction over telehash
-* **[XMPP](ext/bind_xmpp.md)** - How XMPP clients can use telehash for direct messaging and media with end-to-end encryption
-* **[HTTP](ext/bind_http.md)** - Running HTTP over telehash
+* **[XMPP](ext/xmpp.md)** - How XMPP clients can use telehash for direct messaging and media with end-to-end encryption
+* **[THTP](ext/thtp.md)** - Running HTTP over telehash
 * **[NTP](ext/bind_ntp.md)** - Using NTP for time sync between hashnames
 * **[IP](ext/bind_ip.md)** - Tunneling IP traffic over telehash
-* **[Socket](ext/bind_socket.md)** - Minimal TCP socket mapping
+* **[SOCK](ext/sock.md)** - Minimal TCP-style socket mapping
 * **[Serial](ext/bind_serial.md)** - Mapping a serial port interface into a channel
 
 <a name="core" />
