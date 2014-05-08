@@ -15,8 +15,7 @@ There are four primary categories of extensions:
 <a name="channels" />
 # Channels
 
-* **[pool](ext/pool.md)** - Creating "pools" of shared resources, basically how to form miniature DHTs
-* **[buffer](ext/buffer.md)** - Simple lightweight shared key/value storage service
+* **[box](ext/messages.md)** - Asynchronous communication between two hashnames
 * **[verb](ext/verb.md)** - Version information/negotiation, capabilities detection
 * **[chat](ext/chat.md)** - Chat/Messaging, 1:1, small groups, public and private
 

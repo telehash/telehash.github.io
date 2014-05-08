@@ -30,4 +30,3 @@ Definitions:
 * `keys`: The binary public keys for each cipher set used, in base64
 * `parts`: The fingerprints of each included public key
 * `paths`: Array of path objects, as defined in [paths](network.md#paths).
-* `pools`: Array of string names of what [pools](ext/pool.md) it supports.
