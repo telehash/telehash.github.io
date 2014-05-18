@@ -77,9 +77,9 @@ A larger value then both reduces the seek time for connecting to other peers, an
 <a name="link-max" />
 ### `link-max` - Total Links
 
-The primary mechanism for any peer to limit how many other peers it's keeping track of overall is [link-max](implementers.md#defaults), the total number of active `link` channels open to other peers. 
+The primary mechanism for any peer to limit how many other peers it's keeping track of overall is [link-max](implementers.md#defaults), the total number of active `link` channels that are being maintained to other peers.
 
-When any new incoming `link` is requested this value is checked, and if the total links is less than `link-max` then the new request should be accepted.  If the switch is at `link-max` then it must check the distance to the new incoming peer to see if it should evict a more distant one.  This eviction check looks at any bucket that is further (larger) than the incoming link and has more than `k` peers in it, and evict the newest link in that bucket if any.  If there are no other links to evict, then the incoming one should be denied.
+The `link-max` value is enforced when processing all active `link` channels to send regular [link-ping](implementers.md#defaults) maintenance, if the total number of links is greater than `link-max` then only `k` peers per bucket should be sent a ping (sorted by age, maintain the oldest per bucket).  If any of the links were requested by the application, they should always be sent a ping regardless of `link-max` or `k`.
 
 A small value will have the same impact as a small `k`, increasing the cost to search and be found on the DHT. Any single bucket should never fall below `k` even if the total links is greater than a small `link-max`.
 
