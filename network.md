@@ -57,7 +57,7 @@ If a new open request is validated and there's an existing line, when the new op
 
 A packet read from the network that has a HEAD of length 0 is a binary encrypted `line` packet.  The first 16 bytes are always the line ID, and only known line IDs are processed, any packet with an unknown ID is dropped.  The remaining bytes are encrypted and processed by the [Cipher Set](cipher_sets.md) used to create the line, the 16 byte ID should always be added/removed before being processed by any Cipher Set.
 
-Once decrypted, the resulting value is always a [channel](channels.md) packet.
+Once decrypted, the resulting value is always a [channel](channels.md) packet.  The channel packets should be verified to match an existing channel id, or if it's a new channel that is has the [correct id](channels.md#channelid) and a supported type value.  The packet should be silently dropped for any incorrect or unsupported type or id values so that other hashnames cannot blindly probe for channel support.
 
 Often a switch may be acting as a [bridge](switch.md#bridge) where it maps line IDs to other network destinations and doesn't attempt to process/decrypt them.
 
@@ -70,8 +70,8 @@ Every unique network sender/recipient is called a `path` and defined by a JSON o
 
 * `ipv4` - UDP, contains `ip` and `port`, default and most common path
 * `ipv6` - UDP, contains `ip` and `port`, preferred/upgraded when both sides support it
-* `http` - see [HTTP](ext/path_http.md), also is the primary fallback when UDP is blocked
-* `webrtc` - see [WebRTC](ext/path_webrtc.md), preferred when possible
+* `http` - TCP, see [HTTP](ext/path_http.md) for details, also is the primary fallback for lack of UDP support
+* `webrtc` - see [WebRTC](ext/path_webrtc.md), ideal for browsers that have only HTTP support
 
 These paths are used often within the protocol to exchange network information, and frequently sent as an array, for example:
 
