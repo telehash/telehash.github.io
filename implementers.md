@@ -38,9 +38,9 @@ There are many configurable numbers within a switch, here's the list of all of t
 | ---- | ------- | ------- | ------- | -----
 |`csids`|1a, 2a, 3a|||which CSIDs to use by default when generating new hashname
 |`k`|8|2|100|[DHT](dht.md#k)
-|`link-max`|256|8|*|[DHT](dht.md#link-max)
-|`link-ping`|55|||[seconds](dht.md#maintenance)
-|`link-timeout`|120|||[seconds](dht.md#maintenance)
+|`link-max`|256|8|*|[DHT](dht.md#link-max), dedicated seeds may be unlimited
+|`link-ping`|29|||[seconds](dht.md#maintenance) (below NAT 30s timeout)
+|`link-timeout`|60|||[seconds](dht.md#maintenance)
 |``||||
 
 <a name="networking" />

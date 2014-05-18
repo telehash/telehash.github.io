@@ -77,7 +77,7 @@ A larger value then both reduces the seek time for connecting to other peers, an
 <a name="link-max" />
 ### `link-max` - Total Links
 
-The primary mechanism for any peer to limit how many other peers it's keeping track of overall is `link-max`, the total number of active `link` channels open to other peers.  The default value is currently 256, with a minimum of 8, and a maximum of unlimited (for dedicated seeds).
+The primary mechanism for any peer to limit how many other peers it's keeping track of overall is [link-max](implementers.md#defaults), the total number of active `link` channels open to other peers. 
 
 When any new incoming `link` is requested this value is checked, and if the total links is less than `link-max` then the new request should be accepted.  If the switch is at `link-max` then it must check the distance to the new incoming peer to see if it should evict a more distant one.  This eviction check looks at any bucket that is further (larger) than the incoming link and has more than `k` peers in it, and evict the newest link in that bucket if any.  If there are no other links to evict, then the incoming one should be denied.
 
@@ -107,7 +107,7 @@ When answering a `seek` request, the first entry in the `see` must be the oldest
 <a name="maintenance" />
 ## Bucket Maintenance
 
-Every bucket must be checked once every 55 seconds for possible maintenance. Only the `k` number of peers in a bucket need to be sent maintenance packets, and they should be sorted/prioritized by uptime with the oldest age being preferred.  Any peer without any received link maintenance activity in more than 120 seconds should be evicted from the bucket.
+Every bucket must be checked once every [link-ping](implementers.md#defaults) seconds for possible maintenance. Only the `k` number of peers in a bucket need to be sent maintenance packets, and they should be sorted/prioritized by uptime with the oldest age being preferred.  Any peer without any received link maintenance activity in more than [link-timeout](implementers.md#defaults) seconds should be evicted from the bucket.
 
 In case there are multiple links between any two peers, only the most recently active one should be used for maintenance checks/requests.  Whenever a new link is started, it replaces the last known one (if any).
 

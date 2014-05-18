@@ -60,9 +60,9 @@ Any see addresses should all be closer to the recipient, but if there are none t
 
 In the initial response or at any point an `end` or `err` can be sent to cancel the link, at which point both sides must remove the corresponding ones from their DHT.
 
-The link channel requires a keepalive at least once every 30 seconds in both directions, and after one minute of no incoming activity it is considered errored and cancelled.  When one side sends the keepalive, the other should immediately respond with one to keep the link alive as often only one side is maintaining the link.  Links initiated without seeding must be maintained by the requestor.
+The link channel requires a keepalive at least once every [link-ping](implementers.md#defaults) seconds in both directions, and after [link-timeout](implementers.md#defaults) of no incoming activity it is considered errored and cancelled.  When one side sends the keepalive, the other should immediately respond with one to keep the link alive as often only one side is maintaining the link.  Links initiated without seeding must be maintained by the requestor.
 
-The keepalive requires only the single key/value of `"seed":true` or `"seed":false` to be included to indicate its seeding status. This keepalive timing is primarily due to the prevalance of NATs with 30 second activity timeouts, but it also serves to keep only responsive hashnames returned for the DHT.
+The keepalive requires only the single key/value of `"seed":true` or `"seed":false` to be included to indicate its seeding status. This keepalive timing is primarily due to the prevalance of NATs with network activity timeouts, but it also serves to keep only responsive hashnames returned for the DHT.
 
 Details describing the distance logic, maintenance, and limits can be found in [DHT](dht.md) reference.
 
