@@ -18,6 +18,7 @@ Defines:
   * timeouts
 * cipher-sets
 
+Designed to expose *all* trust decisions to app layer, zero metadata is revealed without explicit verified trust from the app. 
 E3X API:
 
 var packet = new Decode(buffer);
@@ -189,4 +190,21 @@ Binder takes path hints to bootstrap
 All handshakes turn paths into pipes of none or newer path
 Transport gives it's local/identifying paths
 Binder tracks active pipe, returns the active path per eid
+packet = e3x.decrypt(), sets packet.eid for all types
+e3x.receive(packet), only if eid is trusted, returns bool on validity
+buffer = e3x.keepalive(eid) by network
+
+Diagrams:
+
+```
+Core Interface:
+                  [ transports ] --->
+                   -----------
+[ channels | crypt | binding ]
+------------------------------
+[             E3X            ]
+------------------------------
+
+
+```
 
