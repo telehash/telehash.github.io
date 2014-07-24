@@ -9,8 +9,8 @@ E3X - End-to-End Encrypted eXchange
 Defines:
 
 * packet encoding format
-* encrypted messages
-* encrypted sessions
+* async encryption
+* sync encryption
   * handshakes
   * keepalives
   * channel state
@@ -18,71 +18,64 @@ Defines:
   * timeouts
 * cipher-sets
 
-Designed to expose *all* trust decisions to app layer, zero metadata is revealed without explicit verified trust from the app. 
+Designed to expose all trust decisions to app layer, zero metadata is ever written to a network, and no identity is revealed to any endpoint without explicit verified trust from the app.
+
 E3X API:
 
-var packet = new Decode(buffer);
-var buffer = new Encode(packet);
+````
+e3x.init(keys);
+// e3x.eid is us
 
-var self = new Local(keys, send); // calls send(buffer, net)
-var packet = self.decrypt(buffer); // for messages
-var packet = self.receive(buffer, net); // validates channel ids for sessions, pass null for any waiting regularly
+// can be used anytime
+packet = e3x.decode(buffer);
+buffer = e3x.encode(packet);
+// packet.header, packet.body, packet.js
 
-var eid = new Remote(self, parts, key);
-var buffer = eid.handshake();
-var buffer = eid.encrypt(packet); // for messages
-eid.deliver(send); // temporarily calls send(buffer) until any incoming net is active
-var cid = eid.channel(args);  // returns new channel id
-var packet = eid.packet(cid);
-// packet.js, packet.body, etc
-eid.send(packet); // goes to any/all active paths, triggers handshake and queues if not
+// generic async crypto with any endpoint
+eid = e3x.endpoint(parts, key); // cached until e3x.drop(eid)
+packet = e3x.decrypt(eid, buffer);
+buffer = e3x.encrypt(eid, packet);
 
-// e3x just tracks all sessions:{ "0a1b..":{channels:{}},cs:{}} and endpoints:{ "48c2..":{sid:"",handshake:buffer} }
-// endpoints+sessions timeout independently when inactive
-e3x.init(keys)
-eid = e3x.validate(parts, key, buffer) // buffer optional to check signature, creates/caches eid->key, 
-buffer = e3x.handshake(eid, packet) // must have called e3x.validate first, flushes any queued packets if new sid, packet optional to create session from given incoming handshake, returns new handshake if needed or no packet
-packet = e3x.decrypt(buffer)
-buffer = e3x.encrypt(parts, key, packet)
-// may have event driven interface, otherwise must be called frequently for any timer based sends
-while([buffer,eid] = e3x.sending()){ send to any/all active pipes for eid }
-//var sid = e3x.session(eid,buffer) 
-var cid = e3x.channel(eid,kind) // reliable or unreliable, creates channel, timeout is for start/acks/ends
-var packet = e3x.packet(eid,cid) // packets created must be given to e3x.send() in order, error after sending end
-e3x.send(eid,packet) // encrypts and shows up in .sending(), cid is invalid after sending any err, errors if not delivered, queues too
-valid = e3x.receive(buffer) // returns 1 if new packet for a session (any handshake, reliable, or channel start), 0 if valid, -1 error
-// must be called after any .receive and regularly for timeout errors
-while([eid,cid,packet] = e3x.receiving()){ process channel packets, cid is invalid after any err }
+// sync comms with any endpoint, for transport binding
+packet = e3x.process(buffer); // validate any data from any network
+// packet.eid is sender, must trust it before passing to receive
+valid = e3x.receive(packet);
+// valid is bool if packet is current, track the sending transport for this eid
+buffer = e3x.keepalive(eid); // when the network transport needs to be re-validated, generates a handshake if any channels, will re-send and start to timeout channels if not confirmed
+eid = e3x.busy();
+// eid is the next endpoint that has data waiting to be sent or received
+while(buffer = e3x.sending(eid)){ send to any/all active transports for this eid }
+while(packet = e3x.receiving(eid)){ packet.cid is channel, process packets, cid is invalid after any err }
+cid = e3x.channel(eid,kind,timeout) // reliable or unreliable, creates channel, timeout is for start/acks/ends
+packet = e3x.packet(eid,cid) // packets created must be given to e3x.send() in order, packet.quota for space avail
+queued = e3x.send(packet) // encrypts and shows up in .sending(), cid is invalid after sending any end/err, errors if not delivered, queues too, reliable packets are returned in .receiving() once delivered
+// queued is number of packets waiting to be sent and/or ack'd
 // channel invald after sending and receiving an end, half-ends will get timeout error
 
-networking guidelines:
+````
 
-* decrypt and validate handshakes, if trusted, try getting sid, if fail call/send handshake again
-* //with any valid .session() result check and see if any waiting channels
-* //store list of all known paths for every sid, any valid .session() and .receive() marks originating path as "active" for 30s
-* //all returned .sending() buffers are copied to every active path for the given sid
-* all cids return from .receiving() will always get a .end or .err (timeout)
-* //session is active if any paths
-* //exposes eid.active
+E3X wrapper must handle native transport bindings for all sending/processing
 
-// pipe id is like type:uid string
-// pipe api gives to transport to handle
-pipe.up any time it's made default
-ep.down moves it to inactive
-try to activate any inactive for any handshake
-transport must handle cleanup / gc (like a socket)
-transport handles discovery ping/pongs and perms
+* A "pipe" is an active network destination for a specific interface (an ip:port, a connected websocket, etc)
+* Transport responsible for all pipes
+* Binding adds listener to pipe as needed
+* Pipe independently events close and keepalive notifications to binding
+* Binder takes path hints from app to bootstrap
+* All handshakes turn paths into pipes of none or newer path
+* Transport gives it's local/identifying paths
+* Binder tracks active pipe, returns the active path per eid
 
-pipe is just transport type + connection id
-pipes must keep track of their own keepalive and signal endpoints to run one
-e3x receiving returns -1 (drop), 0 (ok), 1 (active)
-keepalive will timeout channels
 
-handshake is keepalive, 3x handshake times out
-handshake contains IV now so same key+line means same session, new at is just validation
-handshakes received are always returned w/ same at
-new ones generated are sent w/ at w/ last bit matching our cid mask to guarantee unique
-same session must have increasing at's
+Handshake (Open) Wire Changes:
+
+* handshake is keepalive, 3x handshake times out
+* handshake contains IV now so same key+line means same session, new at is just validation
+* handshakes received are always returned w/ same at
+* new ones generated are sent w/ at w/ last bit matching our cid mask to guarantee unique
+* same session must have increasing at's
+
+
+### older stuff
 
 // endpoint has {e3x:{}, eids:{pipe:pid,active:{pid:path},inactive:[paths],parts,key}}
 ep = new endpoint(e3x, piper)
@@ -121,24 +114,6 @@ ep.local(type, callback)
  - calls back for any eid active locally
  - doesn't reveal our eid w/o going through .discovered first
 
-buffer = e3x.handshake(eid); // returns current handshake
-eid = e3x.session(buffer);
-active = e3x.receive(eid, buffer, keepalive time); // returns if active, and sets next keepalive if flag, this pipe is default
-// for handshakes too to accept them after validated, same pipe logic
-e3x.keepalive(eid, at); 
-// schedules next keepalive up to at ahead (if needed, anything received cancels)
-// upon external pipe close for eid, fire keepalive()
-while([eid,buffer] = e3x.sending()) // if no buffer then pipe.down(eid) cleanup
-// if buffer is a handshake or empty, convert all paths to pipes and send to all
-// session only to active pipe if any, else to all pipes
-while([eid,packet] = e3x.receiving())
-
-pipe.id // guid
-pipe.send()
-pipe.isLocal() // only true if active
-pipe.isDiscoverable() // only when enabled per network
-pipe.expireAt() for optional keepalive info, .down when expired
-pipe.up(eid) / .down(eid) // refcount style
 
 
 // pipes has {e3x:{}, keys:{}, eids:{pipes:[]}}
@@ -181,18 +156,7 @@ ep.local(type, callback)
  - doesn't reveal our eid w/o going through .discovered first
  
 
-No handshake if no channels active
-Transport responsible for all pipes
-Binding adds listener to pipe as needed
-Pipe events close and keepalive notifications
-Binding connects transport and E3X
-Binder takes path hints to bootstrap
-All handshakes turn paths into pipes of none or newer path
-Transport gives it's local/identifying paths
-Binder tracks active pipe, returns the active path per eid
-packet = e3x.decrypt(), sets packet.eid for all types
-e3x.receive(packet), only if eid is trusted, returns bool on validity
-buffer = e3x.keepalive(eid) by network
+
 
 Diagrams:
 
