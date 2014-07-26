@@ -17,6 +17,7 @@ Defines:
   * reliable channels
   * timeouts
 * cipher-sets
+* transport serializations
 
 Designed to expose all trust decisions to app layer, zero metadata is ever written to a network, and no identity is revealed to any endpoint without explicit verified trust from the app.
 
@@ -54,16 +55,18 @@ queued = e3x.send(packet) // encrypts and shows up in .sending(), cid is invalid
 
 ````
 
-E3X wrapper must handle native transport bindings for all sending/processing
+telehash "binding" provides native transport (sockets/events) and language (callbacks/objects) wrapper for all sending/processing
 
-* A "pipe" is an active network destination for a specific interface (an ip:port, a connected websocket, etc)
-* Transport responsible for all pipes
+* Define a common serialization and mapping for every different transport type
+* A "pipe" is a single active transport session (an ip:port, a connected websocket, etc)
+* Each transport is responsible for all of its pipes
 * Binding adds listener to pipe as needed
 * Pipe independently events close and keepalive notifications to binding
 * Binder takes path hints from app to bootstrap
 * All handshakes turn paths into pipes of none or newer path
 * Transport gives it's local/identifying paths
 * Binder tracks active pipe, returns the active path per eid
+
 
 
 Handshake (Open) Wire Changes:
