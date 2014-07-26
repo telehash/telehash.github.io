@@ -32,12 +32,12 @@ packet = e3x.decode(buffer);
 buffer = e3x.encode(packet);
 // packet.header, packet.body, packet.js
 
-// generic async crypto with any endpoint
+// generic async crypto with any endpoint, "messages"
 eid = e3x.endpoint(parts, key); // cached until e3x.drop(eid)
 packet = e3x.decrypt(eid, buffer);
 buffer = e3x.encrypt(eid, packet);
 
-// sync comms with any endpoint, for transport binding
+// sync comms with any endpoint, for transport binding, "channels"
 packet = e3x.process(buffer); // validate any data from any network
 // packet.eid is sender, must trust it before passing to receive
 valid = e3x.receive(packet);
@@ -55,7 +55,50 @@ queued = e3x.send(packet) // encrypts and shows up in .sending(), cid is invalid
 
 ````
 
-telehash "binding" provides native transport (sockets/events) and language (callbacks/objects) wrapper for all sending/processing
+An example pseudocode binding to any native transport:
+
+````
+endpoints = {} // add any eids that are trusted
+
+// handle events from the transport
+transport = udp4server()
+transport.receive = function(buffer, pipe) {
+  packet = e3x.process(buffer)
+  endpoint = endpoints[packet.eid]
+  if(!endpoint) // log and drop
+  valid = e3x.receive(packet)
+  if(!valid) // log and drop
+  endpoint.pipe = pipe
+  pipe.listen = function(event)
+  {
+    if(event == close) endpoint.pipe = false
+    if(event == keepalive) pipe.send(e3x.keepalive(endpoint.id))
+  }
+}
+
+// handle events from e3x
+while(eid = e3x.busy())
+{
+  endpoint = endpoints[eid];
+  while(buffer = e3x.sending(eid)){
+    // log drop if no pipe
+    endpoint.pipe.send(buffer)
+  }
+  while(packet = e3x.receiving(eid)){
+    channel = endpoint.channels[packet.cid];
+    // process channel data
+  }
+}
+
+// handle sending data from app
+channel_id = e3x.channel(endpoint.id,"unreliable",10000)
+endpoint.channels[channel_id] = // track this channel
+packet = e3x.packet(endpoint.id,channel_id)
+// packet.body = ... / packet.header = ... 
+e3x.send(packet)
+````
+
+"binding" provides native transport (sockets/events) and language (callbacks/objects) wrapper for all sending/processing
 
 * Define a common serialization and mapping for every different transport type
 * A "pipe" is a single active transport session (an ip:port, a connected websocket, etc)
