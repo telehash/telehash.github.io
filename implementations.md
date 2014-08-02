@@ -9,7 +9,7 @@ Please update this list through a [pull request](https://github.com/telehash/tel
 * Node.js - [node-telehash][]
 * Javascript (generic) [thjs][]
 * Objective-C - [objc][]
-* C [telehash-c][]
+* C - [telehash-c][]
 * Java - [telehash-java][]
 * Ruby - [ruby-telehash](https://github.com/telehash/ruby-telehash)
 * Haskell - [htelehash](https://github.com/alanz/htelehash)
@@ -47,7 +47,7 @@ Any implementation not listed here is in alpha/development state, please add the
 
 ## App Developer Overview
 
-Each switch implementation will have an [API](implementers.md#api) that varies based on it's implementation, but in general there are a few common things every application using telehash has to do:
+Each switch implementation will have an [API](implementers.md#api) that varies based on its implementation, but in general there are a few common things every application using telehash has to do:
 
 * **seeds** - bundle a [seeds.json](seeds.md) file including public and/or dedicated seeds for your app to bootstrap from
 * **hashname creation** - upon first startup the app will have to create a unique local hashname for that instance and save it out
