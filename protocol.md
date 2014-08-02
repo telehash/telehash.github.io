@@ -6,7 +6,7 @@ The telehash protocol enables any app or device to establish private communicati
 * all channels are encrypted all the time - there is no unencrypted mode
 * because each application instance or device generates its own public/private keypair, they cannot be impersonated and security is not dependent on trust in certificate authorities
 * addresses are generated from public key fingerprints, not centrally managed as with IP addresses
-* routing is based on a globally distributed hash table (DHT), no central authority or managed heirarchy
+* routing is based on a globally distributed hash table (DHT), no central authority or managed hierarchy
 * the dual JSON/binary packet format is extremely flexible while remaining developer-friendly
 * channels can be reliable (like TCP) or unreliable (like UDP), and make use of HTTP, WebRTC, and other existing technologies
 * existing application protocols such as NNTP and XMPP can re-use telehash as a secure transport layer
