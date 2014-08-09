@@ -46,10 +46,6 @@ These are combined into simple easy to use interoperable libraries with a common
 var net = new Network(keys); // starts handling incoming link, path, and connect channels
 net.link(id, direct, up); // optional direct endpoint info if using routers, calls up(id, true||false) on state changes
 net.router(id, direct); // direct is required, routers not allowed any connections
-net.discoverable(true||false, interface); // broadcasts on interface, enables anyone to connect/see id on it
-
-// enable being a router, if any other routers it will return them in see
-net.route(true||false); // starts handling route, peer, and seek channels
 
 // tcp/udp socket tunneling
 net.listen(args);
@@ -72,3 +68,9 @@ var chat = net.chat(args);
 
 // internal hooks to extend
 
+## Network Structure
+
+* a network is a local hashname and links to one or more other hashnames
+* they may have one or more routers, which only support "route" channels (was "peer") and do relaying/bridging
+* routers must come with keys/paths
+* a router must have a way to validate incoming exchanges, external or dynamic (protected keys)
