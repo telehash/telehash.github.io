@@ -20,7 +20,7 @@ V3 Proposal Changelog
   * handshakes are sent throughout the life of the exchange to verify it's current validity, as needed by the network transport in use
 * exchange packets
   * the first 16 bytes are always referenced as the `token` and uniquely identify a destination exchange for any routing purposes
-* [E3X](E3X.md) - common internal library interface
+* [e3x](e3x) - common internal library interface
   * all wire protocol processing and generation is *cleanly* separated from higher level logic
   * encapsulation of all crypto functions
   * single clearly understood location of all trust decisions
@@ -32,7 +32,7 @@ V3 Proposal Changelog
   * make use of NAT-PMP / UPnP to increase direct connectivity
   * push notifications
   * BLE
-* hashname
+* [hashname](hashname/)
   * use base58 encoding to a string instead of hex
   * use raw byte values during the rollup instead of hex strings
   * parts are always the SHA256 of the normalied public key 
@@ -49,11 +49,17 @@ V3 Proposal Changelog
   * peer/connect is simple packet relay, always reflects back recipients visible path, can include token to signal/create bridge
   * path, udp=>udp4/udp6, tcp=>tcp4/tcp6
 
+### Implementations
 
-### DHT
+Experimental progress on v2->v3 updates is happening at:
 
-V3 no longer includes a Kademlia-based Distributed Hash Table and is instead is a simple full mesh protocol that requires mutual explicit trust to connect with support for optional cloud-accelerated routing in any mesh.
+* [telehash-js](https://github.com/telehash/node-telehash/tree/v3)
+* [telehash-c](https://github.com/telehash/telehash-c/tree/v3).
 
-The changes during 2013/2014 for V2 to focus on privacy have created a tension between the desire to have zero metadata exposed and how a DHT uses untrusted peers to coordinate connectivity.  The mission to provide easy *End-to-End* private communication tools is paramount, and no identifying information should be visible to any untrusted entity by default.  Reducing the scope of telehash is also intended to increase it's compatibility with other decentralized private networking tools like I2P/Tor and so that it can be used easily within existing encrypted transports like TLS and WebRTC.
+### DHT to Mesh
 
-A DHT is a tool to provide coordination between *large* numbers of decentralized nodes, and our focus for V3 is to enable private communication between *small* numbers of *trusted* nodes.  As the number of nodes increases, so does the risk of surveillance of which nodes are communicating, and V3 aims to minimize that potential.
+V3 no longer includes a Kademlia-based Distributed Hash Table and is instead is a simple full mesh end-to-end encrypted protocol that requires mutual explicit trust to establish any connection, with optional support for p2p routing coordination.
+
+The changes during 2013/2014 for v2 to focus on privacy have created a tension between the desire to have zero metadata exposed and how a DHT uses many peers to coordinate activities.  The mission to provide easy *private* communication tools is paramount, and no identifying information should be visible to any untrusted entity by default.  Reducing the scope of telehash is also intended to increase it's compatibility with other decentralized private networking tools like I2P/Tor and so that it can be used easily within existing encrypted transports like TLS and WebRTC.
+
+A DHT is a useful tool to provide functionality using *large* numbers of decentralized nodes, and our focus for v3 is to enable private communication between *small* numbers of *trusted* nodes.  As the number of nodes increases, so does the risk of surveillance of which nodes are communicating.
