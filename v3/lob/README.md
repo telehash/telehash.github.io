@@ -1,6 +1,6 @@
-# Packet Format
+# Length-Object-Binary Encoding (packet format)
 
-A packet has two distinct parts, a HEAD and a BODY, both optional. The HEAD is typically parsed as JSON and the BODY is always binary. Packets are generally synonymous with a UDP message so the total size of a packet is determined by the network transport and not part of the format. For encoding packets on other network transports see [HTTP](ext/path_http.md), [WebRTC](ext/path_webrtc.md), and [TCP](ext/path_tcp.md).
+A packet has two distinct parts, a HEAD and a BODY, both optional. The HEAD is parsed as a JSON object and the BODY is always binary. 
 
 Every packet must begin with two bytes which form a network byte-order short unsigned integer. This integer represents the length in bytes of the 'HEAD' that follows it, and the remaining bytes in the packet are treated as raw binary and referenced as the 'BODY'.
 
