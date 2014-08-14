@@ -12,12 +12,14 @@ V3 Proposal Changelog
   * `switch` is not used anymore
   * `DHT` to `mesh`
 * handshake - wire changes
-  * binary/outer packet must contain the IV
-  * one temporary key is used per exchange per sender, the IV changes for each handshake
+  * a 'handshake' is just an 'encrypted packet' that contains the sender's identity
+  * binary/outer packet must contain an IV/nonce that includes a 4-byte network order seq value (was 'at' on the inner)
+  * one temporary key is used per exchange per endpoint
   * channel id base is selected based on the comparison of the public key being used (not the hashname)
-  * the inner `at` value must have it's last digit set to it's channnel id base (0 or 1, to prevent conflicts)
-  * the highest received `at` must always be returned/confirmed in a response handshake for the exchange to be valid
+  * the seq value must have it's last bit set to it's channnel id base (0 or 1, to prevent conflicts)
+  * the highest received seq must always be returned/confirmed in a response handshake for the exchange to be valid
   * handshakes are sent throughout the life of the exchange to verify it's current validity, as needed by the network transport in use
+  * exchange tokens are always the first 16 bytes of the handshake's body
 * exchange packets
   * the first 16 bytes are always referenced as the `token` and uniquely identify a destination exchange for any routing purposes
 * [e3x](e3x) - common internal library interface
