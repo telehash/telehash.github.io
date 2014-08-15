@@ -48,6 +48,7 @@ mesh.router(direct); // direct is keys/paths
 var link = mesh.link(hashname, direct, up); // optional direct endpoint info if using routers, direct may be other keys/paths that is used as a router for this id
 link.up = function(true||false){}; // called on state changes
 var link2 = link.link(hashname);  // use existing link to create one to another (they are routing)
+link.route = true; // enable any other link to route to/from this one
 
 // tcp/udp socket tunneling
 mesh.listen(args); // only links can connect
