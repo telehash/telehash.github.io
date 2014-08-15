@@ -45,7 +45,9 @@ These are combined into simple easy to use interoperable libraries with a common
 
 var mesh = new telehash.Mesh(keys); // starts handling incoming link, path, and connect channels
 mesh.router(direct); // direct is keys/paths
-var link = mesh.link(hashname, direct, up); // optional direct endpoint info if using routers, calls up(true||false) on state changes, direct may be other keys/paths that is used as a router for this id
+var link = mesh.link(hashname, direct, up); // optional direct endpoint info if using routers, direct may be other keys/paths that is used as a router for this id
+link.up = function(true||false){}; // called on state changes
+var link2 = link.link(hashname);  // use existing link to create one to another (they are routing)
 
 // tcp/udp socket tunneling
 mesh.listen(args); // only links can connect
