@@ -6,7 +6,7 @@ Telehash
 
 ## Raw Brainstorming Notes
 
-Telehash is a project to create interoperable encrypted networking libraries:
+Telehash is a project to create interoperable encrypted p2p mesh networking:
 
 * 100% end-to-end encrypted at all times
 * designed to compliment and add to existing transport security
@@ -43,34 +43,36 @@ Telehash defines several independent specifications:
 
 These are combined into simple easy to use interoperable libraries with a common API:
 
-var net = new Network(keys); // starts handling incoming link, path, and connect channels
-net.link(id, direct, up); // optional direct endpoint info if using routers, calls up(id, true||false) on state changes, direct may be other keys/paths that is used as a router for this id
-net.router(id, direct); // direct is required, routers not allowed any connections
+var mesh = new telehash.Mesh(keys); // starts handling incoming link, path, and connect channels
+mesh.router(direct); // direct is keys/paths
+var link = mesh.link(hashname, direct, up); // optional direct endpoint info if using routers, calls up(true||false) on state changes, direct may be other keys/paths that is used as a router for this id
 
 // tcp/udp socket tunneling
-net.listen(args);
-var conn = net.connect(id, args);
+mesh.listen(args); // only links can connect
+var conn = link.connect(args);
 
 // http
-net.server(args);
-net.request(args);
+mesh.server(args);
+var req = link.request(args);
 
 // websocket
-var sock = net.ws(args);
+var sock = link.ws(args);
 sock.on* = callback;
 sock.send(data);
-net.wss(args); // server
+mesh.wss(args); // server for any links
 
 // chat
-var chat = net.chat(args);
+var chat = mesh.chat(args);
+chat.add(link);
 
 // box, async messages
 
-// internal hooks to extend
+// internal hooks to extend custom channels
 
-## Network Structure
+## Mesh Structure
 
-* a network is a local hashname and links to one or more other hashnames
+* a mesh is a local hashname and links to one or more other hashnames (full mesh)
 * they may have one or more routers, which only support "route" channels (was "peer") and do relaying/bridging
 * routers must come with keys/paths
-* a router must have a way to validate incoming exchanges, external or dynamic (protected keys)
+* individual hashnames may have their own router defined
+* a router must have a way to validate hashnames before routing to them
