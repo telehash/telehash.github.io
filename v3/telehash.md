@@ -44,7 +44,7 @@ Telehash defines several independent specifications:
 These are combined into simple easy to use interoperable libraries with a common API:
 
 var net = new Network(keys); // starts handling incoming link, path, and connect channels
-net.link(id, direct, up); // optional direct endpoint info if using routers, calls up(id, true||false) on state changes
+net.link(id, direct, up); // optional direct endpoint info if using routers, calls up(id, true||false) on state changes, direct may be other keys/paths that is used as a router for this id
 net.router(id, direct); // direct is required, routers not allowed any connections
 
 // tcp/udp socket tunneling
