@@ -29,12 +29,10 @@ Telehash defines several independent specifications:
 * Discovery - Announcing/Listening Mappings to Local Networks
 * Channels - Common Multi-Purpose Channels
   * link: create a private connection between two endpoints (mutual)
-  * route: ask a router to provide peering for this endpoint, can return see
   * peer: request connection to an endpoint from a router
-  * seek: request which routers to use for an id
   * connect: incoming connection request relayed
   * path: sync network transport info to try any direct/alternative paths
-  * socket: tcp/udp socket tunneling
+  * socket: tcp/udp socket tunneling 
   * stream: binary streams
   * http: mapping of http requests/responses
   * ws: websocket messaging api
