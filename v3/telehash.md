@@ -79,3 +79,4 @@ chat.add(link);
 * routers must come with keys/paths
 * individual hashnames may have their own router defined
 * a router must have a way to validate hashnames before routing to them
+* any hashname may advertise it's router as a path (and must provide routing to it for the first handshake)
