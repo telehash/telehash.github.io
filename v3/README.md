@@ -49,7 +49,7 @@ V3 Proposal Changelog
   * seek is not used
   * link does not contain `see` or `seed` and is not used to a router, only for mesh connections, contains optional payload packet
   * peer/connect is simple packet relay, always reflects back recipients visible path, can include token to signal/create bridge
-  * path, udp=>udp4/udp6, tcp=>tcp4/tcp6
+  * path, udp=>udp4/udp6, tcp=>tcp4/tcp6, add a via type "via":"hashname" to advertise router
 
 ### Implementations
 
@@ -58,12 +58,10 @@ Experimental progress on v2->v3 updates is happening at:
 * [telehash-js](https://github.com/telehash/node-telehash/tree/v3)
 * [telehash-c](https://github.com/telehash/telehash-c/tree/v3).
 
-### DHT to Mesh
+### Public DHT vs Private Mesh
 
-V3 no longer includes a Kademlia-based Distributed Hash Table and is instead is a simple full mesh end-to-end encrypted protocol that requires mutual explicit trust to establish any connection, with optional support for p2p routing coordination.
+V2 included both a public DHT and private mesh networking which made it more difficult to understand, implement, and trust.  There is now a clear separation of this functionality, the Kademlia-based Distributed Hash Table is split out into it's own project called [dotPublic](https://github.com/quartzjer/dotPublic) and v3 no longer includes a DHT, it is focused on being a simple full mesh (p2p) end-to-end encrypted protocol that requires mutual explicit trust to establish any connection.
 
-The changes during 2013/2014 for v2 to focus on privacy have created a tension between the desire to have zero metadata exposed and how a DHT uses many peers to coordinate activities.  The mission to provide easy *private* communication tools is paramount, and no identifying information should be visible to any untrusted entity by default.  Reducing the scope of telehash is also intended to increase it's compatibility with other decentralized private networking tools like I2P/Tor and so that it can be used easily within existing encrypted transports like TLS and WebRTC.
+The changes during 2013/2014 for v2 to add more privacy created a tension between the desire to have zero metadata exposed and how a DHT uses many peers to coordinate activities.  A DHT is a useful tool to provide functionality using *large* numbers of distributed nodes, and the focus for v3 is to enable private communication between *small* numbers of *trusted* nodes.  As the number of nodes increases, so does the risk of automated surveillance of which nodes are communicating.
 
-A DHT is a useful tool to provide functionality using *large* numbers of decentralized nodes, and our focus for v3 is to enable private communication between *small* numbers of *trusted* nodes.  As the number of nodes increases, so does the risk of surveillance of which nodes are communicating.
-
-Part of the v3 implementation work will be to demonstrate using some of the other [distributed networking](https://github.com/redecentralize/alternative-internet) platforms along with telehash for applications that require a public shared hashname directory that the DHT in v2 was being used for.
+The mission to provide easy *private* communication tools is paramount, and no identifying information should be visible to any untrusted entity without an explicit decision to do so.  Separating the DHT from the scope is also intended to increase v3's compatibility with other private networking tools like I2P, Tor, TLS, and WebRTC, [and more](https://github.com/redecentralize/alternative-internet).
