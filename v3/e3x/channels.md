@@ -41,7 +41,7 @@ An example initial reliable channel open request:
 }
 ```
 
-<a name="channelid" />
+<a name="ids" />
 ### Channel IDs
 
 A Channel ID is a *positive* integer (uint32_t) from 1 to 4,294,967,295 and is determined by the sender and then used by both sides to send/receive packets on that channel.  In order to prevent two endpoints from picking the same `c` value they choose them based on their [order](order.md): the `HIGH` endpoint uses odd numbers starting with 1, and the `LOW` endpoint uses even numbers starting with 2. 0 is never a valid ID.
@@ -49,3 +49,11 @@ A Channel ID is a *positive* integer (uint32_t) from 1 to 4,294,967,295 and is d
 When a new channel is created, the ID must be higher than the last one the initiator used, they must always increment. Upon receiving a new channel request, the recipient must validate that it is higher than the last active channel (note: switches must still allow for two new channel requests to arrive out of order).
 
 When a new exchange is established, it errors any already confirmed opened channels and sets the minimum required incoming channel IDs back to being greater than 0.
+
+<a name="timeouts" />
+### Timeouts
+
+Every channel is responsible for it's own timeout and may have a different value than others.  A timeout occurs whenever the channel open or end packet has not been responded for reliable or unreliable channels, and when any packet has not been ack'd for reliable channels.
+
+A unreliable channel that has been opened will not trigger a timeout individualy since the exchange as a whole will timeout if the connection is lost based on the network transports in use.
+
