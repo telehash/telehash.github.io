@@ -6,17 +6,17 @@ The `hashname` is always a [base 32](http://tools.ietf.org/html/rfc4648) encoded
 
 ## Hashname Generation
 
-### IDs
+### Key IDs
 
-A hashname is created through multiple rounds of [SHA-256](http://en.wikipedia.org/wiki/SHA-2) hashing of one or more public keys. Each public key included must have a unique single-byte ID and a byte array value that is the consistent representation of that public key.  The ID and serialization format must be well defined and agreed upon by any platforms using hashnames, an example of which is the [Cipher Set](../e3x/cipher_sets.md) definitions in [e3x](../e3x/).
+A hashname is created through multiple rounds of [SHA-256](http://en.wikipedia.org/wiki/SHA-2) hashing of one or more public keys. Each public key included must have a unique single-byte `ID` with a byte array value that is the consistent representation of that public key.  The `ID` and serialization format must be well defined and agreed upon by any platforms using hashnames, an example of which is the [Cipher Set](../e3x/cipher_sets.md) definitions in [e3x](../e3x/).
 
 ### Intermediate Hashing
 
-The binary byte array of each public key must first be hashed, resulting in a 32 byte `intermediate hash` value that is used in the rollup calculation.
+The binary byte array of each public key must first be hashed, resulting in a 32 byte `intermediate hash` value that is used in the rollup calculation.  These intermediate values may be used and exchanged instead of the full keys when only one key is in use.
 
 ### Final Rollup
 
-To calculate the hashname the intermediate values are sequentially hashed in ascending order by their ID. Each ID contributes two values: the single byte ID value and the 32 byte intermediate hash value. The hash is rolled up, wherein each resulting binary digest is combined with the next binary value as the input. An example calculation would look like (in pseudo-code):
+To calculate the hashname the intermediate values are sequentially hashed in ascending order by their `ID`. Each `ID` contributes two values: the single byte `ID` value and the 32 byte intermediate hash value. The hash is rolled up, wherein each resulting binary digest is combined with the next binary value as the input. An example calculation would look like (in pseudo-code):
 
 ```js
 hash = sha256(0x1a)
@@ -49,7 +49,8 @@ var hashname = base32.encode(rollup);
 
 ## Exchanging Keys
 
-### Source JSON
+<a name="json" />
+### Full JSON
 
 The source keys to calculate a hashname may be exchanged and represented as a complete JSON object where the ID is in HEX and the public key is BASE32 encoded:
 
@@ -61,9 +62,10 @@ The source keys to calculate a hashname may be exchanged and represented as a co
 }
 ```
 
-### Source Packet
+<a name="compact" />
+### Compact Intermediate JSON
 
-Frequently the source for a hashname is being sent in a context where there is a specific ID already known or agreed upon and only that key needs to be exchanged.  This can be more efficiently encoded as a [packet](../lob/) that includes the `intermediate hash` values of the other IDs base32 encoded in the JSON, and the known ID's key attached as the binary BODY:
+Frequently the source for a hashname is being sent in a context where there is a specific `ID` already known or agreed upon and only that key needs to be exchanged.  This can be more efficiently encoded with JSON that only includes the `intermediate hash` values (in BASE32) of the other IDs so that the correct hashname can be calculated.  Here's an example [packet encoding](../lob/) that includes the known ID key value as the BODY and the remaining intermediate hash values in the JSON:
 
 ```
 HEAD:
@@ -74,4 +76,4 @@ HEAD:
 BODY: [2a's public key bytes]
 ```
 
-
+The full and compact JSON formats use the same ID-as-name in order to ensure that the formats are only used in the correct contexts, they are never interchangable.
