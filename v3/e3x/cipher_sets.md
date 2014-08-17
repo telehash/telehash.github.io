@@ -9,10 +9,7 @@ Each set is identified with a unique identifier (`CSID`) that represents the ove
 * [CS2a](cs/2a.md) - (legacy) Original set from 2013 using RSA (2048), ECC (P-256), and AES (256)
 * [CS3a](cs/3a.md) - (preferred) Modern set using [NaCl](http://nacl.cr.yp.to/)
 
-Each CS contributes two values that are used within the protocol, a `fingerprint` and a `key`.  The `fingerprint` is used to calculate the [hashname](hashnames.md) (included in its `parts`), and the `key` is the binary public key that is required in order to initiate an `open`.
 
-Two hashnames must always initiate a `line` to each other using the highest shared CSID between them.  Apps may choose which one or more CSIDs they want to support when they create a new hashname and know that a lower one will only ever be used to communicate with hashnames that only support that CS.
+Two endpoints must always create exchanges to each other using the highest common CSID between them.  Apps may choose which one or more CSIDs they want to support when they create an endpoint and know that a lower one will only ever be used to communicate with other endpoints that only support that CS.
 
-Any CSID of "0*" ("01" through "0a") are reserved for special case custom Cipher Sets whose definitions are entirely app-specific, "00" is not allowed to be used at all.
-
-> Also see the [FAQ](faq.md#cs) for common questions and [Implementers Notes](implementers.md#cs) for help when implementing a Cipher Set.
+Any CSID of "0*" ("01" through "0a") are reserved for special case custom Cipher Sets whose definitions are entirely app-specific, the "00" ID is not allowed to be used at all and always considered invalid.

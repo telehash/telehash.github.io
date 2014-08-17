@@ -8,8 +8,8 @@ E3X - End-to-End Encrypted eXchange
 
 Defines:
 
-* async encryption
-* sync encryption
+* message encryption
+* channel encryption
   * handshakes
   * keepalives
   * channel state
