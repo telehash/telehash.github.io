@@ -44,9 +44,9 @@ A sender MAY opportunistically remove packets from it's outgoing buffer that are
 
 Here's some summary notes for implementors:
 
-* send an ack with every outgoing packet, of the highest seq you've received and processed
-* only send a miss if you've discovered missing packets in the incoming seq ordering/buffering
-* if an app is receiving packets and hasn't generated response packets, send an ack after 1s
+* just send an ack with every outgoing packet, of the highest seq you've received and processed
+* only send a miss if you've discovered missing packets in the incoming seq ordering/buffering or when you're dropping
+* once an app processes a packet and it had an ack, send an ack back
 * when an `end` is sent, don't close the channel until it's acked and after it's been idle for timeout wait
 * when an `end` is received, process it in order like any other content packet, and close only after acking + timeout wait to allow re-acking if needed
 * automatically resend the last-sent un-acked sequence packet every 2 seconds until the channel timeout
