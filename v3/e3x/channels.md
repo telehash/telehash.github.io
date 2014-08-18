@@ -16,7 +16,7 @@ Once decrypted they result in an INNER packet that must always contain valid JSO
 Base parameters on channel packets:
 
 * `"type":"value"` - A channel always opens with a `type` in the first outgoing packet to distinguish to the recipient what the name/category of the channel it is. This value must only be set on the first packet, not on any subsequent ones or any responses.
-* `"end":"true"` - Upon sending any content packet with an `end` of true, the sender must not send any more content packets (reliability acks/resends may still be happening though). An `end` may be sent by either side and is required to be sent by both to cleanly close a channel.
+* `"end":true` - Upon sending any content packet with an `end` of true, the sender must not send any more content packets (reliability acks/resends may still be happening though). An `end` may be sent by either side and is required to be sent by both to cleanly close a channel.
 * `"err":"message"` - As soon as any packet on a channel is received with an `err` it must be immediately closed and no more packets can be sent or received at all, any/all buffered content in either direction must be dropped. These packets must contain no content other than optional extra details on the error.
 * `"seq":0` - An integer sequence number that is only used for and defined by [reliable](reliable.md) channels and must be sent in the first open packet along with the `type`, it is an error to send/receive this without using reliability on both sides.
 
@@ -40,6 +40,17 @@ An example initial reliable channel open request:
 	"hello":{"custom":"values"}
 }
 ```
+
+<a name="states" />
+### Channel States
+
+A channel may only be in one of the following states:
+
+* OPENING - the initial channel open packet containing the `type` has been sent or received, but not confirmed or responded to yet and will time out
+* OPEN - the channel open packets have been both sent and received and it will not timeout unless the exchange does or reliability fails
+* ENDED - a packet containing an `"end":true` has been received and no further content will be delivered for this channel and it will be timed out
+
+These are the states that e3x manages, if an application requires additional states (such as when one party ended but the other hasn't) it must track them itself.  Any channel having received or sent an `err` is immediately removed after processing that packet and no more state is tracked.
 
 <a name="ids" />
 ### Channel IDs
