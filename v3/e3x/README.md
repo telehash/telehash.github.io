@@ -18,10 +18,11 @@ Designed to expose all trust decisions to app layer, zero information or metadat
 * endpoint - one or more generated CS keys to identify a local instance
 * exchange - created by combining a local and remote endpoint and one ephemeral CS key for the exchange
 
+An endpoint creates an exchange to another endpoint, generating handshakes (which are special purpose encrypted messages) in both directions.  Once the handshakes have been verified, encrypted channels can be sent/received using an exchange between the two endpoints.  Everything is encrypted with a specific Cipher Set defining the public key and streaming cipher algorithms, and all data is encoded as packets before and after encryption.
 
 ## API
 
-The interface to use e3x is designed to minimize any accidential leakage of information by any usage of it.
+The interface to use e3x is designed to minimize any accidential leakage of information by any usage of it.  Implementations may vary depending on their platform/language, but should strive for a similar common pattern of interaction.
 
 [E3X API](https://github.com/telehash/telehash-c/blob/master/src/e3x.h)
 
