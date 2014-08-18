@@ -76,4 +76,4 @@ HEAD:
 BODY: [2a's public key bytes]
 ```
 
-The full and compact JSON formats use the same ID-as-name in order to ensure that the formats are only used in the correct contexts, they are never interchangable.
+The full and compact JSON formats use the same ID-as-name in order to ensure that they are only used in the correct contexts, they are never interchangable.
