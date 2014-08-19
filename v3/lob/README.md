@@ -4,7 +4,7 @@ This is a simple encoding scheme to combine any JSON object with any binary data
 
 The resulting byte array (a packet) is created by combining three distinct parts, the `LENGTH`, an optional `HEAD`, and an optional `BODY`.
 
-The `LENGTH` is always two bytes which are a network-order short unsigned integer that represents the number of bytes for the `HEAD`.  When the `HEAD` is greather than 7 bytes then they are always parsed and represented as a UTF-8 JSON object.  Any bytes remaining after the `HEAD` are the `BODY` and always handled as binary.
+The `LENGTH` is always two bytes which are a network-order short unsigned integer that represents the number of bytes for the `HEAD`.  When the `HEAD` is greather than 6 bytes then they are always parsed and represented as a UTF-8 JSON object.  Any bytes remaining after the `HEAD` are the `BODY` and always handled as binary.
 
 The format is thus:
 
