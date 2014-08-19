@@ -35,7 +35,7 @@ V3 Proposal Changelog
   * push notifications
   * BLE
 * [hashname](hashname/)
-  * use base58 encoding to a string instead of hex
+  * use base32 encoding to a string instead of hex
   * use raw byte values during the rollup instead of hex strings
   * parts are always the SHA256 of the normalied public key 
 * [telehash](telehash.md) - higher level interoperable library with easy interface
