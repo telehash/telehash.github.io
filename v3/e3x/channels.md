@@ -46,9 +46,9 @@ An example initial reliable channel open request:
 
 A channel may only be in one of the following states:
 
-* OPENING - the initial channel open packet containing the `type` has been sent or received, but not confirmed or responded to yet and will time out
-* OPEN - the channel open packets have been both sent and received and it will not timeout unless the exchange does or reliability fails
-* ENDED - a packet containing an `"end":true` has been received and no further content will be delivered for this channel and it will be timed out
+* `OPENING` - the initial channel open packet containing the `type` has been sent or received, but not confirmed or responded to yet and will time out
+* `OPEN` - the channel open packets have been both sent and received and it will not timeout unless the exchange does or reliability fails
+* `ENDED` - a packet containing an `"end":true` has been received and no further content will be delivered for this channel, it will be timed out
 
 These are the states that e3x manages, if an application requires additional states (such as when one party ended but the other hasn't) it must track them itself.  Any channel having received or sent an `err` is immediately removed after processing that packet and no more state is tracked.
 
@@ -59,12 +59,12 @@ A Channel ID is a *positive* integer (uint32_t) from 1 to 4,294,967,295 and is d
 
 When a new channel is created, the ID must be higher than the last one the initiator used, they must always increment. Upon receiving a new channel request, the recipient must validate that it is higher than the last active channel (note: switches must still allow for two new channel requests to arrive out of order).
 
-When a new exchange is established, it errors any already confirmed opened channels and sets the minimum required incoming channel IDs back to being greater than 0.
+When a new exchange is established, it errors any `OPEN` channels and sets the minimum required incoming channel IDs back to being greater than 0.
 
 <a name="timeouts" />
 ### Timeouts
 
-Every channel is responsible for it's own timeout and may have a different value than others.  A timeout occurs whenever the channel open or end packet has not been responded for reliable or unreliable channels, and when any packet has not been ack'd for reliable channels.
+Every channel is responsible for it's own timeout and may have a different value than others.  A timeout occurs whenever the channel is in `OPENING` or `ENDED` state or when any packet has not been ack'd for reliable channels.
 
-A unreliable channel that has been opened will not trigger a timeout individualy since the exchange as a whole will timeout if the connection is lost based on the network transports in use.
+Any channel that is in `OPEN` state will not trigger a timeout individualy since the exchange as a whole will timeout if the connection is lost based on the network transports in use.
 
