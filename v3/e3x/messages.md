@@ -10,7 +10,7 @@ All [handshakes](handshake.md) are message packets.
 
 ## Packet Encryption
 
-All message packets are encrypted using a cipher as determined by the [Cipher Set](cipher_sets.md) in use for the exchange.  The encrypted (OUTER) packets must have a `HEAD` of length 1 to identify the CSID and the encrypted contents as the binary `BODY`.
+All message packets are encrypted using a cipher as determined by the [Cipher Set](cs/) in use for the exchange.  The encrypted (OUTER) packets must have a `HEAD` of length 1 to identify the CSID and the encrypted contents as the binary `BODY`.
 
 Once decrypted they result in an INNER packet with a structure that is determined entirely by the application.  It is common practice for applications to use a `"type":"value"` on the INNER JSON similarly to channel packets, but not required.
 

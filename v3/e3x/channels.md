@@ -6,7 +6,7 @@ A channel may have only one outgoing initial packet, only one response to it, or
 
 ## Packet Encryption
 
-All channel packets are encrypted using a stream cipher as determined by the [Cipher Set](cipher_sets.md) in use for the exchange.  The encrypted (OUTER) packets must have a `HEAD` of length 0 and the encrypted contents as the binary `BODY`.
+All channel packets are encrypted using a stream cipher as determined by the [Cipher Set](cs/) in use for the exchange.  The encrypted (OUTER) packets must have a `HEAD` of length 0 and the encrypted contents as the binary `BODY`.
 
 Once decrypted they result in an INNER packet that must always contain valid JSON (have a `HEAD` of 7 or greater).
 

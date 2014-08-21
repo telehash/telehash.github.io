@@ -11,7 +11,7 @@ Designed to expose all trust decisions to app layer, zero information or metadat
 ## Index
 
 * [packet](../lob/)
-* [Cipher Set](cipher_sets.md) (CS)
+* [Cipher Set](cs/) (CS)
 * [message](messages.md)
 * [handshake](handshake.md) - a type of message
 * [channel](channels.md)

@@ -22,4 +22,4 @@ When first creating a handshake, the sender should make every effort to always c
 
 The handshake determines the exchange's routeable `TOKEN` value, which must always be 16 bytes of the temporary public key representation.  The `TOKEN` is not used cryptographically and is only a unique value to assist the two endpoints and any routing parties on mapping to a known exchange.
 
-Each [Cipher Set](cipher_sets.md) must structure their handshake such that the first 16 bytes of the `BODY` are the `TOKEN`.
+Each [Cipher Set](cs/) must structure their handshake such that the first 16 bytes of the `BODY` are the `TOKEN`.
