@@ -4,6 +4,11 @@ A `hashname` is a unique fingerprint to represent one or more public keys of dif
 
 The `hashname` is always a [base 32](http://tools.ietf.org/html/rfc4648) encoded string that is 52 characters long, and when decoded is a 32 byte binary value result of a [SHA-256](http://en.wikipedia.org/wiki/SHA-2) hash.  An example hashname is `uvabrvfqacyvgcu8kbrrmk9apjbvgvn2wjechqr3vf9c1zm3hv7g`.
 
+## Implementations
+
+* [javascript](https://github.com/quartzjer/hashname) (node and browserify)
+* [c](https://github.com/telehash/telehash-c/blob/v3/src/hn.h) (in progress)
+
 ## Hashname Generation
 
 ### Key IDs
@@ -27,7 +32,7 @@ print base32encode(hash)
 "vtneykw49cj8qw7ndvmejc8jw9zake8fkkmzvc8rautmf3evar90"
 ```
 
-Here is a working example in node.js to do the calculation, results in `yxxe092y8rnw73ba3n2gnk9ugf5cmzfbuh0jhxqyergfttemnke0`
+Here is a working example in node.js to do the calculation, results in `5ccn9gcxnj9nd7hp1m3v5pjwcu5hq80bt366bzh1ebhf9zqaxu2g`
 
 ```js
 var crypto = require("crypto");
@@ -39,7 +44,7 @@ var keys = {
 var rollup = new Buffer(0);
 Object.keys(keys).sort().forEach(function(id){
   rollup = crypto.createHash("sha256").update(Buffer.concat([rollup,new Buffer(id,"hex")])).digest();
-  var intermediate = crypto.createHash("sha256").update(new Buffer(base32.decode(keys[id]))).digest();
+  var intermediate = crypto.createHash("sha256").update(new Buffer(base32.decode(keys[id]),"binary")).digest();
   rollup = crypto.createHash("sha256").update(Buffer.concat([rollup,intermediate])).digest();
 });
 var hashname = base32.encode(rollup);
