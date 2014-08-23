@@ -2,7 +2,14 @@
 
 This is a simple encoding scheme to combine any JSON object with any binary data (both are optional) into one byte array.  This encoding does not include any total packet size or checksums, and expects the context where it's used to provide those when necessary (see [chunking](chunking.md)).
 
-The resulting byte array (a packet) is created by combining three distinct parts, the `LENGTH`, an optional `HEAD`, and an optional `BODY`.
+## Implementations
+
+* [javascript](https://github.com/quartzjer/lob-enc) (node and browserify)
+* [c](https://github.com/telehash/telehash-c/blob/v3/src/packet.h) (in progress)
+
+## Definition
+
+The wire-format byte array (a packet) is created by combining three distinct parts, the `LENGTH`, an optional `HEAD`, and an optional `BODY`.
 
 The `LENGTH` is always two bytes which are a network-order short unsigned integer that represents the number of bytes for the `HEAD`.  When the `HEAD` is greather than 6 bytes then they are always parsed and represented as a UTF-8 JSON object.  Any bytes remaining after the `HEAD` are the `BODY` and always handled as binary.
 
@@ -44,3 +51,4 @@ A `LENGTH` of 7+ means the HEAD must be a UTF-8 encoded JSON object (not any bar
 The optional `BODY` is always a raw binary of the remainder bytes between the packet's total length and that of the `HEAD`. 
 
 Often packets are attached inside other packets as the `BODY`, enabling simple packet wrapping/relaying usage patterns.
+
