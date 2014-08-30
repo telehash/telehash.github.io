@@ -55,7 +55,7 @@ These are the states that e3x manages, if an application requires additional sta
 <a name="ids" />
 ### Channel IDs
 
-A Channel ID is a *positive* integer (uint32_t) from 1 to 4,294,967,295 and is determined by the sender and then used by both sides to send/receive packets on that channel.  In order to prevent two endpoints from picking the same `c` value they choose them based on their [order](order.md): the `HIGH` endpoint uses odd numbers starting with 1, and the `LOW` endpoint uses even numbers starting with 2. 0 is never a valid ID.
+A Channel ID is a *positive* integer (uint32_t) from 1 to 4,294,967,295 and is determined by the sender and then used by both sides to send/receive packets on that channel.  In order to prevent two endpoints from picking the same `c` value they choose them based on their [order](order.md): the `ODD` endpoint uses odd numbers starting with 1, and the `EVEN` endpoint uses even numbers starting with 2. 0 is never a valid ID.
 
 When a new channel is created, the ID must be higher than the last one the initiator used, they must always increment. Upon receiving a new channel request, the recipient must validate that it is higher than the last active channel (note: switches must still allow for two new channel requests to arrive out of order).
 

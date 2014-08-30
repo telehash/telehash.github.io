@@ -16,7 +16,7 @@ Designed to expose all trust decisions to app layer, zero information or metadat
 * [handshake](handshake.md) - a type of message
 * [channel](channels.md)
 * endpoint - one or more generated CS keys to identify a local instance
-* exchange - created by combining a local and remote endpoint and one ephemeral CS key for the exchange
+* exchange - created by combining a local and remote endpoint and ephemeral CS keys
 
 An endpoint creates an exchange to another endpoint, generating handshakes (which are special purpose encrypted messages) in both directions.  Once the handshakes have been verified, encrypted channels can be sent/received using an exchange between the two endpoints.  Everything is encrypted with a specific Cipher Set defining the public key and streaming cipher algorithms, and all data is encoded as packets before and after encryption.
 

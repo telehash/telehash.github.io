@@ -12,7 +12,7 @@ The `JSON` may optionally include [compact](../hashname/#compact) values if ther
 
 ## Sequence Value
 
-Every handshake must include a `SEQ` integer that is 4 bytes in network order, this sequence value determines if the handshake is the most current and if the recipient needs to respond.  The last bit in the `SEQ` must always match the [order](order.md) value of the sender, if they are `HIGH` it must be a 1 (and 0 if they are `LOW`) to guarantee that no two endpoints can choose the same `SEQ` independently.
+Every handshake must include a `SEQ` integer that is 4 bytes in network order, this sequence value determines if the handshake is the most current and if the recipient needs to respond.  The last bit in the `SEQ` must always match the [order](order.md) value of the sender, if they are `ODD` it must be a 1 (and 0 if they are `EVEN`) to guarantee that no two endpoints can choose the same `SEQ` independently.
 
 When a `SEQ` is received that is higher than one sent, a new handshake must be returned with that matching highest `SEQ` value in order to inform the sender that their handshake is confirmed.  Upon receiving and confirming a new `SEQ`, any pending channel packets that may have been waiting to send may be flushed/delivered.
 
