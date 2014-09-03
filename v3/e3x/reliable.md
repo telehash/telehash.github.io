@@ -30,7 +30,7 @@ An `ack` must be sent a minimum of once per second after receiving any packet in
 
 The `"miss":[1,2,4]` is an array of integers and must be sent along with any `ack` if in the process of receiving packets there were any missing sequences.  Because the `ack` is confirmed processed packets, all of the `miss` ids will be higher than the accompanying `ack`.
 
-The `miss` ids are in accending order and delta encoded using `ack` as the base.
+The `miss` ids are in ascending order and delta encoded using `ack` as the base.
 
 When a recipient's incoming buffer of packets is full and it must drop new packets, it should send a `miss` indicating the `seq` that it started dropping at.  When the sender gets a `miss` that starts with a `seq` more than 1 greater than the included `ack` it should adjust it's sending window buffer accordingly.
 
@@ -51,7 +51,7 @@ Given the list of missing `seq` ids `[78236, 78235, 78245, 78238]` and `"ack": 7
 2. Calculate the difference between all subsequent ids (including the `ack`).<br/>
    `[(78235 - 78231), (78236 - 78235), (78238 - 78236), (78245 - 78238)]`<br/>
    `[4, 1, 2, 7]`
-3. Delive the delta encoded list to the other end.
+3. Deliver the delta encoded list to the other end.
 
 
 
