@@ -46,10 +46,10 @@ A sender MAY opportunistically remove packets from it's outgoing buffer that are
 
 Given the list of missing `seq` ids `[78236, 78235, 78245, 78238]` and `"ack": 78231`.
 
-1. Sort the `miss` list:
+1. Sort the `miss` list:<br/>
    `[78235, 78236, 78238, 78245]`
-2. Calculate the difference between all subsequent ids (including the `ack`).
-   `[(78235 - 78231), (78236 - 78235), (78238 - 78236), (78245 - 78238)]`
+2. Calculate the difference between all subsequent ids (including the `ack`).<br/>
+   `[(78235 - 78231), (78236 - 78235), (78238 - 78236), (78245 - 78238)]`<br/>
    `[4, 1, 2, 7]`
 3. Delive the delta encoded list to the other end.
 
