@@ -17,9 +17,9 @@ The URI can also be `thtp:///path` which defaults to the current hashname in the
 
 ## THTP Packet
 
-Any HTTP request/response is normalized into a telehash packet by translating the headers into the JSON and any contents attached as the binary BODY.  The headers are always lower-cased keys and string values, for requests the `method` and `path` with string values are included, and for responses the `status` with the numeric value is included.
+Any HTTP request/response is normalized into a telehash packet by translating the headers into the JSON and any contents attached as the binary BODY.  The headers are always lower-cased keys and string values, for requests the `:method` and `:path` with string values are included, and for responses the `:status` with the numeric value is included.
 
-The request: 
+The request:
 
 ```
 GET / HTTP/1.1
@@ -31,8 +31,8 @@ Becomes:
 
 ```json
 {
-  "method":"get",
-  "path":"/",
+  ":method":"get",
+  ":path":"/",
   "user-agent":"curl/7.30.0",
   "accept":"*/*",
 }
@@ -65,7 +65,7 @@ Becomes:
 
 ```json
 {
-  "status":301,
+  ":status":301,
   "server":"nginx",
   "date":"Fri, 07 Mar 2014 21:12:39 GMT",
   "content-type":"text/html",
