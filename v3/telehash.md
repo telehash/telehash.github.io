@@ -39,12 +39,12 @@ Telehash defines several independent specifications:
   * chat: personal messaging
   * box: async/offline messaging
 
-These are combined into simple easy to use interoperable libraries with a common API:
+These are combined into simple easy to use interoperable libraries with a common API (pseudocode):
 
-var mesh = new telehash.Mesh(keys); // starts handling incoming link, path, and connect channels
+var mesh = telehash.mesh({keys}); // starts handling incoming link, path, and connect channels
 mesh.router(direct); // direct is keys/paths
-var link = mesh.link(hashname, direct, packet); // optional direct endpoint info if using routers, direct may be other keys/paths that is used as a router for this id, optional packet passed in link request
-link.up = function(true||false, packet){}; // called on state changes, can deny based on packet
+var link = mesh.link({hashname, keys, paths}, packetf(in,cb){}); // optional keys/paths endpoint info if using routers, optional packetf to gen/process passed in link request and to handle incoming, marked up w/ cb(), down w/ cb(err), and just sends packet w/ cb(undef,pkt);
+link.up = function(true||false){}; // called on state changes
 var link2 = link.link(hashname);  // use existing link to create one to another (they are routing)
 link.route = true; // enable any other link to route to/from this one
 
