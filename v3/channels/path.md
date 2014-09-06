@@ -53,7 +53,6 @@ An established path is one that comes from the network interface, the actual enc
 
 The information about an available network transport is called a `path` and defined by a JSON object that contains a `"type":"..."` to identify which type of network it describes. The current path types defined are:
 
-* `any` - contains `ip` and `port` that can be used as the default for any network transport
 * `udp4` / `udp6` - UDP, contains `ip` and `port`, may be multiples (public and private ip's)
 * `tcp4` / `tcp6` - TCP, contains `ip` and `port` like UDP
 * `http` - contains `url` which can be http or https, see [HTTP](e3x/tp/http.md) for details
