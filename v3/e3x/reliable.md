@@ -26,9 +26,11 @@ When receiving an `ack` the recipient may then discard any buffered packets up t
 
 An `ack` must be sent a minimum of once per second after receiving any packet including a `seq` value, either included with response content packets or their own ad-hoc packets.  Allowing up to one second gives a safe default for the application to generate any response content, as well as receive a larger number of content packets before acknowleding them all.
 
-## `miss` - Misssing Sequences
+## `miss` - Missing Sequences
 
-The `"miss":[1,2,4]` is an array of integers and must be sent along with any `ack` if in the process of receiving packets there were any missing sequences, containing in any order the known missing sequence values.  Because the `ack` is confirmed processed packets, all of the `miss` ids will be higher than the accompanying `ack`.
+The `"miss":[1,2,4]` is an array of integers and must be sent along with any `ack` if in the process of receiving packets there were any missing sequences.  Because the `ack` is confirmed processed packets, all of the `miss` ids will be higher than the accompanying `ack`.
+
+The `miss` ids are in ascending order and delta encoded using `ack` as the base.
 
 When a recipient's incoming buffer of packets is full and it must drop new packets, it should send a `miss` indicating the `seq` that it started dropping at.  When the sender gets a `miss` that starts with a `seq` more than 1 greater than the included `ack` it should adjust it's sending window buffer accordingly.
 
@@ -39,6 +41,19 @@ A `miss` should be no larger than 100 entries, any array larger than that should
 Upon receiving a `miss` the recipient should resend those specific matching `seq` packets in it's buffer, but never more than once per second. So if an id in a `miss` is repeated or shows up in multiple incoming packets quickly (happens often), the matching packet is only resent once until at least one second has passed.
 
 A sender MAY opportunistically remove packets from it's outgoing buffer that are higher than the `ack` and lower than the highest value in a `miss` array, and are not included in the array as that's a signal that they've been received.
+
+### `miss` encoding example
+
+Given the list of missing `seq` ids `[78236, 78235, 78245, 78238]` and `"ack": 78231`.
+
+1. Sort the `miss` list:<br/>
+   `[78235, 78236, 78238, 78245]`
+2. Calculate the difference between all subsequent ids (including the `ack`).<br/>
+   `[(78235 - 78231), (78236 - 78235), (78238 - 78236), (78245 - 78238)]`<br/>
+   `[4, 1, 2, 7]`
+3. Deliver the delta encoded list to the other end.
+
+
 
 # Reliability Notes
 
