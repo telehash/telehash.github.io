@@ -1,14 +1,14 @@
 # JSON Web Key (JWK) to Hashname mapping
 
-[JOSE](https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-31#section-7.4).
+A [hashname](./) may be generated from keys encoded with [JOSE-JWK](https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-31#section-7.4) using simple mappings for the `ID` and `VALUE`.
 
-## "kty":"RSA"
+## `"kty":"RSA"`
 
-Each RSA `VALUE` is the concatenation of the JSON `n` and `e` keys, in binary after base64 decoding.
+Each `VALUE` is the concatenation of the JSON `n` and `e` keys, in binary after base64 decoding.
 
 The `ID` is mapped based on the RSA key size:
 
-| bits |  ID  |
+| bits | `ID` |
 |------|:----:|
 | 2048 | 0x83 |
 | 3072 | 0x84 |
@@ -18,7 +18,7 @@ The `ID` is mapped based on the RSA key size:
 | 7168 | 0x88 |
 | 8192 | 0x89 |
 
-## "kty":"EC"
+## `"kty":"EC"`
 
 Refer to [Elliptic Curve Registry](https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-31#section-7.6).
 
