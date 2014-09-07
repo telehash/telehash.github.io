@@ -21,7 +21,7 @@ Cipher Sets are designed to work well with [hashnames](../../hashname/), which u
 One or more Cipher Set Keys can be encoded in JSON using the same BASE32 encoding and the CSID as the key.
 
 <a name="json" />
-### Full JSON
+### JSON
 
 The source keys to calculate a hashname may be exchanged and represented as a complete JSON object where the ID is in HEX and the public key is BASE32 encoded:
 
@@ -33,18 +33,19 @@ The source keys to calculate a hashname may be exchanged and represented as a co
 }
 ```
 
-<a name="compact" />
-### Compact Intermediate JSON
+<a name="packet" />
+### Packet 
 
-Frequently the source for a hashname is being sent in a context where there is a specific `ID` already known or agreed upon and only that key needs to be exchanged.  This can be more efficiently encoded with JSON that only includes the `intermediate hash` values (in BASE32) of the other IDs so that the correct hashname can be calculated.  Here's an example [packet encoding](../lob/) that includes the known ID key value as the BODY and the remaining intermediate hash values in the JSON:
+Frequently the source for a hashname is being sent in a context where there is a specific `ID` already known or agreed upon and only that key needs to be exchanged.  This can be more efficiently encoded as a [packet](../lob/) with JSON that only includes the `intermediate hash` values (in BASE32) of the other IDs and the key bytes in the BODY:
 
 ```
 HEAD:
 {
   "3a": "gmamb66xcujtuzu9cm3ea9jjwxeyn2c0r8a4bz8y7b7n408bz630",
+  "2a":true,
   "1a": "5vt3teqvjettaxkzkh47a7ta48e3hgp3bruern92xgh89am04h4g"
 }
 BODY: [2a's public key bytes]
 ```
 
-The full and compact JSON formats use the same ID-as-name in order to ensure that they are only used in the correct contexts, they are never interchangable.
+The packet JSON uses the same ID-as-name in order to ensure that it is only used in this context and not mistaken as the full keys.
