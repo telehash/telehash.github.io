@@ -48,4 +48,6 @@ HEAD:
 BODY: [2a's public key bytes]
 ```
 
+When the context of which ID is already known, that ID's key and true value in the JSON is not required to identify which key is in the BODY.
+
 The packet JSON uses the same ID-as-name in order to ensure that it is only used in this context and not mistaken as the full keys.

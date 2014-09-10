@@ -16,11 +16,7 @@ Once decrypted they result in an INNER packet with a structure that is determine
 
 The [handshakes](handshake.md) messages have an INNER that contains the sending endpoint's public key for the CSID used so that the sender identity can be immediately validated.
 
-## Sequence Value
-
-All message packet `BODY` values must begin with a 4-byte network order `SEQ` value, this is important for the application to indicate message ordering and priority.  This value is also used and validated internally by the Cipher Set (usually for the IV/nonce).
-
 ## Tokens
 
-All message packets generated from one exchange will have at least 16 bytes following the `SEQ` value that remain fixed for the lifetime of that exchange to be used for network routing and validation caching.  These 16 bytes are SHA-256 hashed into a 32 byte digest in order to remove any CSID uniqueness, and then the first 16 bytes of the digest are used as the official `TOKEN` value to match future message or channel packets from that exchange.
+All message packets generated from one exchange will have at least the first 16 bytes remain fixed for the lifetime of that exchange to be used for network routing and validation caching.  These 16 bytes are SHA-256 hashed into a 32 byte digest in order to remove any CSID uniqueness, and then the first 16 bytes of the digest are used as the official `TOKEN` value to match future message or channel packets from that exchange.
 
