@@ -2,7 +2,7 @@
 
 All streaming data sent between two endpoints in an exchange must be part of a `channel` packet. Every channel has an integer id included as the `c` parameter in the JSON. See [Channel IDs](#channelids) for details on how they are selected/handled.
 
-A channel may have only one outgoing initial packet, only one response to it, or it may be long-lived with many packets exchanged using the same "c" identifier (depending on the type of channel).  Channels are by default unreliable, they have no retransmit or ordering guarantees, and an `end` always signals the last packet for the channel with none in response.  When required, an app can also create a [reliable](reliable.md) channel that does provide ordering and retransmission functionality.
+A channel may have only one outgoing initial packet, only one response to it, or it may be long-lived with many packets exchanged using the same "c" identifier (depending on the type of channel).  Channels are by default unreliable, they have no retransmit or ordering guarantees, and an `end` always signals the last *content* packet being sent (acknowledgements/retransmits may still occur after).  When required, an app can also create a [reliable](reliable.md) channel that does provide ordering and retransmission functionality.
 
 ## Packet Encryption
 
@@ -16,8 +16,8 @@ Once decrypted they result in an INNER packet that must always contain valid JSO
 Base parameters on channel packets:
 
 * `"type":"value"` - A channel always opens with a `type` in the first outgoing packet to distinguish to the recipient what the name/category of the channel it is. This value must only be set on the first packet, not on any subsequent ones or any responses.
-* `"end":true` - Upon sending any content packet with an `end` of true, the sender must not send any more content packets (reliability acks/resends may still be happening though). An `end` may be sent by either side and is required to be sent by both to cleanly close a channel.
-* `"err":"message"` - As soon as any packet on a channel is received with an `err` it must be immediately closed and no more packets can be sent or received at all, any/all buffered content in either direction must be dropped. These packets must contain no content other than optional extra details on the error.
+* `"end":true` - Upon sending any content packet with an `end` of true, the sender must not send any more content packets (reliability acks/resends may still be happening though). An `end` may be sent by either side and is required to be sent by both to cleanly close a channel, otherwise the channel will eventually close with a timeout.
+* `"err":"message"` - As soon as any packet on a channel is received with an `err` it must be immediately closed and no more packets can be sent or received at all, any/all buffered content in either direction must be dropped. These packets must contain no content other than optional extra details on the error. Any internal channel inactivity timeout is the same as receiving an `"err":"timeout"`.
 * `"seq":0` - An integer sequence number that is only used for and defined by [reliable](reliable.md) channels and must be sent in the first open packet along with the `type`, it is an error to send/receive this without using reliability on both sides.
 
 An example unreliable channel start packet JSON for a built-in channel:
@@ -50,7 +50,7 @@ A channel may only be in one of the following states:
 * `OPEN` - the channel open packets have been both sent and received and it will not timeout unless the exchange does or reliability fails
 * `ENDED` - a packet containing an `"end":true` has been received and no further content will be delivered for this channel, it will be timed out
 
-These are the states that e3x manages, if an application requires additional states (such as when one party ended but the other hasn't) it must track them itself.  Any channel having received or sent an `err` is immediately removed after processing that packet and no more state is tracked.
+These are the states that e3x manages, if an application requires additional states (such as when one party ended but the other hasn't) it must track them itself.  Any channel having received or sent an `err` is immediately removed after processing that packet and no more state is tracked.  Any channel having both received and sent an `end` is no longer available for any sending/processing, but internal state will be tracked until the channel timeout for any necessary reliability retransmits/acknowledgements.
 
 <a name="ids" />
 ### Channel IDs
