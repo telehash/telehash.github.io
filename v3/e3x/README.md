@@ -24,5 +24,6 @@ An endpoint creates an exchange to another endpoint, generating handshakes (whic
 
 The interface to use e3x is designed to minimize any accidential leakage of information by any usage of it.  Implementations may vary depending on their platform/language, but should strive for a similar common pattern of interaction.
 
-[E3X API](https://github.com/telehash/telehash-c/blob/master/src/e3x.h)
+* [JavaScript](https://github.com/quartzjer/e3x)
+* [C](https://github.com/telehash/telehash-c/blob/master/src/e3x.h)
 
