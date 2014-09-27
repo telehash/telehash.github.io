@@ -44,7 +44,7 @@ A `LENGTH` of 0 means there is no `HEAD` included and the packet is all binary (
 
 A `LENGTH` of 1-6 means the `HEAD` is only binary (no JSON).
 
-A `LENGTH` of 7+ means the HEAD must be a UTF-8 encoded JSON object (not any bare string/bool/number/array value).  If the JSON parsing fails, the parser must return an error.
+A `LENGTH` of 7+ means the HEAD must be a UTF-8 encoded JSON object (not any bare string/bool/number/array value) within the guidelines of [I-JSON](https://datatracker.ietf.org/doc/draft-ietf-json-i-json/?include_text=1).  If the JSON parsing fails, the parser must return an error.
 
 ## BODY
 
