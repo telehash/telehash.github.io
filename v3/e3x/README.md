@@ -15,6 +15,7 @@ Designed to expose all trust decisions to app layer, zero information or metadat
 * [message](messages.md)
 * [handshake](handshake.md) - a type of message
 * [channel](channels.md)
+* [transport bindings](tp/) - sending and receiving encrypted packets over different networks
 * endpoint - one or more generated CS keys to identify a local instance
 * exchange - created by combining a local and remote endpoint and ephemeral CS keys
 
