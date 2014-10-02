@@ -6,7 +6,7 @@ This is a channel mapping HTTP to telehash for the common browser user-agent and
 
 ## Packet
 
-Any HTTP request/response is normalized into a packet by translating the headers into the JSON and any contents attached as the binary BODY.  The headers are always lower-cased keys and string values, for requests the `:method` and `:path` with string values are included, and for responses the `:status` with the numeric value is included.
+Any HTTP request/response is normalized into a packet by translating the headers into the JSON and any contents attached as the binary BODY.  The headers are always lower-cased keys and string values, for requests the `:method` (upper case) and `:path` with string values are included, and for responses the `:status` with the numeric value and optional `:reason` string value are included.
 
 The request:
 
@@ -20,7 +20,7 @@ Becomes:
 
 ```json
 {
-  ":method":"get",
+  ":method":"GET",
   ":path":"/",
   "user-agent":"curl/7.30.0",
   "accept":"*/*",
@@ -55,6 +55,7 @@ Becomes:
 ```json
 {
   ":status":301,
+  ":reason":"Moved Permanently",
   "server":"nginx",
   "date":"Fri, 07 Mar 2014 21:12:39 GMT",
   "content-type":"text/html",
