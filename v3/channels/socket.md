@@ -19,3 +19,5 @@ For a reliable bind, incoming connections will individually open new `accept` ch
 ## `accept`
 
 When the recipient has an active reliable `bind`, any new incoming connection will generate an accept channel and must have the `dst` of the originating bind along with the `src` address information.
+
+An accept can also be generated for when a binding is created independently, if a hashname is listening on a TCP or UDP port on behalf of another without using a `bind` channel.  The semantics of `dst` and `src` are the same, and the accept channel may be reliable or unreliable.
