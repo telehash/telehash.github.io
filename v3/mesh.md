@@ -1,46 +1,24 @@
-Telehash
-========
+Mesh Network
+============
 
-> see discussion at
-> https://github.com/telehash/telehash.org/issues/57
+A mesh network consists of one or more links, which are active encrypted sessions between two endpoints over any transport.  Each endpoint is identified with a unique hashname, the fingerprint of it's public key(s).  A mesh is private to each endpoint, which has complete control over what links it accepts.
 
-## Raw Brainstorming Notes
+[Channels](channels/) are used to create a mesh and run common services over it:
 
-Telehash is a project to create interoperable encrypted p2p mesh networking:
-
-* 100% end-to-end encrypted at all times
-* designed to compliment and add to existing transport security
-* easy to use for developers to encourage wider adoption of privacy
-* manages active link state on all connections
-* native implementations to each language/platform
-* capable of using different transport protocols
-* supports bridging and routing privately or via a DHT
-* each endpoint has verifiable unique fingerprint
-* provides native tunneling of TCP/UDP, HTTP, WebSockets, and more
-* strict privacy, no content, identity, or metadata is ever revealed to 3rd parties
-* designed for embedded device, mobile, and web usage
-
-Telehash defines several independent specifications:
-
-* Packet - Minimal JSON+Binary Packet Encoding
-  * Transports - Common Serialization of Packets
-* Hashname - Compound Public-Key Fingerprinting
-* [E3X](E3X.md) - End-to-End Encrypted eXchange
-* Discovery - Announcing/Listening Mappings to Local Networks
-* Channels - Common Multi-Purpose Channels
   * link: create a private connection between two endpoints (mutual)
   * peer: request connection to an endpoint from a router
   * connect: incoming connection request relayed
   * path: sync network transport info to try any direct/alternative paths
-  * socket: tcp/udp socket tunneling 
+  * sock: tcp/udp socket tunneling 
   * stream: binary streams
-  * http: mapping of http requests/responses
-  * ws: websocket messaging api
+  * thtp: mapping of http requests/responses
+  * ws: websocket api
   * chat: personal messaging
   * box: async/offline messaging
 
 These are combined into simple easy to use interoperable libraries with a common API (pseudocode):
 
+```js
 var mesh = telehash.mesh({keys}); // starts handling incoming link, path, and connect channels
 mesh.router(direct); // direct is keys/paths
 var link = mesh.link({hashname, keys, paths}, packetf(in,cb){}); // optional keys/paths endpoint info if using routers, optional packetf to gen/process passed in link request and to handle incoming, marked up w/ cb(), down w/ cb(err), and just sends packet w/ cb(undef,pkt);
@@ -72,6 +50,7 @@ chat.add(link);
 // box, async messages
 
 // internal hooks to extend custom channels
+```
 
 ## Mesh Structure
 
