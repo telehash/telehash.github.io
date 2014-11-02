@@ -8,5 +8,5 @@ This repo is the contents of [telehash.org](http://telehash.org) including the o
 Quick links to the specs:
 
 * [v3 (draft, 2014)](v3/)
-* [v2 (2013)](v2/)
-* [v1 (2010)](v1/)
+* [v2 (2013)](v2/protocol.md)
+* [v1 (2010)](https://github.com/quartzjer/telehash)
