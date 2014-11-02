@@ -1,8 +1,7 @@
 telehash mesh protocol (v3)
 ===========================
 
-> this is a draft, issues and pull requests welcome
-> planning for release version in 01/2015
+> this is a draft (issues and pull requests welcome), planning for release version in 01/2015
 
 Telehash is a project to create interoperable private mesh networking:
 
