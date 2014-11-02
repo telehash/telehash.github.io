@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>TeleHash / JSON + UDP + DHT = Freedom</title>
+<title>telehash - encrypted mesh protocol</title>
 
 <meta content="en" http-equiv="content-language">
 <meta content="" name="description">
@@ -16,24 +16,25 @@
 <header>
 <nav>
 <ul>
-<li><a href="https://github.com/telehash/telehash.org/blob/master/implementations.md">Implementations v2</a></li>
-<li><a href="https://github.com/telehash/telehash.org/blob/master/protocol.md">Protocol v2</a></li>
-<li><a href="https://github.com/telehash/telehash.org/tree/v3/v3">Protocol v3</a></li>
-<li><a href="https://github.com/telehash">GitHub</a></li>
+<li><a href="https://github.com/telehash/telehash.org/tree/master/v3">Protocol</a></li>
+<li><a href="https://github.com/telehash/">Code</a></li>
 <li><a href="http://twitter.com/search?q=telehash">News</a></li>
 </ul>
 </nav>
+<img src="logo/mesh-logo-128.png" align="left" />
+<div>
 <h1>
-	telehash
+ telehash
 </h1>
-<h2>Privacy by Default</h2>
+<h2>encrypted mesh protocol</h2>
+</div>
 </header>
 </div>
 </div>
 
 <div class="alt" id="intro">
 <p>
-A private mesh network protocol for apps and devices ⚡
+An embeddable private network stack for mobile, web, and devices
 </p>
 </div>
 
@@ -41,23 +42,21 @@ A private mesh network protocol for apps and devices ⚡
 <div class="stripe" id="steps">
 <div class="span-8">
 <h3>What</h3>
-	<p>It works by having every endpoint generate its own unique public-key based address to send and receive small encrypted packets of <a href="http://www.json.org/">JSON</a> (with optional binary payloads) to other trusted endpoints.  It also provides an automatic routing system to assist in creating a full p2p mesh between all endpoints.  
+	<p>A lightweight interoperable protocol with strong encryption to enable mesh networking across multiple transports and platforms.  Each endpoint generates its own unique public-key based address (a <i>hashname</i>) to send and receive small encrypted packets of JSON (with optional binary payloads) to other trusted endpoints.  An endpoint may also providing routing assistance to others for bridging across different transports and to help negotiate direct peer-to-peer links.
 </div>
 <div class="span-8">
 <h3>Rival Messenger</h3>
 <p>
-<a href="http://www.rivalmessenger.com">Rival Messenger</a> is an instant messaging application for OSX 10.9 and above. It is built on top of the <a href="https://github.com/telehash/objc">Objective-C</a> library, and has been built from the ground up to work exclusively on top of Telehash to provide a proof of concept for the network.	
+<a href="http://www.rivalmessenger.com">Rival Messenger</a> is an instant messaging application for OSX 10.9 and above. It is built on top of the <a href="https://github.com/telehash/objc">Objective-C</a> library, and is being created from the ground up to work exclusively on top of telehash to provide a proof of concept for a chat system using a private mesh network.	
 </p>
 
-<h3>Demo</h3>
-<p>It's very much in the R&amp;D stages yet, but check out the <a href="https://github.com/quartzjer/fieldtest">field-test utility</a> for a simple demo, or try one of the <a href="https://github.com/telehash/telehash.org/blob/master/implementations.md">libraries</a>.
-</p>
 </div>
 <div class="span-8 last">
-<h3>Status</h3>
-<p>We are hard at work defining the next generation of telehash, the <a href="https://github.com/telehash/telehash.org/tree/v3/v3">v3 spec</a> is currently being defined, and is open for feedback <a href="https://github.com/telehash/telehash.org/issues/67">here.</a>
+<h3>Code</h3>
+<p>A <a href="https://github.com/telehash/telehash.org/tree/master/v3">version 3 of the protocol</a> is being actively stabilized with <a href="https://github.com/telehash/">multiple interoperable implementations in development</a>.  The efforts are loosely coordinated through <a href="https://github.com/telehash/telehash.org/">github</a>, anyone is welcome to contribute.
+</p>
 <p>
-The legacy <a href="https://github.com/telehash/telehash.org/blob/master/protocol.md">spec</a> is implemented in a <a href="https://github.com/telehash/telehash.org/blob/master/implementations.md">few languages</a> (any help here would be great!) and prototype apps are being created to test it.  Questions can be directed at <a href="http://twitter.com/jeremie">twitter</a>, or to <a href="xmpp:jer@jabber.org">Jeremie Miller</a> directly.
+Questions can be filed as issues, asked via <a href="http://twitter.com/jeremie">twitter</a>, or to <a href="xmpp:jer@jabber.org">Jeremie Miller</a> directly.
 </p>
 </div>
 </div>
