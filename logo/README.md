@@ -1,0 +1,1 @@
+This "mesh" logo was designed and [contributed](https://github.com/telehash/telehash.org/pull/72) by [Jake Ingman](https://github.com/jingman).
