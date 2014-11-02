@@ -6,7 +6,7 @@ Telehash
 
 ## Raw Brainstorming Notes
 
-Telehash is a project to create interoperable encrypted networking libraries:
+Telehash is a project to create interoperable encrypted p2p mesh networking:
 
 * 100% end-to-end encrypted at all times
 * designed to compliment and add to existing transport security
@@ -29,48 +29,55 @@ Telehash defines several independent specifications:
 * Discovery - Announcing/Listening Mappings to Local Networks
 * Channels - Common Multi-Purpose Channels
   * link: create a private connection between two endpoints (mutual)
-  * route: ask a router to provide peering for this endpoint, can return see
   * peer: request connection to an endpoint from a router
-  * seek: request which routers to use for an id
   * connect: incoming connection request relayed
   * path: sync network transport info to try any direct/alternative paths
-  * socket: tcp/udp socket tunneling
+  * socket: tcp/udp socket tunneling 
   * stream: binary streams
   * http: mapping of http requests/responses
   * ws: websocket messaging api
   * chat: personal messaging
   * box: async/offline messaging
 
-These are combined into simple easy to use interoperable libraries with a common API:
+These are combined into simple easy to use interoperable libraries with a common API (pseudocode):
 
-var net = new Network(keys); // starts handling incoming link, path, and connect channels
-net.link(id, direct, up); // optional direct endpoint info if using routers, calls up(id, true||false) on state changes
-net.router(id, direct); // direct is required, routers not allowed any connections
+var mesh = telehash.mesh({keys}); // starts handling incoming link, path, and connect channels
+mesh.router(direct); // direct is keys/paths
+var link = mesh.link({hashname, keys, paths}, packetf(in,cb){}); // optional keys/paths endpoint info if using routers, optional packetf to gen/process passed in link request and to handle incoming, marked up w/ cb(), down w/ cb(err), and just sends packet w/ cb(undef,pkt);
+link.up = function(true||false){}; // called on state changes
+var link2 = link.link(hashname);  // use existing link to create one to another (they are routing)
+link.route = true; // enable any other link to route to/from this one
+
+// for dynamic links (servers), or to be available on and discover new on local transport
+mesh.discover(callback); // callback(hashname) given before responding, use .link to accept
 
 // tcp/udp socket tunneling
-net.listen(args);
-var conn = net.connect(id, args);
+mesh.listen(args); // only links can connect
+var conn = link.connect(args);
 
 // http
-net.server(args);
-net.request(args);
+mesh.server(args);
+var req = link.request(args);
 
 // websocket
-var sock = net.ws(args);
+var sock = link.ws(args);
 sock.on* = callback;
 sock.send(data);
-net.wss(args); // server
+mesh.wss(args); // server for any links
 
 // chat
-var chat = net.chat(args);
+var chat = mesh.chat(args);
+chat.add(link);
 
 // box, async messages
 
-// internal hooks to extend
+// internal hooks to extend custom channels
 
-## Network Structure
+## Mesh Structure
 
-* a network is a local hashname and links to one or more other hashnames
+* a mesh is a local hashname and links to one or more other hashnames (full mesh)
 * they may have one or more routers, which only support "route" channels (was "peer") and do relaying/bridging
 * routers must come with keys/paths
-* a router must have a way to validate incoming exchanges, external or dynamic (protected keys)
+* individual hashnames may have their own router defined
+* a router must have a way to validate hashnames before routing to them
+* any hashname may advertise it's router as a path (and must provide routing to it for the first handshake)
