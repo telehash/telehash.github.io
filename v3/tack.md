@@ -1,3 +1,15 @@
+URI for OOB negotiation
+
+* router must support
+* returns in link channel
+* router sets base
+* protocol is per-app
+* optional user component
+* required path component for current exchange (opaque)
+* app can decide to drop user/path based on context
+* app can add fragment, which is passed in
+
+
 # TACK - Telehash Alias Canonical toKen
 
 TACK is a globally unique resolvable identifier for use within any system that supports telehash.  It defines a URI format that any endpoint can use to exchange temporary or permanent connectivity information with any other.  Once a TACK is resolved, the endpoint information (keys and paths) should be used in its place, they are only used successfully once.
