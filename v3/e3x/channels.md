@@ -1,6 +1,6 @@
 # Channels - Streaming Content Transport
 
-All streaming data sent between two endpoints in an exchange must be part of a `channel` packet. Every channel has an integer id included as the `c` parameter in the JSON. See [Channel IDs](#channelids) for details on how they are selected/handled.
+All streaming data sent between two endpoints in an exchange must be part of a `channel` packet. Every channel has an integer id included as the `c` parameter in the JSON. See [Channel IDs](#ids) for details on how they are selected/handled.
 
 A channel may have only one outgoing initial packet, only one response to it, or it may be long-lived with many packets exchanged using the same "c" identifier (depending on the type of channel).  Channels are by default unreliable, they have no retransmit or ordering guarantees, and an `end` always signals the last *content* packet being sent (acknowledgements/retransmits may still occur after).  When required, an app can also create a [reliable](reliable.md) channel that does provide ordering and retransmission functionality.
 
