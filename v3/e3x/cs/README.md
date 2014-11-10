@@ -5,9 +5,9 @@ A Cipher Set (`CS`) is a group of crypto algrithms that are used to implement th
 
 Each set is identified with a unique identifier (`CSID`) that represents the overall selection priority. The `CSID` is a single byte, represented in lower case hex. The CSIDs are always sorted from lowest to highest preference.
 
-* [CS1a](cs/1a.md) - (legacy) Minimum lightweight set designed for use with embedded devices and low resource environments using ECC (160r1) and AES (128)
-* [CS2a](cs/2a.md) - (legacy) Original set circa 2013 using RSA (2048), ECC (P-256), and AES (256)
-* [CS3a](cs/3a.md) - (preferred) Modern set using [NaCl](http://nacl.cr.yp.to/)
+* [CS1a](1a.md) - (legacy) Minimum lightweight set designed for use with embedded devices and low resource environments using ECC (160r1) and AES (128)
+* [CS2a](2a.md) - (legacy) Original set circa 2013 using RSA (2048), ECC (P-256), and AES (256)
+* [CS3a](3a.md) - (preferred) Modern set using [NaCl](http://nacl.cr.yp.to/)
 
 
 Two endpoints must always create exchanges to each other using the highest common `CSID` between them.  Apps may choose which one or more `CSIDs` they want to support when they create an endpoint and know that a lower one will only ever be used to communicate with other endpoints that only support that `CS`.
@@ -36,7 +36,7 @@ The source keys to calculate a hashname may be exchanged and represented as a co
 <a name="packet" />
 ### Packet 
 
-Frequently the source for a hashname is being sent in a context where there is a specific `ID` already known or agreed upon and only that key needs to be exchanged.  This can be more efficiently encoded as a [packet](../lob/) with JSON that only includes the `intermediate hash` values (in BASE32) of the other IDs and the key bytes in the BODY:
+Frequently the source for a hashname is being sent in a context where there is a specific `ID` already known or agreed upon and only that key needs to be exchanged.  This can be more efficiently encoded as a [packet](../../lob/) with JSON that only includes the `intermediate hash` values (in BASE32) of the other IDs and the key bytes in the BODY:
 
 ```
 HEAD:
