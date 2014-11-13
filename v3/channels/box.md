@@ -2,7 +2,7 @@
 
 > This is a **rough draft** and a work in progress
 
-The box channel is used to send and receive [messages](messages.md) directly or from any third party hashname that is acting as a cache.  The caching hosts can be selected automatically based on DHT proximity or chosen specifically based on the application's design (fixed servers, known/elected peers, etc).
+The box channel is used to send and receive [messages](../e3x/messages.md) directly or from any third party hashname that is acting as a cache.  The caching hosts can be selected automatically based on DHT proximity or chosen specifically based on the application's design (fixed servers, known/elected peers, etc).
 
 A box channel is always opened for a specific hashname.  The given "box" hashname combined with the sender is the unique identity of the box. The channel is client-server oriented (not bi-directional, one could be open in both directions) where the initial request is sent by the client and the recipient is the server.  Upon opening, any waiting messages for the client are sent.
 
