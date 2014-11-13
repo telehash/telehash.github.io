@@ -25,7 +25,7 @@ An example unreliable channel start packet JSON for a built-in channel:
 ```json
 {
 	"c":1,
-	"type":path",
+	"type":"path",
 	"paths":[...]
 }
 ```
@@ -35,7 +35,7 @@ An example initial reliable channel open request:
 ```json
 {
 	"c":2,
-  "seq":0,
+	"seq":0,
 	"type":"hello",
 	"hello":{"custom":"values"}
 }
