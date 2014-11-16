@@ -1,3 +1,3 @@
 # Bluetooth
 
-> The mapping for telehash to run natively over Bluetooth is still [being defined](https://github.com/telehash/telehash.org/issues/28).
+See [chunking](../lob/chunking.md) to start, this is a work-in-progress.
