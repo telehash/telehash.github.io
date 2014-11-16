@@ -5,11 +5,22 @@ Sending sequential packet byte arrays over streaming transports (such as TCP/TLS
 
 LOB chunking is a minimalist byte-encoding technique describing how to break any packet into multiple sequential chunks and re-assemble them into packets with minimum overhead. There is no CRC or other consistency checks as it is only designed to carry encrypted packets with their own internal validation and be implemented as a library utility for many transports with differing needs.
 
-## Chunk
+## Format
 
 A packet is broken into fragments of size 1 to 255 bytes each, and each fragment is prefixed with a single byte representing its length, together this is called a `chunk`. The sequence of one or more chunks is terminated with a zero-length terminator chunk, a single null byte.
 
 Sequential chunks received that have any size should be appended to a buffer until the zero terminator chunk, at which point the buffer should be checked for a valid packet or discarded.  Any lone zero chunks with no buffer should just be ignored.
+
+Chunk size of 5:
+```
+packet = [0,1,2,3,4,5,6,7,8,9]; // 10 byte packet
+chunk1 = [4,0,1,2,3]; // 4-byte fragments
+chunk2 = [4,4,5,6,7];
+chunk3 = [2,8,9];
+chunk4 = [0]; // terminator
+```
+
+When using chunks for fixed frame sizes the terminator should be included in the last frame if there's space, so the last frame for the example would be `[2,8,9,0]`.
 
 ## Acks
 
