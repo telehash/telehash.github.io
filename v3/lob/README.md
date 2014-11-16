@@ -1,11 +1,11 @@
 # Length-Object-Binary Encoding (Packet Format)
 
-This is a simple encoding scheme to combine any JSON object with any binary data (both are optional) into one byte array.  This encoding does not include any total packet size or checksums, and expects the context where it's used to provide those when necessary (see [chunking](chunking.md)).
+This is a simple encoding scheme to combine any JSON object with any binary data (both are optional) into one byte array, often referred to as a single `packet`.  This encoding does not include any total packet size or checksums, and expects the context where it's used to provide those when necessary (see [chunking](chunking.md)).
 
 ## Implementations
 
 * [javascript](https://github.com/quartzjer/lob-enc) (node and browserify)
-* [c](https://github.com/telehash/telehash-c/blob/v3/src/packet.h) (in progress)
+* [c](https://github.com/telehash/telehash-c/blob/master/src/lib/lob.h)
 
 ## Definition
 
