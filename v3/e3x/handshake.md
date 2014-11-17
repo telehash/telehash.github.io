@@ -4,6 +4,8 @@ A handshake must be both sent and received in order for an exchange to be create
 
 New handshakes are also triggered automatically for existing exchanges as needed by the transport(s) in use to verify that the network paths are still valid or maintain any NAT mappings.
 
+The resulting size of encrypted handshake packets vary by which Cipher Sets are used, from a minimum of ~70 bytes to a maximum of ~1100 bytes currently.
+
 ## Inner Packet
 
 The `INNER` is the [packet encoding](cs/#packet) of the sender's keys.
