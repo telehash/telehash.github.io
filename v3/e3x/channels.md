@@ -4,7 +4,11 @@ All streaming data sent between two endpoints in an exchange must be part of a `
 
 A channel may have only one outgoing initial packet, only one response to it, or it may be long-lived with many packets exchanged using the same "c" identifier (depending on the type of channel).  Channels are by default unreliable, they have no retransmit or ordering guarantees, and an `end` always signals the last *content* packet being sent (acknowledgements/retransmits may still occur after).  When required, an app can also create a [reliable](reliable.md) channel that does provide ordering and retransmission functionality.
 
-Channel packets must always be a maximum of 1400 bytes or less each.  Larger data should use reliable channels to sequence and reassemble pieces of this size, and transports with a lower MTU than 1400 must use [chunked encoding](../lob/chunking.md).
+## Packet Size Default
+
+Channel packets should always be a maximum of 1400 bytes or less each, which allows enough space for added variable encryption, token, and transport overhead to fit within 1500 bytes total (one ethernet frame).  Larger data should use reliable channels to sequence and reassemble pieces of this size, and transports with a fixed lower MTU than 1400 should use [chunked encoding](../lob/chunking.md) by default.
+
+A channel library should provide a `quota` method per packet for the app to determine how many bytes are available within the 1400 limit, and app-specific channel logic can use this to break larger data into packets.  In special cases (such as with a local high bandwidth transport) when the transport MTU is known, the app or custom channel logic may ignore this and send larger/smaller packets.
 
 ## Packet Encryption
 
