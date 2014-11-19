@@ -22,6 +22,7 @@ These are similar low-level encrypted wire protocols:
 * [OTR](http://en.wikipedia.org/wiki/Off-the-Record_Messaging), ([spec](https://otr.cypherpunks.ca/Protocol-v3-4.0.0.html))
 * [CurveCP](http://curvecp.org)
 * [QUIC](http://en.wikipedia.org/wiki/QUIC) ([spec](https://docs.google.com/document/d/1g5nIXAIkN_Y-7XJW5K45IblHd_L2f5LTaDUDwvZ5L6g/edit))
+* [SRTP](http://en.wikipedia.org/wiki/Secure_Real-time_Transport_Protocol) ([spec](http://tools.ietf.org/html/rfc3711))
 
 ## Implementations
 
