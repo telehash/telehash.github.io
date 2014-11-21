@@ -6,8 +6,15 @@ The `hashname` is always a [base 32](http://tools.ietf.org/html/rfc4648) encoded
 
 ## Implementations
 
-* [javascript](https://github.com/quartzjer/hashname) (node and browserify)
-* [c](https://github.com/telehash/telehash-c/blob/v3/src/hn.h) (in progress)
+* [javascript](https://github.com/telehash/hashname) (node and browserify)
+* [c](hhttps://github.com/telehash/telehash-c/blob/master/src/lib/hashname.c)
+* [go](https://github.com/telehash/gogotelehash/tree/master/hashname)
+
+## Usage
+
+While hashnames are very useful generic identifiers that group multiple public keys, it is not recommended that they be used as single IDs for multiple scopes by combining or re-using keys. Examples are to represent a user identity and an application instance/endpoint identity or a wallet fingerprint, the best practice is to use different hashnames for each scope, and bind them together independently.
+
+The keys used to generate a hashname should be relevant only to and all usable by the scope in which the hashname is validated, it is not a method for linking independent public keys together.
 
 ## Hashname Generation
 
@@ -30,21 +37,21 @@ To calculate the hashname the `INTERMEDIATE` hashes are sequentially hashed in a
 
 ```js
 hash = sha256(0x1a)
-hash = sha256(hash + base32decode("gmamb66xcujtuzu9cm3ea9jjwxeyn2c0r8a4bz8y7b7n408bz630"))
-hash = sha256(hash + 0x2a)
-hash = sha256(hash + base32decode("5vt3teqvjettaxkzkh47a7ta48e3hgp3bruern92xgh89am04h4g"))
+hash = sha256(hash + base32decode("eg3fxjnjkz763cjfnhyabeftyf75m2s4gll3gvmuacegax5h6nia"))
+hash = sha256(hash + 0x3a)
+hash = sha256(hash + base32decode("ckczcg2fq5hhaksfqgnm44xzheku6t7c4zksbd3dr4wffdvvem6q"))
 print base32encode(hash)
-"vtneykw49cj8qw7ndvmejc8jw9zake8fkkmzvc8rautmf3evar90"
+"27ywx5e5ylzxfzxrhptowvwntqrd3jhksyxrfkzi6jfn64d3lwxa"
 ```
 
 Here is a working example in node.js to do the calculation, results in `5ccn9gcxnj9nd7hp1m3v5pjwcu5hq80bt366bzh1ebhf9zqaxu2g`
 
 ```js
 var crypto = require("crypto");
-var base32 = require("base32");
+var base32 = require("rfc-3548-b32"); // https://github.com/sehrope/node-rfc-3548-b32
 var keys = {
-  "3a":"tydfjkhd5vzt006t4nz5g5ztxmukk35whtr661ty3r8x80y46rv0",
-  "1a": "8jze4merv08q6med3u21y460fjdcphkyuc858538mh48zu8az39t1vxdg9tadzun"
+  "3a":"eg3fxjnjkz763cjfnhyabeftyf75m2s4gll3gvmuacegax5h6nia",
+  "1a": "an7lbl5e6vk4ql6nblznjicn5rmf3lmzlm"
 };
 var rollup = new Buffer(0);
 Object.keys(keys).sort().forEach(function(id){
@@ -52,7 +59,7 @@ Object.keys(keys).sort().forEach(function(id){
   var intermediate = crypto.createHash("sha256").update(new Buffer(base32.decode(keys[id]),"binary")).digest();
   rollup = crypto.createHash("sha256").update(Buffer.concat([rollup,intermediate])).digest();
 });
-var hashname = base32.encode(rollup);
+var hashname = base32.encode(rollup).toLowerCase().split("=").join(""); // normalize to lower case and remove padding
 ```
 
 
