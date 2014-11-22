@@ -5,10 +5,11 @@ A Cipher Set (`CS`) is a group of crypto algrithms that are used to implement th
 
 Each set is identified with a unique identifier (`CSID`) that represents the overall selection priority. The `CSID` is a single byte, represented in lower case hex. The CSIDs are always sorted from lowest to highest preference.
 
-* [CS1a](1a.md) - (legacy) Minimum lightweight set designed for use with embedded devices and low resource environments using ECC (160r1) and AES (128)
-* [CS2a](2a.md) - (legacy) Original set circa 2013 using RSA (2048), ECC (P-256), and AES (256)
-* [CS3a](3a.md) - (preferred) Modern set using [NaCl](http://nacl.cr.yp.to/)
-
+| CSID          | Status | Crypto                        | Uses                  |
+|---------------|--------|-------------------------------|-----------------------|
+| [CS1a][1a.md] | Active | ECC-160, AES-128              | Embedded, Browser     |
+| [CS2a][2a.md] | Active | RSA-2048, ECC-256, AES-256    | Server, Apps          |
+| [CS2a][3a.md] | Active | [NaCl](http://nacl.cr.yp.to/) | Server, Apps          |
 
 Two endpoints must always create exchanges to each other using the highest common `CSID` between them.  Apps may choose which one or more `CSIDs` they want to support when they create an endpoint and know that a lower one will only ever be used to communicate with other endpoints that only support that `CS`.
 
