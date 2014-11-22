@@ -8,7 +8,10 @@ Each set is identified with a unique identifier (`CSID`) that represents the ove
 | CSID          | Status | Crypto                        | Uses                  |
 |---------------|--------|-------------------------------|-----------------------|
 | [CS1a](1a.md) | Active | ECC-160, AES-128              | Embedded, Browser     |
+| [CS1b](1b.md) | Draft  | ECC-256, AES-128              | Hardware-Accelerated  |
+| [CS1c](1c.md) | Draft  | ECC-256k, AES-256             | Bitcoin-based Apps    |
 | [CS2a](2a.md) | Active | RSA-2048, ECC-256, AES-256    | Server, Apps          |
+| [CS2b](2b.md) | Draft  | RSA-4096, ECC-521, AES-256    | High-Security         |
 | [CS3a](3a.md) | Active | [NaCl](http://nacl.cr.yp.to/) | Server, Apps          |
 
 Two endpoints must always create exchanges to each other using the highest common `CSID` between them.  Apps may choose which one or more `CSIDs` they want to support when they create an endpoint and know that a lower one will only ever be used to communicate with other endpoints that only support that `CS`.
