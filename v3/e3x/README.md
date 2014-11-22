@@ -12,6 +12,7 @@ It is designed to be used as a low-level software library that can be embedded i
 * [message](messages.md) - an asynchronous encrypted packet between two endpoints
 * [handshake](handshake.md) - a type of message used to establish a streaming encryption session for channels
 * [channel](channels.md) - small (max 1400 bytes) synchronous encrypted packets, proxies larger reliable and unreliable data streams
+* [cloaking](cloaking.md) - randomize all bytes on the wire
 
 An `endpoint` generates local keys to uniquely identify itself (one or more keys, depending on what Cipher Sets it supports), and requires another endpoint's public key(s) to create an `exchange` to it. The exchange can then be used to create encrypted `messages` and generate `handshakes` in both directions.  Once the handshakes have been received and verified, encrypted `channels` can stream reliable or unreliable data between the two connected endpoints.  All data is encoded as `packets` both before (app layer) and after encryption (wire transport layer).
 
