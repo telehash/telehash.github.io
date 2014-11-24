@@ -4,7 +4,7 @@ For transferring lossy data with block sizes larger than the default packet MTU 
 
 The `"type":"block"` channel is unidirectional, blocks only flow in one direction, and multiple block channels may be open in either direction.
 
-The channel open request must not contain any block data and may contain an attached packet to specify the purpose of the block channel request (like `link` channels).
+The channel open request must not contain any block data and may contain an attached packet to specify the purpose of the block channel request (like `link` channels). A block channel may be opened in response to an external request and the sender may begin sending block packets immediately following the open, or may wait for an answer before sending.
 
 ### Sending a Block
 
