@@ -1,16 +1,17 @@
-# URI handling for Out-Of-Band requests
+# URI handling for Out-Of-Band / Invite requests
 
 This defines a URI format that any endpoint can use to encode temporary or permanent connectivity information for sending in an out-of-band medium.  Once a URI is resolved to an endpoint, that information (keys and paths) should be stored and used in place of the URI, a successful resolution only needs to be performed once.
 
-A URI takes the form of: `protocol://user@canonical/session#token`
+A URI takes the form of: `protocol://user@canonical/session?csid=base32#token`
 
 * `protocol` - should be defined or customized by the app so that it can install it's own handlers, defaults to `mesh` 
 * `user@` - optional, only used to indicate a human-recognizable name that the URI is associated to within the app
 * `canonical` - required, valid host name format (defaults to ip), may include optional `:port`
 * `/session` - optional, opaque string used by the recipient to match to a particular session
+* `?csid=base32` - optional, when a host name is used that has no mechanism for retrieving its public keys, they may be included as query string args
 * `#token` - optional, opaque string used by the recipient to track a specific request
 
-Routers return the base URI for the endpoint (if supported) in the [link](channels/link.md) channel, and endpoints can add a `#token`. The routers may also use [dotPublic](https://github.com/quartzjer/dotPublic) instead of a registered domain name.
+If supported, routers should always return a URI without a `#token` for the endpoint in the [link](channels/link.md) channel, and endpoints can add a `#token` before sharing the full URI.  Endpoints may also generate their own URI to themsevles if they have an accessible hostname and port available.
 
 Processing:
 
@@ -20,7 +21,11 @@ Processing:
 4. issue a `peer` request to the canonical including `user`, `session`, and `token` attributes, only `token` is passed in `connect`
 5. process any response handshake as the permanent resolution for this URI
 
-## DNS
+## Canonical Host Keys
+
+In order to send a handshake to the canonical host name given in a URI, its public keys must be known.  Each Cipher Set may be optionally included in the query string, and/or the keys may be shared via other standard lookup mechanisms to make the URIs shorter and easier.
+
+### DNS
 
 SRV records always resolve to a hashname-prefixed host, with TXT records returning all of the keys.
 
@@ -35,7 +40,7 @@ If a key's base32 encoding is larger than 250 characters, it is broken into mult
 
 No other DNS record type is supported, only SRV records resulting in one or more A and TXT records.
 
-## HTTP well-known
+### HTTP well-known
 
 ```
 GET http://example.com/.well-known/mesh.json
@@ -43,3 +48,15 @@ GET http://example.com/.well-known/mesh.json
   "keys":{...},
   "paths":{...}
 }
+
+### dotPublic
+
+Routers may also use a [dotPublic](https://github.com/quartzjer/dotPublic) hostname instead of a registered domain name, which will internally resolve using public keys.
+
+### Local Network
+
+A hostname that is a local IPv4 or IPv6 network address may be sent a discovery request directly on that network.
+
+## Connecting
+
+With keys available, if the resolution of the canonical does not also result in `path` information and only an IP and Port are known, handshakes should be sent to that address in every transport supported that can use an IP and Port, including UDP, TCP, TLS, and HTTP(S).
