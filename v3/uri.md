@@ -7,9 +7,9 @@ A URI takes the form of: `protocol://user@canonical/session?csid=base32#token`
 * `protocol` - should be defined or customized by the app so that it can install it's own handlers, defaults to `mesh` 
 * `user@` - optional, only used to indicate a human-recognizable name that the URI is associated to within the app
 * `canonical` - required, valid host name format (defaults to ip), may include optional `:port`
-* `/session` - optional, opaque string used by the recipient to match to a particular session
+* `/session` - optional, opaque string of [unreserved characters](https://tools.ietf.org/html/rfc3986#section-2.3) used by the recipient to match to a particular session
 * `?csid=base32` - optional, when a host name is used that has no mechanism for retrieving its public keys, they may be included as query string args
-* `#token` - optional, opaque string used by the recipient to track a specific request
+* `#token` - optional, opaque string of [unreserved characters](https://tools.ietf.org/html/rfc3986#section-2.3) used by the recipient to track a specific request
 
 If supported, routers should always return a URI without a `#token` for the endpoint in the [link](channels/link.md) channel, and endpoints can add a `#token` before sharing the full URI.  Endpoints may also generate their own URI to themsevles if they have an accessible hostname and port available.
 
