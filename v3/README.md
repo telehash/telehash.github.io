@@ -3,6 +3,8 @@ telehash mesh protocol (v3)
 
 > this is a draft (issues and pull requests welcome), planning for release version in 01/2015
 
+![logo](logo/mesh-logo-128.png)
+
 Telehash is a project to create interoperable private mesh networking:
 
 * 100% end-to-end encrypted at all times
@@ -26,6 +28,7 @@ The full protocol is a composite of different individual specifications:
 * [mesh](mesh.md) - common channels to establish links to peers and maintain a private mesh
 * [uri](uri.md) - how to encode/decode endpoint info via URIs for out-of-band bootstrapping
 * [transports](transports/) - details for mapping/supporting different network transports
+* [logo](../logo/) - for use to represent telehash mesh support in apps 
 
 ### Implementations
 
