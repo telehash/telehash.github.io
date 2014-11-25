@@ -31,6 +31,15 @@ These are similar low-level encrypted wire protocols:
 * [C](https://github.com/telehash/telehash-c/blob/master/src/e3x.h)
 * [Go](https://github.com/telehash/gogotelehash/tree/master/e3x)
 
+
+|              | base | reliable | cloaking | 1a | 1b | 1c | 2a | 2b | 3a |
+|:------------:|:----:|:--------:|:--------:|:--:|:--:|:--:|:--:|:--:|:--:|
+|    node.js   |   ✅  |     ✅    |     ✅    |  ✅ |    |    | 🔶 |    | 🔶 |
+| browser js   |   ✅  |     ✅    |     ✅    |  ✅ |    |    |    |    |    |
+|   c - unix   |   ✅  |    🔶    |     ✅    |  ✅ |    |    | 🔶 |    |    |
+| c - embedded |   ✅  |    🔶    |     ✅    |  ✅ |    |    |    |    |    |
+|      go      |   ✅  |     ✅    |          |  ✅ |    |    |    |    |    |
+
 ## API 
 
 The interface to use e3x is designed to minimize any accidential leakage of information by any usage of it.  Implementations may vary depending on their platform/language, but should strive for a similar common pattern of interaction.
