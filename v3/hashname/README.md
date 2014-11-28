@@ -16,6 +16,8 @@ While hashnames are very useful generic identifiers that group multiple public k
 
 The keys used to generate a hashname should be relevant only to and all usable by the scope in which the hashname is validated, it is not a method for linking independent public keys together.
 
+When exchanging hashnames over existing IPv4/IPv6 based systems, the 4 or 16 byte prefix of the 32 byte hashname binary value is used to provide a backward-compatible mechanism for addressing.  It does not guarantee uniqueness (which should be enforced outside of the IP-based systems) but for many use-cases it can be a helpful connectivity signalling tool.  When the IP space must be scoped into a reserved range and the port number is also available to use, the first 2 bytes may be sent as the port and then those 2 bytes in the address are hard-coded to a reserved IP prefix.
+
 ## Hashname Generation
 
 ### Key IDs
@@ -61,5 +63,4 @@ Object.keys(keys).sort().forEach(function(id){
 });
 var hashname = base32.encode(rollup).toLowerCase().split("=").join(""); // normalize to lower case and remove padding
 ```
-
 
