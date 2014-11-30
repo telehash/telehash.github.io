@@ -29,4 +29,7 @@ The router may ignore attached keys that it knows to be an invalid `CSID` for th
 
 When the `BODY` contains a [handshake](../e3x/handshake.md) packet, the router should determine the routing `token` value of the handshake and create a mapping of that token to the network path that the peer request arrived via.  Any subsequent encrypted channel packets received with this token should be re-delivered to that network path, providing automatic bridging.
 
+## Sessions
+
+If a peer is willing to be a router for another peer to other unknown hashnames, it may generate a unique `session` value and send it over a [link](link.md) to be included in a [URI](../uri.md) or [peer path](path.md).  When the unknown hashname sends the `peer` open it should include the given `"session":"..."` so that it can be verified.
 
