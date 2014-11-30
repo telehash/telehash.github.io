@@ -51,4 +51,4 @@ The information about an available network transport is encoded as a JSON object
 * `tcp4` / `tcp6` - [TCP](../transports/tcp.md), contains `ip` and `port` like UDP
 * `http` - contains `url` which can be http or https, see [HTTP](../transports/http.md) for details
 * `webrtc` - see [WebRTC](../transports/webrtc.md), ideal for browsers that have only HTTP support
-* `peer` - contains `hn` which is sent [peer](peer.md) requests to provide routing assistance, optional `[session](../uri.md)` if provided by the peer
+* `peer` - contains `hn` which is sent [peer](peer.md) requests to provide routing assistance, optional `[uri](../uri.md)` if provided by the peer
