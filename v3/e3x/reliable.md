@@ -35,14 +35,16 @@ Upon receiving a `miss` the recipient should resend those specific matching calc
 
 The `miss` recipient can make no assumptions about the sender's state of any `seq` ids higher than the `ack` and not included in the array, it can only use the values included as a signal for them alone.
 
-### `miss` encoding example
+### `miss` delta encoding example
 
-Given the list of missing `seq` ids `[78236, 78235, 78245, 78238]` and `"ack": 78231`.
+Given the raw list of missing `seq` ids `[78236, 78235, 78245, 78238]` and `"ack": 78231`.
 
-1. Sort the `miss` list:<br/>
+1. Sort the original list of missing seq ids:<br/>
    `[78235, 78236, 78238, 78245]`
 2. Calculate the difference between all subsequent ids (including the `ack`).<br/>
    `[(78235 - 78231), (78236 - 78235), (78238 - 78236), (78245 - 78238)]`<br/>
    `[4, 1, 2, 7]`
-3. Deliver the delta encoded list to the other end.
+3. If the incoming max buffer size is 20 packets, append the highest acceptable seq (`78251`) as a final delta (`78251 - 78245`).<br/>
+   `[4, 1, 2, 7, 6]`
+3. Deliver the final delta encoded `miss` array.
 
