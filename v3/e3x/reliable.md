@@ -18,27 +18,22 @@ Upon receiving `seq` values, the recipient must only process the packets and the
 
 The `"ack":1` integer is included on outgoing packets as the highest known `seq` value confirmed as *delivered to the app* (as much as is possible). What this means is that any library must provide a way to send data/packets to the app using it in a serialized way, and be told when the app is done processing one packet so that it can both confirm that `seq` as well as give the app the next one in order. Any outgoing `ack` must be the last processed `seq` so that the sender can confirm that the data was completely received/handled by the recipient.
 
-If a received packet contains a `seq` but does not contain an `ack` then the recipient is not required to send one for the given `seq` while it's still processing packets.  This allows senders to manage their outgoing buffer of packets and the rate of ack's being returned.
+If a received packet contains a `seq` but does not contain an `ack` then the recipient is not required to send one for the given `seq` while it's still processing packets for up to one second.  This allows senders to manage their outgoing buffer of packets and the rate of ack's being returned, and ensures that an `ack` will still be sent at a regular rate based on what is actually received.
 
-An `ack` may also be sent in it's own packet ad-hoc at any point without any content data, and these ad-hoc acks must not include a `seq` value as they are not part of the content stream.
+An `ack` may also be sent in it's own packet ad-hoc at any point without any content data, and these ad-hoc acks must not include a `seq` value as they are not part of the content stream and are out-of-band.
 
 When receiving an `ack` the recipient may then discard any buffered packets up to and including that matching `seq` id, and also confirm to the app that the included content data was received and processed by the other side.
 
-An `ack` must be sent a minimum of once per second after receiving any packet including a `seq` value, either included with response content packets or their own ad-hoc packets.  Allowing up to one second gives a safe default for the application to generate any response content, as well as receive a larger number of content packets before acknowleding them all.
 
 ## `miss` - Missing Sequences
 
-The `"miss":[1,2,4]` is an array of integers and must be sent along with any `ack` if in the process of receiving packets there were any missing sequences.  Because the `ack` is confirmed processed packets, all of the `miss` ids will be higher than the accompanying `ack`.
+The `"miss":[1,2,4]` is an array of positive delta integers and must be sent along with any `ack` if in the process of receiving packets there are missing sequences. The array entries each represent a `seq` value calculated as the delta from the previous entry, using the accompanying `ack` as the initial base to start calculating from.
 
-The `miss` ids are in ascending order and delta encoded using `ack` as the base.
+The last entry in the array always represents the `seq` id that the recipient will start dropping packets at, it is the maximum capacity of the incoming unprocessed packet buffer.  Whenever the buffer is over 50% full the recipient should send a `miss` to indicate the capacity left even if there are no other missing packets.  When the sender gets a `miss` it should always cache the total delta number as the maximum window size and never send packets with a higher `seq` than the last received `ack`+delta.
 
-When a recipient's incoming buffer of packets is full and it must drop new packets, it should send a `miss` indicating the `seq` that it started dropping at.  When the sender gets a `miss` that starts with a `seq` more than 1 greater than the included `ack` it should adjust it's sending window buffer accordingly.
+Upon receiving a `miss` the recipient should resend those specific matching calculated `seq` id packets in it's buffer, but never more than once per second. If the missing `seq` is signalled in multiple incoming packets quickly (happens often), the matching packet should only be resent once until at least one second has passed.
 
-This is only applicable when a recipient is buffering incoming sequences and is missing specific packets in the buffer that it requires before it can continue processing the content in them.
-
-Upon receiving a `miss` the recipient should resend those specific matching `seq` packets in it's buffer, but never more than once per second. So if an id in a `miss` is repeated or shows up in multiple incoming packets quickly (happens often), the matching packet is only resent once until at least one second has passed.
-
-A sender MAY opportunistically remove packets from it's outgoing buffer that are higher than the `ack` and lower than the highest value in a `miss` array, and are not included in the array as that's a signal that they've been received.
+The `miss` recipient can make no assumptions about the sender's state of any `seq` ids higher than the `ack` and not included in the array, it can only use the values included as a signal for them alone.
 
 ### `miss` encoding example
 
@@ -51,15 +46,3 @@ Given the list of missing `seq` ids `[78236, 78235, 78245, 78238]` and `"ack": 7
    `[4, 1, 2, 7]`
 3. Deliver the delta encoded list to the other end.
 
-
-
-# Reliability Notes
-
-Here's some summary notes for implementors:
-
-* just send an ack with every outgoing packet, of the highest seq you've received and processed
-* only send a miss if you've discovered missing packets in the incoming seq ordering/buffering or when you're dropping
-* once an app processes a packet and it had an ack, send an ack back
-* when an `end` is sent, don't close the channel until it's acked and after it's been idle for timeout wait
-* when an `end` is received, process it in order like any other content packet, and close only after acking + timeout wait to allow re-acking if needed
-* automatically resend the last-sent un-acked sequence packet every 2 seconds until the channel timeout
