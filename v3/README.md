@@ -3,7 +3,7 @@ telehash mesh protocol (v3)
 
 > this is a draft (issues and pull requests welcome), planning for release version in 01/2015
 
-![logo](logo/mesh-logo-128.png)
+![logo](../logo/mesh-logo-128.png)
 
 Telehash is a project to create interoperable private mesh networking:
 
@@ -31,6 +31,8 @@ The full protocol is a composite of different individual specifications:
 * [logo](../logo/) - for use to represent telehash mesh support in apps 
 
 ### Implementations
+
+Each implementation provides a library API adapted to its platform or language but they all strive to offer similar functionality including handling hashnames, URIs, and packets (lob), higher level interfaces to create a mesh and links within it, and lower level tools for e3x, transports/pipes, managing keys, etc.  Refer to the [implementers guide](guides/implementers.md) for an overview of the typical methods and patterns.
 
 Experimental implementations are being actively developed at:
 
