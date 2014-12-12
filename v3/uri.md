@@ -76,7 +76,7 @@ When establishing a new [link](channels/link.md) or updating an existing one as 
 <a name="friendly" />
 ## Friendly `user@` Name
 
-The optional `user` part of the URI is only used for visual human-recognizable purposes, it should never be sent or used except as a user-experience display and any subsequent request-matching are always performed with only the `session` and `token` values.
+The optional `user` part of the URI is only used for visual human-recognizable purposes, it should never be sent or used except as a user-experience display and any subsequent request-matching is always performed with only the `session` and `token` values.
 
 The user string must begin with 1 to 8 lower-case ascii alpha characters only (`a-z`) to serve as a simple visual indicator in a raw string encoded URI.  It may be followed by a single period (`.`) and 2 to 52 valid base32 characters (same base32 encoding as [hashnames](hashname/)), which when decoded contain a sequence of 1 to 32 UTF-8 characters to be shown or used in place of the preceeding ascii alpha characters in displays that support Unicode and for when special characters or punctuation are required.
 
