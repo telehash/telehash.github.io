@@ -21,6 +21,10 @@ Processing:
 4. issue a `peer` request to the canonical including `user`, `session`, and `token` attributes, only `token` is passed in `connect`
 5. process any response handshake as the permanent resolution for this URI
 
+## Token Reserved Characters
+
+Upon encountering any reserved character (not part of the set of `ALPHA / DIGIT / "-" / "." / "_" / "~"`) when processing the token string, the remainder of the token must be ignored and not considered part of the token or URI.  It is not an error to have additional data at the end, that data must be processed by the application and is ignored by all URI handling.
+
 ## Canonical Host Keys
 
 In order to send a handshake to the canonical host name given in a URI, its public keys must be known.  Each Cipher Set may be optionally included in the query string, and/or the keys may be shared via other standard lookup mechanisms to make the URIs shorter and easier.
