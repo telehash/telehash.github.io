@@ -31,5 +31,5 @@ When the `BODY` contains a [handshake](../e3x/handshake.md) packet, the router s
 
 ## Sessions
 
-If a peer is willing to be a router for another peer to other unknown hashnames, it may generate a unique `session` value and send it over a [link](link.md) to be included in a [URI](../uri.md) or [peer path](path.md).  When the unknown hashname sends the `peer` open it should include the given `"session":"..."` so that it can be verified.
+If a peer is willing to be a router for another peer to other unknown hashnames, it may generate a unique [URI](../uri.md) including an opaque `session` value and send it as a [handshake](../e3x/handshake.md) to that peer.  When the unknown hashname sends the router a handshake it must include the URI so that the router can validate the `session` and accept correct `peer` requests from them.  When the new hashname generates the `peer` open it must aslso include the given `"uri":"..."` so that it can be re-verified by both the router and destination peer.
 
