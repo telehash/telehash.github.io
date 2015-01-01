@@ -8,7 +8,7 @@ telehash mesh protocol (v3)
 Telehash is a project to create interoperable private mesh networking:
 
 * 100% end-to-end encrypted at all times
-* designed to compliment and add to existing transport security
+* designed to complement and add to existing transport security
 * easy to use for developers to encourage wider adoption of privacy
 * manages active link state on all connections
 * native implementations to each language/platform
