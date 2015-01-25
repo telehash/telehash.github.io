@@ -4,34 +4,25 @@ A `hashname` is a unique fingerprint to represent one or more public keys of dif
 
 The `hashname` is always a [base 32](http://tools.ietf.org/html/rfc4648) encoded string that is 52 characters long, lower cased with [no padding](http://tools.ietf.org/html/rfc4648#section-3.2).  When decoded it is alway a 32 byte binary value result of a [SHA-256](http://en.wikipedia.org/wiki/SHA-2) hash.  An example hashname is `uvabrvfqacyvgcu8kbrrmk9apjbvgvn2wjechqr3vf9c1zm3hv7g`.
 
+In many ways, a `hashname` can be used as a portable secure [MAC address](http://en.wikipedia.org/wiki/MAC_address), it is a globally unique identifier for a network endpoint that is also self-generated and cryptographically verifiable.
+
 ## Implementations
 
 * [javascript](https://github.com/telehash/hashname) (node and browserify)
 * [c](hhttps://github.com/telehash/telehash-c/blob/master/src/lib/hashname.c)
 * [go](https://github.com/telehash/gogotelehash/tree/master/hashname)
 
-## Usage
-
-While hashnames are very useful generic identifiers that group multiple public keys, it is not recommended that they be used as single IDs for multiple scopes by combining or re-using keys. Examples are to represent a user identity and an application instance/endpoint identity or a wallet fingerprint, the best practice is to use different hashnames for each scope, and bind them together independently.
-
-The keys used to generate a hashname should be relevant only to and all usable by the scope in which the hashname is validated, it is not a method for linking independent public keys together.
-
-When exchanging hashnames over existing IPv4/IPv6 based systems, the 4 or 16 byte prefix of the 32 byte hashname binary value is used to provide a backward-compatible mechanism for addressing.  It does not guarantee uniqueness (which should be enforced outside of the IP-based systems) but for many use-cases it can be a helpful connectivity signalling tool.  When the IP space must be scoped into a reserved range and the port number is also available to use, the first 2 bytes may be sent as the port and then those 2 bytes in the address are hard-coded to a reserved IP prefix.
-
 ## Hashname Generation
 
 ### Key IDs
 
-A hashname is created through multiple rounds of [SHA-256](http://en.wikipedia.org/wiki/SHA-2) hashing of one or more public keys. Each public key included must have a unique single-byte `ID` with a byte array `VALUE` that is the consistent representation of that public key.
+A hashname is created through multiple rounds of [SHA-256](http://en.wikipedia.org/wiki/SHA-2) hashing of one or more public keys. Each public key included must have a unique single-byte `ID` with a byte array `VALUE` that is the consistent binary encoding of that public key.
 
-The `ID` and serialization format must be well defined and agreed upon by any platforms using hashnames, two such systems are:
-
-* [Cipher Set](../e3x/cs/) definitions in [e3x](../e3x/)
-* [JSON Web Key](JWK.md) mappings from [JOSE](https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-31#section-7.4)
+The currently defined public key `IDs` are the [Cipher Set](../e3x/cs/) definitions and the list will change over time or may be implementation specific. Any hashname software does not need to know this mapping or what the public key types are and only has to do the consistent hashing of any given set of `ID` and `VALUE` pairs.
 
 ### Intermediate Hashing
 
-The binary byte array `VALUE` of each public key must first be hashed, resulting in a 32 byte `INTERMEDIATE` hash that is used in the rollup calculation.  These intermediate hashes may be used and exchanged instead of the full keys when only one key is in use.
+The binary byte array `VALUE` of each public key must first be hashed, resulting in a 32 byte `INTERMEDIATE` hash that is used in the rollup calculation.  These intermediate hashes may be used and exchanged instead of the full keys when necessary.
 
 ### Final Rollup
 
@@ -63,4 +54,13 @@ Object.keys(keys).sort().forEach(function(id){
 });
 var hashname = base32.encode(rollup).toLowerCase().split("=").join(""); // normalize to lower case and remove padding
 ```
+
+## Mapping/Addressing
+
+When exchanging hashnames over existing IPv4/IPv6 based systems, the 4 or 16 byte prefix of the 32 byte hashname binary value is used to provide a backward-compatible mechanism for addressing.  It does not guarantee uniqueness (which should be enforced outside of the IP-based systems) but for many use-cases it can be a helpful connectivity signalling tool.
+
+When the IP space must be scoped into a reserved range and the port number is also available to use, the first 2 bytes may be sent as the port and then those 2 bytes in the address are hard-coded to a reserved IP prefix.
+
+A hashname may also be used as a normal MAC address with the prefix of `42` (has the locally-assigned bit set) and the first 5 bytes of the hashname: `42:XX:XX:XX:XX:XX`.
+
 
