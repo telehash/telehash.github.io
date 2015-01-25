@@ -6,6 +6,12 @@ Applications may send or expect more than one handshake message for additional a
 
 The resulting size of encrypted handshake packets vary by which Cipher Sets are used and the value of the inner packet, typically it ranges from ~70 to ~1100 bytes.
 
+## Resend/Timeout
+
+After a new handshake is generated and delivered it should be resent verbatim at 1 second, 3 seconds, 8 seconds, and again at 20 seconds unless there is a valid handshake response.  After 30 seconds with no response the exchange should be timed out, considered invalid and all related state removed.
+
+At any point the transport being used to deliver packets may generate a keepalive handshake request which will start this process.
+
 ## Message Types
 
 Any decrypted handshake message is identified with a `"type":"..."` string value, that if not included in the header must be defaulted to the type of `"key"`.  Only one unique type may exist concurrently with any handshake.
