@@ -1,3 +1,13 @@
 # Bluetooth
 
-See [chunking](../lob/chunking.md) to start, this is a work-in-progress.
+> this is a work-in-progress
+
+The goal is to enable any device to discover, connect, and then send and receive encrypted packets over BLE.
+
+## Advertising
+
+Consider using [UriBeacon](https://github.com/google/uribeacon/tree/master/specification) and the `urn:uuid:` to advertise when in discoverable mode.
+
+## Connections
+
+See [chunking](../lob/chunking.md) for encoding packets as a series of PDUs.
