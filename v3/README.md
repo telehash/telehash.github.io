@@ -13,7 +13,7 @@ Telehash is a project to create interoperable private mesh networking:
 * manages active link state on all connections
 * native implementations to each language/platform
 * capable of using different transport protocols
-* supports bridging and routing privately or via a DHT
+* supports bridging and routing privately by default and optionally via a [public DHT](https://github.com/telehash/dotPublic)
 * each endpoint has verifiable unique fingerprint
 * provides native tunneling of TCP/UDP, HTTP, WebSockets, and more
 * strict privacy, no content, identity, or metadata is ever revealed to 3rd parties
