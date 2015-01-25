@@ -1,8 +1,8 @@
 # Cloaking - Network Obfuscation
 
-In situations where the network may be performing any packet filtering or inspection it is important to add as much random noise as possible to all bytes sent across an untrusted/unencrypted transport. Cloaking is a simple and efficient technique that can be used on any transport and is recommended for all unencrypted ones by default (such as TCP and UDP).
+In situations where the network may be performing any packet filtering or inspection it is important to add as much random noise as possible to all bytes sent across an untrusted/unencrypted transport. Cloaking is a simple and efficient technique that can be used on any transport and is the default for all unencrypted ones by default (such as TCP and UDP).
 
-The cloaking technique simply requires an extra processing step that adds a random number of 8 byte nonces to every packet and randomizes 100% of the bytes on the wire.  It is not a guarantee that the packets cannot be filtered but it makes any standard pattern identification significantly more difficult.  Future designs will continually increase this difficulty.
+The cloaking technique simply requires an extra processing step that adds a random number of 8 byte nonces to every packet and randomizes 100% of the bytes on the wire.  It makes large-scale pattern identification techniques significantly more difficult, but is not a guarantee that individual packets cannot be targetted.  Future designs will continually increase this difficulty.
 
 ## Per-Packet
 
