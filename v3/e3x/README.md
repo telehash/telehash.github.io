@@ -34,10 +34,10 @@ These are similar low-level encrypted wire protocols:
 
 |              | base | reliable | cloaking | 1a | 1b | 1c | 2a | 2b | 3a |
 |:------------:|:----:|:--------:|:--------:|:--:|:--:|:--:|:--:|:--:|:--:|
-|    node.js   |   ✓  |     ✓    |     ✓    |  ✓ |    |    | ✍ |    | ✍ |
-| browser js   |   ✓  |     ✓    |     ✓    |  ✓ |    |    |    |    |    |
-|   c - unix   |   ✓  |    ✍    |     ✓    |  ✓ |    |    | ✍ |    |    |
-| c - embedded |   ✓  |    ✍    |     ✓    |  ✓ |    |    |    |    |    |
+|    node.js   |   ✓  |     ✓    |     ✓    |  ✓ |    |    | ✓ |    | ✓ |
+| browser js   |   ✓  |     ✓    |     ✓    |  ✓ |    |    | ✓ |    |   |
+|   c - unix   |   ✓  |    ✓    |     ✓    |  ✓ |    |    | ✓ |    | ✓ |
+| c - embedded |   ✓  |    ✓    |     ✓    |  ✓ |    |    |    |    |    |
 |      go      |   ✓  |     ✓    |          |  ✓ |    |    |    |    |    |
 
 ## API 
