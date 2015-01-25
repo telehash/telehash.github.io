@@ -69,6 +69,8 @@ When a new channel is created, the ID must be higher than the last one the initi
 
 When a new exchange is established, it errors any `OPEN` channels and sets the minimum required incoming channel IDs back to 1.
 
+If the maximum ID is reached the exchange must be regenerated, resetting it back to 1.
+
 <a name="timeouts" />
 ### Timeouts
 

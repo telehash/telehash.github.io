@@ -35,7 +35,7 @@ A [bitcoin transaction](../guides/bitcoin.md) is attached as the `BODY` to valid
 
 ## Sequencing with `at`
 
-All decrypted handshake messages must contain an `"at":123456` with a 32 bit unsigned integer value to determine the newest generated handshake from either endpoint.  There is no requirement for the `at` value to be the current time, in sync, or accurate, only that it increases on all subsequent handshakes in the future from the last highest known value.
+All decrypted handshake messages must contain an `"at":123456` with a 64 bit positive unsigned integer value to determine the newest generated handshake from either endpoint.  There is no requirement for the `at` value to be the current time, in sync, or accurate, only that it increases on all subsequent handshakes in the future from the last highest known value.
 
 Multiple messages as part of one handshake must all have the same `at` value and different types, only one message per type with the highest `at` is used.
 
@@ -43,7 +43,9 @@ The `at` value determines if an incoming handshake is the most current and if th
 
 When an `at` is received that is higher than one sent, new handshake message (or messages) must be returned with that matching highest `at` value in order to inform the sender that their handshake is confirmed.  Upon receiving and confirming a new `at`, any pending channel packets that may have been waiting to send may be flushed/delivered.
 
-When first creating a handshake, the sender should make every effort to always choose a higher `at` than any they may have sent in the past.  Most can just use local [epoch](http://en.wikipedia.org/wiki/Unix_time) as this value, but when not available (embedded systems) they should locally store the last sent `at` and always increase it.  If an `at` is artifically inflated it may result in two endpoints being unable to exchange future handshakes.
+When first creating a handshake, the sender should make every effort to always choose a higher `at` than any they may have sent in the past.  Most can just use local [32-bit epoch](http://en.wikipedia.org/wiki/Unix_time) as this value, but when not available (embedded systems) they should locally store the last sent `at` and always increase it.
+
+If the maximum `at` value is ever reached/used the two hashnames cannot send any more subsequent handshakes and will no longer be able to communicate, either side must generate a new hashname to start over.
 
 ## Routing Token
 
