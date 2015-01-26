@@ -42,32 +42,36 @@ These are similar low-level encrypted wire protocols:
 
 ## API 
 
-The interface to use e3x is designed to minimize any accidential leakage of information by any usage of it.  Implementations may vary depending on their platform/language, but should strive for a similar common pattern of interaction.
+The interface to use e3x is designed to minimize any accidential leakage of information by having a small explicit API.
+
+Implementations may vary depending on their platform/language but should strive for a similar common pattern of interaction and method/data language as documented here at a high level.
 
 ### `generate`
 
 Create a new set of public and private keys for all supported Cipher Sets.
 
-### `self`
+### `self(keypairs)`
 
-Load a given set of public/private keys to create a local endpoint state.
+Load a given set of public/secret keys to create a local endpoint state.
 
-* `decrypt(message)` - take an enecrypted packet received from a wire transport, return a decrypted packet
+* `decrypt(message)` - take an enecrypted message received from a wire transport, return a decrypted [packet](../lob)
 
-### `exchange`
+### `exchange(self, public keys)`
 
 Load a given set of another endpoint's public keys to create an exchange state object between the `self` and that endpoint.
 
 * `token` - 16 byte ephemeral exchange identifier
 * `verify(message)` - validate that this message was sent from this exchange
-* `encrypt(packet)` - return async-encrypted message to this endpoint
-* `handshake` - return a current handshake
-* `sync(handshake)` - process incoming handshake
-* `receive(channel)` - process an incoming sync-encrypted channel packet
+* `encrypt(packet)` - return encrypted message to this endpoint
+* `handshake(at)` - return a handshake with the given at value
+* `sync(handshake)` - process incoming handshake, returns current at value
+* `receive(channel)` - process/validate an incoming encrypted channel packet, return decrypted packet
 
-### `channel`
+### `channel(exchange, open)`
 
 Requires an exchange that has sent/received a handshake and is in sync.
 
 * `id` - unique numeric id
-* `send(packet)` - return sync-encrypted packet on this channel
+* `state` - current state of the channel (`ENDED`, `OPENING`, `OPEN`)
+* `timeout` - get/set the current timeout value of this channel
+* `send(packet)` - return encrypted channel packet
