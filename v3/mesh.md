@@ -1,9 +1,11 @@
 Mesh Network
 ============
 
-A mesh network consists of one or more links, which are active encrypted sessions between two endpoints over any transport.  Each endpoint is identified with a unique hashname, the fingerprint of it's public key(s).  A mesh is private to each endpoint, which has complete control over what links it accepts.
+A mesh network consists of one or more links, which are active [encrypted sessions](e3x/) between two endpoints over any [transport](transports/).  Each endpoint is identified with a unique [hashname](hashname/), the fingerprint of it's public key(s).  A mesh is private to each endpoint, which has complete control over what links it accepts, there is no automatic sharing of any link state to any other link.
 
-[Channels](channels/) are used to create a mesh and run common services over it:
+The details for a link are often stored or exchanged in [json](json.md) or as a [URI](uri.md), and the links are established and maintained via [handshakes](e3x/handshake.md).
+
+Once a link is up, [channels](channels/) are used to run common services over it:
 
   * peer: request connection to an endpoint from a router
   * connect: incoming connection request relayed
@@ -15,41 +17,49 @@ A mesh network consists of one or more links, which are active encrypted session
   * chat: personal messaging
   * box: async/offline messaging
 
-These are combined into simple easy to use interoperable libraries with a common API (pseudocode):
+## Mesh Structure
 
-```js
-var mesh = telehash.mesh({keys}); // starts handling incoming link, path, and connect channels
-mesh.router(direct); // direct is keys/paths
-var link = mesh.link({hashname, keys, paths}, packetf(in,cb){}); // optional keys/paths endpoint info if using routers, optional packetf to gen/process passed in link request and to handle incoming, marked up w/ cb(), down w/ cb(err), and just sends packet w/ cb(undef,pkt);
-link.up = function(true||false){}; // called on state changes
-var link2 = link.link(hashname);  // use existing link to create one to another (they are routing)
-link.route = true; // enable any other link to route to/from this one
+* a mesh is a local hashname and links to one or more other hashnames (full mesh)
+* any link may be flagged as a `router` when it will provide relaying/bridging to other links
+* individual hashnames may have their own router defined
+* a router must have a way to validate hashnames before providing routing assistance to them
+* any hashname may advertise it's router as a path (and must provide routing to it for the first handshake)
+* a hashname my use a base [URI](uri.md) from a router as an out-of-band mechanism to establish new links
 
-// for dynamic links (servers), or to be available on and discover new on local transport
-mesh.discover(callback); // callback(hashname) given before responding, use .link to accept
+## API
 
-// tcp/udp socket tunneling
-mesh.listen(args); // only links can connect
-var conn = link.connect(args);
+A simple API is documented here to help provide a consistent foundation for all implementations by using similar methods/names and interaction patterns:
 
-// http
-mesh.server(args);
-var req = link.request(args);
 
-// websocket
-var sock = link.ws(args);
-sock.on* = callback;
-sock.send(data);
-mesh.wss(args); // server for any links
+### `mesh = create(keypairs)`
 
-// chat
-var chat = mesh.chat(args);
-chat.add(link);
+Create a new mesh using the given keypairs (or generate new ones).  This should enable all transports and start handling incoming channels.
 
-// box, async messages
+### `mesh.onDiscover = function (from) {...}`
 
-// internal hooks to extend custom channels
-```
+When a new unknown hashname is discovered at any point (from transports or a connect channel), all of the details (keys, hashname, paths) are given to a callback or discovery event to be processed by the app.
+
+### `link = mesh.link(to)`
+
+Establish a link to the given hashname.  The `to` may be a [URI](uri.md), [JSON](json.md), or just a plain hashname.
+
+### `link.onLink = function (state) {...}`
+
+When the link state changes to up or down the app must be able to receive these events, as well as check the current state at any point.
+
+### `link.router(bool)`
+
+Set this link to be a default (trusted) router, which will automatically ask it to assist in connections to any other link and provide assistance in connecting to the local endpoint.
+
+### `mesh.discover(bool)`
+
+Set the local endpoint discovery mode to on or off, when on this will tell any available transport to announce the endpoint's presence on local networks and newly discovered endpoints will generate `onDiscover` events.
+
+### Built-in and Custom Channels
+
+All implementations should strive to support as many [channels](channels/) as possible directly off of `mesh` and `link` objects using the language and patterns described in each channel definition.  For example, the [stream](channels/stream.md) channel should be supported with a simple `mesh.onStream` event to handle incoming requests and `link.stream()` to connect new streams (using a language-native streaming interface if possible).
+
+Custom channels should be avoided whenever possible by using one of the built-in channels, and the API to create and handle custom channels is implementation specific.
 
 ## Discovery
 
@@ -59,11 +69,3 @@ This mode should be used sparingly so that local networks cannot record what end
 
 All transports that support discovery will always be listening for incoming discover announcements regardless of the discovery state and pass those to the application to evaluate.  Discovery does not need to be enabled to receive announcements and see other endpoints, only to announce the local endpoint.
 
-## Mesh Structure
-
-* a mesh is a local hashname and links to one or more other hashnames (full mesh)
-* they may have one or more routers, which only support "route" channels (was "peer") and do relaying/bridging
-* routers must come with keys/paths
-* individual hashnames may have their own router defined
-* a router must have a way to validate hashnames before routing to them
-* any hashname may advertise it's router as a path (and must provide routing to it for the first handshake)
