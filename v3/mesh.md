@@ -5,13 +5,12 @@ A mesh network consists of one or more links, which are active encrypted session
 
 [Channels](channels/) are used to create a mesh and run common services over it:
 
-  * link: create a private connection between two endpoints (mutual)
   * peer: request connection to an endpoint from a router
   * connect: incoming connection request relayed
   * path: sync network transport info to try any direct/alternative paths
   * sock: tcp/udp socket tunneling 
   * stream: binary streams
-  * thtp: mapping of http requests/responses
+  * thtp: mapping/proxying of http requests/responses
   * ws: websocket api
   * chat: personal messaging
   * box: async/offline messaging
@@ -51,6 +50,14 @@ chat.add(link);
 
 // internal hooks to extend custom channels
 ```
+
+## Discovery
+
+By default a local endpoint will never respond to any request unless it comes from another endpoint it already knows and trusts.  A `discover` mode can be enabled that changes this behavior and broadcasts the endpoint's hashname and keys to any local [network transport](transports/) that supports discovery.
+
+This mode should be used sparingly so that local networks cannot record what endpoints are available, typically only enabled based on a user behavior ("add a friend" or "pair device", etc) and only for a short period of time.  Permanent local services/servers that support dynamic association may have it always enabled.
+
+All transports that support discovery will always be listening for incoming discover announcements regardless of the discovery state and pass those to the application to evaluate.  Discovery does not need to be enabled to receive announcements and see other endpoints, only to announce the local endpoint.
 
 ## Mesh Structure
 

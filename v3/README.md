@@ -1,7 +1,7 @@
-telehash mesh protocol (v3)
-===========================
+telehash secure mesh protocol (v3)
+==================================
 
-> this is a draft (issues and pull requests welcome), planning for release version in 01/2015
+> this is a draft (issues and pull requests welcome), planning for release version in 02/2015
 
 ![logo](../logo/mesh-logo-128.png)
 
@@ -18,6 +18,7 @@ Telehash is a project to create interoperable private mesh networking:
 * provides native tunneling of TCP/UDP, HTTP, WebSockets, and more
 * strict privacy, no content, identity, or metadata is ever revealed to 3rd parties
 * designed for compatibility between embedded device, mobile, and web usage
+* supports an automatic discovery mode on local networks when available
 * [more background](background.md)
 
 The full protocol is a composite of different individual specifications:
@@ -27,7 +28,7 @@ The full protocol is a composite of different individual specifications:
 * [e3x](e3x/) - end-to-end encrypted exchange (wire encoding, crypto)
 * [mesh](mesh.md) - common channels to establish links to peers and maintain a private mesh
 * [uri](uri.md) - how to encode/decode endpoint info via URIs for out-of-band bootstrapping
-* [transports](transports/) - details for mapping/supporting different network transports
+* [transports](transports/) - details (encoding, timeouts, discovery, etc) for mapping/supporting different network transports
 * [logo](../logo/) - for use to represent telehash mesh support in apps 
 
 ### Implementations

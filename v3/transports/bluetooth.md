@@ -4,7 +4,7 @@
 
 The goal is to enable any device to discover, connect, and then send and receive encrypted packets over BLE.
 
-## Advertising
+## Advertising / Discovery
 
 Consider using [UriBeacon](https://github.com/google/uribeacon/tree/master/specification) and the `urn:uuid:` to advertise when in discoverable mode.
 
