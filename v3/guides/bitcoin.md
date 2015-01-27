@@ -18,10 +18,9 @@ High-level ideas on how to use telehash to encrypt connections to the bitcoin ne
 
 When a hashname needs to be associated to a transaction it can be included as an `OP_RETURN` output by generating a random 8-byte nonce and processing the 32-byte hashname with the [ChaCha20 cipher](http://cr.yp.to/chacha.html).  The key input must be a common or private shared value used by the parties generating the transaction as well as validating it, as determined by the needs of the application.
 
-The result is 40 bytes, the 8-byte nonce with the 32-byte encrypted hashname.
+The result is the 40 bytes for the `OP_RETURN` value, the 8-byte nonce followed by the 32-byte encrypted hashname.
 
-* use this transaction as a reference that can be independently validated and is a public lock to a single hashname
-* may use multiple `OP_RETURN` outputs to pin two or more hashnames together in a group, such as including a router hashname to assist in the connection
+This transaction acts as a reference that can be independently validated by anyone with the key input as a public lock to a single hashname.
 
 ## Chain of Custody
 
