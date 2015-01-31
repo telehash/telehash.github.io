@@ -1,14 +1,14 @@
 # Messages - Asynchronous / Offline Content Transport with Forward Secrecy
 
-Message packets are for when one endpoint is unable to establish a channel to another and has a mechanism to send content for the other endpoint to receive independently such that both don't need to be online at the same time.
+Message packets are for encrypting small amounts of content to other entities without requiring a synchronous exchange, such that the recipient can process them at any point in the future.  They are used primarily for creating handshakes to establish synchronous [channel](channels.md) encryption that has forward secrecy guarantees, as messages alone provide a lower level of privacy and should only be used for temporary or non-secret data and never stored at rest.
 
-Messages define how to encrypt the packets but have no required internal structure (unlike channels).  There is more size overhead for encrypted message packets as they must always include the temporary public key information used, and it may be different for each one requiring additional expensive compute as well.
+Messages define how to encrypt the packets but have no required internal structure (unlike channels).  There is a larger overhead for encrypted message packets as they must always include the ephemeral public key information used and often require additional computation as well.
 
-An exchange may be used to generate one or more messages as needed and can be created as needed to process incoming ones, but messages are asynchronous and do not need the same exchanges on either side to be handled.
+An exchange may be created on demand just to generate/process one or more messages and not used for channels, but since messages are asynchronous they do not require the exchanges to be in sync to operate.
 
 All [handshakes](handshake.md) are message packets.
 
-The size of an encrypted message is determined by the application and context in which it is used, handshakes are usually small (<1400 bytes to maximize transport compatibility) and any messages intended to be sent over a transport with a low MTU may need to use [chunked encoding](../lob/chunking.md) or the app may need to do chunking of the data before encrypting.  Most apps use [channels](channels.md) for arbitrary sized/streaming data which handles this automatically.
+The size of an encrypted message is determined by the application and context in which it is used, handshakes are usually small (<1400 bytes to maximize transport compatibility) and any messages intended to be sent over a transport with a low MTU may need to use [chunked encoding](../lob/chunking.md) as the BODY of multiple messages.
 
 ## Packet Encryption
 
