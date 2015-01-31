@@ -18,7 +18,7 @@ All channel payload bytes are [LOB encoded](../lob).
 
 ## `1` CBOR encoded
 
-The value `1` signals support of [CBOR based](http://tools.ietf.org/html/rfc7049) payloads, the bytes are interpreted as a stream of CBOR values instead of LOB encoding.
+The value `1` signals support of [CBOR based](http://cbor.io) payloads, the bytes are interpreted as a stream of CBOR values instead of LOB encoding.
 
 * first value is always channel id ("c", unsigned int)
 * [optional] byte string of a payload LOB packet
