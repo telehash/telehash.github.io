@@ -1,31 +1,61 @@
-# Compact Channel Headers
+# Channel Payload Compression
 
-* set `"c":1` in handshake to signal CBOR headers (`0` is default, regular LOB with JSON)
-* after decryption it is decoded as CBOR instead of LOB
-* first value is always channel id (unsigned int)
-* optional text value is the "type"
-* optional unsigned int is a seq
-* optional array is ack+miss (ack is always the first value)
-* optional byte string is the payload LOB packet
+Since channel packets are the most frequent and have a set of fixed well-known key/values in their JSON headers, both endpoints may support optional channel compression encoding to minimize the resources required.
 
-JSON channel header (46 bytes):
+This is important in embedded/device networks where the MTU is small (BLE and 6lowpan), and may improve performance in other edge cases with frequent small packets.
 
-`{"c":1,"type":"type","seq":2,"ack":22,"miss":[1,2,20]}`
+## `z` Handshake Signalling
 
+To indicate support of a channel payload compression any endpoint may include a `z` key with an unsigned integer value in the handshake.  The value `0` is the default and signals no support.
 
-[CBOR diagnostic](http://cbor.me/?diag={0:1,1:%22type%22,8:22,9:[1,2,20]}) (wrapped in map for the tool):
+The `z` value indicates how to decode/interpret the channel payload bytes immediately after decryption.  After any alternative processing the resulting value must still always be identical to a LOB packet with a JSON header and binary BODY, it is only to minimize encoding and not for use to include additional data in a payload.
 
-`1, "type", 22, [22,1,2,20]`
+Both endpoints must include identical `z` in a confirmed handshake in order for it to be enabled on any channel packets using the resulting keys, and only that type of channel payload is supported when enabled.
 
-CBOR binary (11 bytes):
+## `0` LOB encoded (default)
 
+All channel payload bytes are [LOB encoded](../lob).
+
+## `1` CBOR encoded
+
+The value `1` signals support of CBOR based payloads, the bytes are interpreted as a stream of CBOR values instead of LOB encoding.
+
+* first value is always channel id ("c", unsigned int)
+* [optional] byte string of a payload LOB packet
+* [optional] map of additional key/value pairs
+* [optional] text value is the "type" string value
+* [optional] unsigned int is a "seq" value
+* [optional] array is the "ack" and "miss" unsigned int values, ack is always the first value in the CBOR array
+
+### Decoding
+
+When processing CBOR the result is always a regular LOB packet with a JSON header.
+
+1. decode the channel id
+2. if a byte string follows it is processed as the source LOB, if not then generate a blank/empty LOB packet
+3. set the `"c":id` in the packet JSON to the channel id from 1.
+4. if a map follows, it's key/value pairs must be processed any only text keys and text or number values are used, each one being set in the packet JSON
+5. if a text value follows, it is set as the `"type":value` in the JSON
+6. if an unsigned int follows, it is set as the `"seq":value` in the JSON
+7. if an array follows, it must be processed and only unsigned int values are used, the first one is always set as the `"ack":value` and all other entries in the array are the `"miss":[1,2,3]` in the JSON.
+
+### Examples
+
+JSON `{"c":1,"type":"type"}` (21) [CBOR](http://cbor.me/?diag=[1,%22open%22]) (6):
 ```
-   01          # unsigned(1)
-   64          # text(4)
-      74797065 # "type"
-   16          # unsigned(22)
-   83          # array(3)
-      01       # unsigned(1)
-      02       # unsigned(2)
-      14       # unsigned(20)
+01          # unsigned(1) // c
+64          # text(4)     // type
+   6f70656e # "open"
 ```
+
+JSON `{"c":2,"seq":22,"ack":20,"miss":[1,2,20]}` (41) [CBOR](http://cbor.me/?diag=[2,22,[20,1,2,20]]) (7):
+```
+02    # unsigned(2)  // c
+16    # unsigned(22) // seq
+84    # array(4)
+   14 # unsigned(20) // ack
+   01 # unsigned(1)
+   02 # unsigned(2)
+   14 # unsigned(20)
+```
+
