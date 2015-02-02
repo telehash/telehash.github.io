@@ -30,11 +30,10 @@ To calculate the hashname the `INTERMEDIATE` hashes are sequentially hashed in a
 
 ```js
 hash = sha256(0x1a)
-hash = sha256(hash + base32decode("eg3fxjnjkz763cjfnhyabeftyf75m2s4gll3gvmuacegax5h6nia"))
+hash = sha256(hash + 0x21b65ba5a9567fed892569f00090b3c17fd66a5c32d7b355940088605fa7f350)
 hash = sha256(hash + 0x3a)
-hash = sha256(hash + base32decode("ckczcg2fq5hhaksfqgnm44xzheku6t7c4zksbd3dr4wffdvvem6q"))
-print base32encode(hash)
-"27ywx5e5ylzxfzxrhptowvwntqrd3jhksyxrfkzi6jfn64d3lwxa"
+hash = sha256(hash + 0x97d83d1af8919874a449769145b7b3cb46359b2c12169ee53e683477bec47101)
+final = hash
 ```
 
 Here is a working example in node.js to do the calculation, results in `5ccn9gcxnj9nd7hp1m3v5pjwcu5hq80bt366bzh1ebhf9zqaxu2g`
