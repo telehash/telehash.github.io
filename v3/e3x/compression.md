@@ -41,7 +41,7 @@ When processing CBOR the result is always a regular LOB packet with a JSON heade
 
 ### Examples
 
-JSON `{"c":1,"type":"type"}` (21) [CBOR](http://cbor.me/?diag=[1,%22open%22]) (6):
+JSON `{"c":1,"type":"open"}` (21) [CBOR](http://cbor.me/?diag=[1,%22open%22]) (6):
 ```
 01          # unsigned(1) // c
 64          # text(4)     // type
