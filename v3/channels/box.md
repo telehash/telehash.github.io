@@ -12,7 +12,7 @@ A `box` always has a consistent unique ID that is the [SipHash](http://en.wikipe
 
 ## Advertising Capacity/Status
 
-Box status is advertised when an exchange is [synchronized](../e3x/handshake.md) as a channel of type "boxes":
+Box status is advertised after an exchange is first [synchronized](../e3x/handshake.md) as a channel of type "boxes":
 
 ```
 {
@@ -22,9 +22,9 @@ Box status is advertised when an exchange is [synchronized](../e3x/handshake.md)
 BODY: id1, id2, id3
 ```
 
-The BODY is the list of binary 64-bit box IDs with messages waiting, only the first 120 IDs are included, any additional are sent in the next message on the channel.
+The BODY is the list of binary 64-bit box IDs with messages waiting, only 120 IDs are included per message and any additional are sent in the next message on the channel.
 
-The quota is an array of two unsigned integers where the first number is how many total waiting messages there are for the recipient, and the second is how many messages the sender is willing to cache for the recipient.
+The quota is an array of two unsigned integers where the first number is how many total bytes of messages there are in all boxes for the recipient, and the second is the total bytes the sender is willing to cache for the recipient.
 
 No additional data is returned (such as size of each box, timestamps, or sorting) in order to minimize the metadata the sender is required to maintain.
 
@@ -58,11 +58,11 @@ A recipient opens a box channel to receive any waiting messages with the format:
 }
 ```
 
-If the `"box"` is not included it is a request for the next available box with any ID, and the selected box key/value is sent in a single response packet.  Any given ID must be validated as being to the recipient.
-
 Upon opening, all waiting messages for the client are streamed back (flow is managed normally as a reliable channel).  If there are no messages or the box is unknown the channel is always closed by the server without an error.
 
-Any packet on the channel can contain a message attached as the BODY in either direction, and each message must never be larger than 1024 bytes.  All messages are uniquely identified/cached by the SipHash of the BODY using the box ID as the key so that the server can easily dedup messages. If the box is at capacity, older messages are automaticlly removed when new ones are sent. The server should always retain at least one message for any sender regardless of age up to the total capacity of messages (quota of 100 would be at most 1 message per 100 senders).
+Any packet on the channel can contain a message attached as the BODY in one direction, if the message is larger than one channel packet it is broken across multiple with the last packet always containing a `"done":true`.  All messages are uniquely identified/cached by the SipHash of the entire BODY bytes using the box ID as the key so that the server can easily dedup messages. 
+
+If the box is at capacity, older messages are automaticlly removed when new ones are sent. The server should attempt to retain the last message from any sender if it is <1024 bytes regardless of age (quota of 10k would be at most 1 message per 10 senders).
 
 A packet with a `"id":"16-hex"` only and no BODY from either the sender or recipient is a request to clear/remove any matching message in the box.
 
