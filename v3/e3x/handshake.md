@@ -32,9 +32,6 @@ A [URI](../uri.md) was used to generate this handshake and it is included as the
 
 A [bitcoin transaction](../guides/bitcoin.md) is attached as the `BODY` to validate this handshake.
 
-### "box"
-
-A message containing metadata about [boxes](../channels/box.md) the sender has available for the recipient.
 
 ## Sequencing with `at`
 

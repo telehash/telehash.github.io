@@ -12,17 +12,17 @@ A `box` always has a consistent unique ID that is the [SipHash](http://en.wikipe
 
 ## Advertising Capacity/Status
 
-Box status is advertised during any [handshake](../e3x/handshake.md) as a message using a "box" type:
+Box status is advertised when an exchange is [synchronized](../e3x/handshake.md) as a channel of type "boxes":
 
 ```
 {
-  "type": "box",
+  "type": "boxes",
   "quota": [used, capacity]
 }
 BODY: id1, id2, id3
 ```
 
-The BODY is the list of binary 64-bit box IDs with messages waiting, only the first 120 IDs are included, any additional are truncated and must be retrieved dynamiclly by the recipient.
+The BODY is the list of binary 64-bit box IDs with messages waiting, only the first 120 IDs are included, any additional are sent in the next message on the channel.
 
 The quota is an array of two unsigned integers where the first number is how many total waiting messages there are for the recipient, and the second is how many messages the sender is willing to cache for the recipient.
 
@@ -38,7 +38,7 @@ When a box channel is opened by a sender to a recipient it uses the format:
 {
   "c":1,
   "seq":1,
-  "type":"box",
+  "type":"oubox",
   "to":"uvabrvfqacyvgcu8kbrrmk9apjbvgvn2wjechqr3vf9c1zm3hv7g"
 }
 ```
@@ -53,7 +53,7 @@ A recipient opens a box channel to receive any waiting messages with the format:
 {
   "c":1,
   "seq":1,
-  "type":"box",
+  "type":"inbox",
   "box":"851042800434dd49"
 }
 ```
