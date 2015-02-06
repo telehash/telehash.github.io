@@ -1,53 +1,60 @@
 # Box - Offline Signalling (Store-and-Forward)
 
-> This is a **rough draft** and a work in progress
-
 The box channel is used to asynchronously send and receive encrypted [messages](../e3x/messages.md) directly or via any shared hashname that is acting as a cache/router.  A caching entity can be selected automatically based on capacity/availability or chosen specifically based on app configuration.
 
 The use of remote entities to provide caching should be considered carefully and minimized, they must be trusted to not collect metadata about the status and volume of signalling between any hashnames using them, as well as to not archive the encrypted payloads for future analysis.  When providing caching for other hashnames, the existence of and contents of all boxes must never be stored at rest and only kept in dynamic memory.
 
+Boxes are always one direction only, from a sender to a cache to a recipient or directly from a sender to a recipient.  No status or state is returned to the sender, it is the responsibility of the recipient only to share any message state.
+
 ## Box IDs
 
-A `box` always has a consistent unique ID that is the [SipHash](http://en.wikipedia.org/wiki/SipHash) of the recipient hashname (32 bytes) using the first half of the sender hashname (16 bytes) as the key.  The resulting 64-bit hash output is always hex encoded as a string when used in JSON: `"box":"851042800434dd49"` 
+A `box` always has a consistent unique ID that is the [SipHash](http://en.wikipedia.org/wiki/SipHash) of the recipient hashname (32 bytes) using the first half of the sender hashname (16 bytes) as the key.  The resulting 64-bit hash output is always hex encoded as a string when used in JSON: `"box":"851042800434dd49"`.
+
+## Message IDs
+
+Every message has a unique ID within a box that is the SipHash of the message bytes with the box ID as the key.
 
 ## Advertising Capacity/Status
 
-Box status is advertised after an exchange is first [synchronized](../e3x/handshake.md) as a channel of type "boxes":
+Box status is advertised after an exchange is first [synchronized](../e3x/handshake.md) as an unreliable channel of type `boxes`.  Any endpoint that has cached messages should automatically initiate this channel to indicate status to the recipient.
 
 ```
 {
   "type": "boxes",
-  "quota": [used, capacity]
 }
 BODY: id1, id2, id3
 ```
 
-The BODY is the list of binary 64-bit box IDs with messages waiting, only 120 IDs are included per message and any additional are sent in the next message on the channel.
-
-The quota is an array of two unsigned integers where the first number is how many total bytes of messages there are in all boxes for the recipient, and the second is the total bytes the sender is willing to cache for the recipient.
+The BODY is the list of binary 64-bit box IDs with messages waiting, only 120 IDs are included per message and any additional are sent in the next message on the channel, ending the channel with the last one.
 
 No additional data is returned (such as size of each box, timestamps, or sorting) in order to minimize the metadata the sender is required to maintain.
 
-## Channel Flow
+## Sending - `box`
 
-The box channel is always reliable and client-server oriented (not bi-directional, one could be open in both directions) where the initial open request is sent by the client and the recipient is the server managing the box.
-
-When a box channel is opened by a sender to a recipient it uses the format:
+The `box` channel is always reliable and initiated by the sender to a caching server or directly to the recipient.
 
 ```json
 {
   "c":1,
   "seq":1,
-  "type":"oubox",
+  "type":"box",
   "to":"uvabrvfqacyvgcu8kbrrmk9apjbvgvn2wjechqr3vf9c1zm3hv7g"
 }
 ```
 
-The server calculates the box ID based on the recipient and sender, and must never return an `err` based on any internal status of the given box or recipient so as to not reveal any metadata or relationship.  If there is not capacity for the recipient the server must just accept and acknowledge all messages but not cache them.
+The box ID is always calculated based on the `to` recipient and the hashname of the sender.  Messages are attached as the BODY and concatenated until a packet contains a `"done":true`, at which point that message ID is calculated and it is processed.
 
-Packets may contain an optional `"x":3600` specifying the number of seconds to cache a message, the server is not required to support or enforce this, it is just a signal to help optimize cache management.
+The done packet may contain an optional `"x":3600` specifying the number of seconds to cache a message, the server is not required to support or enforce this, it is just a signal to help optimize cache management.
 
-A recipient opens a box channel to receive any waiting messages with the format:
+A packet with a `"id":"16-hex"` only and no BODY at any point is a request to clear/remove any cached messages with that ID.  A packet with a `"clear":true` at any point will clear all currently cached messages in the box or any messages in progress on the channel, and any BODY is the start of a new message.
+
+If the box is at capacity, older messages are automaticlly removed when new ones are sent. The server should attempt to retain the last message from any sender if it is <1024 bytes regardless of age (quota of 10k would be at most 1 message per 10 senders).
+
+Handling a box channel must never return an `err` based on any internal status of the given box or recipient so as to not reveal any metadata or relationship.  If there is not capacity for the recipient the server must just accept and acknowledge all messages but not cache them.
+
+## Receiving - `inbox`
+
+A recipient opens an `inbox` channel to receive any waiting messages with the format:
 
 ```json
 {
@@ -58,12 +65,10 @@ A recipient opens a box channel to receive any waiting messages with the format:
 }
 ```
 
-Upon opening, all waiting messages for the client are streamed back (flow is managed normally as a reliable channel).  If there are no messages or the box is unknown the channel is always closed by the server without an error.
+Upon opening, all waiting messages for the client are streamed back (flow is managed normally as a reliable channel).  
 
-Any packet on the channel can contain a message attached as the BODY in one direction, if the message is larger than one channel packet it is broken across multiple with the last packet always containing a `"done":true`.  All messages are uniquely identified/cached by the SipHash of the entire BODY bytes using the box ID as the key so that the server can easily dedup messages. 
+Every packet sent back will contain message bytes as the BODY, if the message is larger than one channel packet it is broken across multiple with the last packet always containing a `"done":true`.  
 
-If the box is at capacity, older messages are automaticlly removed when new ones are sent. The server should attempt to retain the last message from any sender if it is <1024 bytes regardless of age (quota of 10k would be at most 1 message per 10 senders).
+Once all messages are sent, or when there are no messages or the box is unknown, the server must send a packet that contains a `"cap":1234` of an unsigned integer to indicate the number of bytes of message data it will cache for the given box ID.
 
-A packet with a `"id":"16-hex"` only and no BODY from either the sender or recipient is a request to clear/remove any matching message in the box.
-
-Any packet from the client may contain a `"clear":true` which empties all of the messages in the box before processing any attached BODY.
+Identically to the `box` channel, any packet sent back with an `"id":"16-hex"` only is a request to clear/remove any matching message in the box, and a `"clear":true` immediately empties all of the messages in the box regardless of status.  The server will always respond with an updated `cap` value.
