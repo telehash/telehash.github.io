@@ -14,9 +14,9 @@ A `box` always has a consistent unique ID that is the [SipHash](http://en.wikipe
 
 Every message has a unique ID within a box that is the SipHash of the message bytes with the box ID as the key.
 
-## Advertising Capacity/Status
+## Advertising Status - `boxes`
 
-Box status is advertised after an exchange is first [synchronized](../e3x/handshake.md) as an unreliable channel of type `boxes`.  Any endpoint that has cached messages should automatically initiate this channel to indicate status to the recipient.
+Box status is advertised as an unreliable channel of type `boxes` always opened to the recipient.  Any endpoint that has cached messages should automatically initiate this channel to indicate status to the recipient, typically when an exchange is first [synchronized](../e3x/handshake.md) but also whenever an empty box has a message added.
 
 ```
 {
@@ -29,15 +29,15 @@ The BODY is the list of binary 64-bit box IDs with messages waiting, only 120 ID
 
 No additional data is returned (such as size of each box, timestamps, or sorting) in order to minimize the metadata the sender is required to maintain.
 
-## Sending - `box`
+## Sending - `outbox`
 
-The `box` channel is always reliable and initiated by the sender to a caching server or directly to the recipient.
+The `outbox` channel is always reliable and initiated by the sender to a caching server or directly to the recipient.
 
 ```json
 {
   "c":1,
   "seq":1,
-  "type":"box",
+  "type":"outbox",
   "to":"uvabrvfqacyvgcu8kbrrmk9apjbvgvn2wjechqr3vf9c1zm3hv7g"
 }
 ```
@@ -71,4 +71,4 @@ Every packet sent back will contain message bytes as the BODY, if the message is
 
 Once all messages are sent, or when there are no messages or the box is unknown, the server must send a packet that contains a `"cap":1234` of an unsigned integer to indicate the number of bytes of message data it will cache for the given box ID.
 
-Identically to the `box` channel, any packet sent back with an `"id":"16-hex"` only is a request to clear/remove any matching message in the box, and a `"clear":true` immediately empties all of the messages in the box regardless of status.  The server will always respond with an updated `cap` value.
+Identically to the `outbox` channel, any packet sent back with an `"id":"16-hex"` only is a request to clear/remove any matching message in the box, and a `"clear":true` immediately empties all of the messages in the box regardless of status.  The server will always respond with an updated `cap` value.
