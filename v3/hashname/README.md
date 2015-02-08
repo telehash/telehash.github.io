@@ -9,24 +9,34 @@ In many ways, a `hashname` can be used as a portable secure [MAC address](http:/
 ## Implementations
 
 * [javascript](https://github.com/telehash/hashname) (node and browserify)
-* [c](hhttps://github.com/telehash/telehash-c/blob/master/src/lib/hashname.c)
+* [c](https://github.com/telehash/telehash-c/blob/master/src/lib/hashname.c)
 * [go](https://github.com/telehash/gogotelehash/tree/master/hashname)
 
 ## Hashname Generation
 
+A hashname is calculated by combining the binary public key material of one or more different [cryptographic algorithms](http://en.wikipedia.org/wiki/Public-key_cryptography) through multiple rounds of [SHA-256](http://en.wikipedia.org/wiki/SHA-2) hashing.  
+
+The generation has three distinct steps:
+
+1. Each active key is mapped to a unique one-byte `ID` based on its algorithm to provide consistent ordering
+2. The binary key material for each `ID` is hashed into intermediate digest values
+3. An ordered roll-up hashing of the intermediate values generates the final 32-byte digest
+
 ### Key IDs
 
-A hashname is created through multiple rounds of [SHA-256](http://en.wikipedia.org/wiki/SHA-2) hashing of one or more public keys. Each public key included must have a unique single-byte `ID` with a byte array `VALUE` that is the consistent binary encoding of that public key.
+Each public key included must have a unique single-byte `ID` with a byte array `VALUE` that is the consistent binary encoding of that public key material for a given algorithm. Only one key can be used per-algorithm to calculate a hashname.
 
-The currently defined public key `IDs` are the [Cipher Set](../e3x/cs/) definitions and the list will change over time or may be implementation specific. Any hashname software does not need to know this mapping or what the public key types are and only has to do the consistent hashing of any given set of `ID` and `VALUE` pairs.
+The current public key `ID` mappings and `VALUE` binary encodings are defined in [Cipher Sets](../e3x/cs/).
+
+Any hashname generation software does not need to know or understand the Cipher Sets or support the algorithms defined there, it only has to do the consistent hashing of any given set of `ID` and `VALUE` pair inputs.
 
 ### Intermediate Hashing
 
-The binary byte array `VALUE` of each public key must first be hashed, resulting in a 32 byte `INTERMEDIATE` hash that is used in the rollup calculation.  These intermediate hashes may be used and exchanged instead of the full keys when necessary.
+The binary byte array `VALUE` of each public key must first be hashed, resulting in a 32 byte intermediate digest that is used in the rollup calculation.  These intermediate digests may be used by applications and exchanged instead of the full keys when necessary.
 
 ### Final Rollup
 
-To calculate the hashname the `INTERMEDIATE` hashes are sequentially hashed in ascending order by their `ID`. Each `ID` contributes two values: the single byte `ID` value and the 32 byte `INTERMEDIATE` hash value. The calculated hash is rolled up, wherein each resulting 32 byte binary digest is combined with the next binary value as the input. An example calculation would look like (in pseudo-code):
+To calculate the hashname the intermediate digests are sequentially hashed in ascending order by their `ID`. Each one contributes two values: the single byte `ID` value and the 32 byte intermediate digest value. The calculated hash is rolled up, wherein each resulting 32 byte binary output is concatenated with the next binary value as the input. An example calculation would look like (in pseudo-code):
 
 ```js
 hash = sha256(0x1a)
