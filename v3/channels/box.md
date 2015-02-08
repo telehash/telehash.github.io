@@ -8,11 +8,15 @@ Boxes are always one direction only, from a sender to a cache to a recipient or 
 
 ## Box IDs
 
-A `box` always has a consistent unique ID that is the [SipHash](http://en.wikipedia.org/wiki/SipHash) of the recipient hashname (32 bytes) using the first half of the sender hashname (16 bytes) as the key.  The resulting 64-bit hash output is always hex encoded as a string when used in JSON: `"box":"851042800434dd49"`.
+A `box` always has a consistent unique binary 8-byte ID that is the [SipHash](http://en.wikipedia.org/wiki/SipHash) output of the recipient hashname (32 bytes) using the first half of the sender hashname (16 bytes) as the key. 
+
+All box IDs will be consistent between a sender/recipient pair regardless of the identity of any caching party.
 
 ## Message IDs
 
-Every message has a unique ID within a box that is the SipHash of the message bytes with the box ID as the key.
+Every message has a unique ID within a box that is the SipHash of the message bytes with the box ID doubled to make 16 byte key.
+
+All message IDs will be unique to a box and sender/recipient pair, always consistent regardless of the source/delivery of the message.
 
 ## Advertising Status - `boxes`
 
@@ -25,9 +29,9 @@ Box status is advertised as an unreliable channel of type `boxes` always opened 
 BODY: id1, id2, id3
 ```
 
-The BODY is the list of binary 64-bit box IDs with messages waiting, only 120 IDs are included per message and any additional are sent in the next message on the channel, ending the channel with the last one.
+The BODY is the list of binary 8-byte box IDs with messages waiting, only up to 120 IDs are included per message and any additional are sent in the next message on the channel, ending the channel with the last one.
 
-No additional data is returned (such as size of each box, timestamps, or sorting) in order to minimize the metadata the sender is required to maintain.
+No additional data is returned (such as size of each box, timestamps, original hashname, or sorting) in order to minimize the metadata the sender is required to maintain.
 
 ## Sending - `outbox`
 
@@ -65,7 +69,7 @@ A recipient opens an `inbox` channel to receive any waiting messages with the fo
 }
 ```
 
-Upon opening, all waiting messages for the client are streamed back (flow is managed normally as a reliable channel).  
+The box ID is the hex encoding of the 8-byte value from the `boxes` channel. Upon opening, all waiting messages for the recipient are streamed back (flow is managed normally as a reliable channel).  
 
 Every packet sent back will contain message bytes as the BODY, if the message is larger than one channel packet it is broken across multiple with the last packet always containing a `"done":true`.  
 
