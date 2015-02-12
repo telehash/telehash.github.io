@@ -12,7 +12,7 @@ This is a next-generation decentralized chat protocol designed to encourage mini
 * for individuals and small/private groups, not for large/persistent groupchat
 * flexible for both private/direct and public/broadcast usage
 
-A `chat` is a container of one or more `messages` from one or more participants.  A participant is always a single [hashname](../hashname/), the list of participants for a single chat is called a `roster` and the first participant is called the `originator`.  All messages are sent synchronously over a `chat` channel or fetched asynchronously via [THTP](thtp.md).
+A `chat` is a container of one or more `messages` from one or more participants.  A participant is always a single [hashname](../hashname/), the list of participants for a single chat is called a `roster` and the first participant is called the `leader`.  All messages are sent synchronously over a `chat` channel or fetched asynchronously via [THTP](thtp.md).
 
 The simplest form of a `chat` between two `hashnames` is a single channel sending/receiving `messages` bi-directionally on that channel.
 
@@ -22,10 +22,10 @@ Every chat ID created by taking the 32 bytes from the hashname and appending the
 
 ## THTP
 
-The roster and individual messages can be fetched asynchronously using [THTP](thtp.md). The roster should only ever be requested from the originator, and individual messages should only be requested from each participant.  The originator must always be able to return the join messages for every participant as well.
+The roster and individual messages can be fetched asynchronously using [THTP](thtp.md). The roster should only ever be requested from the leader, and individual messages should only be requested from each participant.  The leader must always be able to return the join messages for every participant as well.
 
 * `thtp://2whzi65idcn33wzacvwfy2shsgdgtabr4gadcxtfbwhy2atxok2q/chat/sgoomt3lqqkia/roster`
-  * **2whzi65idcn33wzacvwfy2shsgdgtabr4gadcxtfbwhy2atxok2q** the originator of the chat
+  * **2whzi65idcn33wzacvwfy2shsgdgtabr4gadcxtfbwhy2atxok2q** the leader of the chat
   * **sgoomt3lqqkia** the base32 of the 8-byte chat id
   * **roster** request to return the raw JSON of the roster
 * `thtp://kf7it53r5tvsylgsjzjrh4m7bsgb4jjygnr6nx3sgoomt3lqqkia/chat/sgoomt3lqqkia/id/4gadcxtfbwhy2,100`
@@ -50,27 +50,27 @@ The chat channel is reliable and the start request/response looks like:
 }
 ```
 
-The field sare defined as:
+The fields are defined as:
 
 * **type** - always `chat`
-* **to** - (only sent in the request) the id of the room @ the originator's hashname
+* **to** - (only sent in the request) the id of the chat
 * **from** - (optional) the join id of the sender when they want to join, otherwise is a read-only connection
 * **last** - (optional) the last chat message id from the sender, this can be used by the recipient to fetch any missed/historical ones from the sender
-* **roster** - (optional, only sent when the sender has a roster) the hash of the sender's current roster for this chat, if it doesn't match the stored one then fetch it from the originator or sender and look for new participants
+* **roster** - (optional, only sent when the sender has a roster) the hash of the sender's current roster for this chat, if it doesn't match the stored one then fetch it from the leader or sender and look for new participants
 
-A chat channel can be opened by any hashname to another hashname that is either the originator or an existing participant, but it can only be initially started by the originator to invite a new hashname as a participant to an existing chat (participants can't invite each other directly).
+A chat channel can be opened by any hashname to another hashname that is either the leader or an existing participant, but it can only be initially started by the leader to invite a new hashname as a participant to an existing chat (participants can't invite each other directly).
 
 ### Permissions / Roster
 
-The originator may set a star entry in the roster of `"*":"invite"` to indicate that anyone can join and retrieve data for this chat.
+The leader may set a star entry in the roster of `"*":"invite"` to indicate that anyone can join and retrieve data for this chat.
 
 The star entry of `"*":"block"` indicates that only hashnames listed in the roster may join and retrieve data.
 
-No star entry indicates that it is a read-only `visible` chat, anyone can retrieve data but only the hashnames listed in the roster can join.  If the originator makes changes to the roster on a visible chat it must re-connect to notify anyone connected of the changes.
+No star entry indicates that it is a read-only `visible` chat, anyone can retrieve data but only the hashnames listed in the roster can join.  If the leader makes changes to the roster on a visible chat it must re-connect to notify anyone connected of the changes.
 
 Any hashname in the roster can either have the values of "invite", "block", or their actual/known join message id, indicating that they are blocked, allowed to join, or already joined.
 
-When new participants are added to the chat the nature of them connecting to everyone will update their rosters, but when the originator changes an existing entry it must re-establish chat channels with the participants to notify them of the roster change.  Participants only need to use their cached roster to determine the permission for any other incoming connection, and if they don't have a roster yet (new chat invite) they should respond as read-only (no `from`) until they decide to join/accept and then re-connect.
+When new participants are added to the chat the nature of them connecting to everyone will update their rosters, but when the leader changes an existing entry it must re-establish chat channels with the participants to notify them of the roster change.  Participants only need to use their cached roster to determine the permission for any other incoming connection, and if they don't have a roster yet (new chat invite) they should respond as read-only (no `from`) until they decide to join/accept and then re-connect.
 
 ### Interface
 
@@ -139,7 +139,7 @@ Use the following to transform the fixed string values to binary when necessary:
 * `invited` = `0x01`
 * `block` = `0x00`
 
-The joining participant should try to initiate connections to the other participants via the originator (send a `peer` request directly to the originator for each participant), since they are connected already the originator can act as a temporary router to the other hashnames.
+The joining participant should try to initiate connections to the other participants via the leader (send a `peer` request directly to the leader for each participant), since they are connected already the leader can act as a temporary router to the other hashnames.
 
 ## Chat Messages
 
