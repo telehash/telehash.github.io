@@ -147,34 +147,12 @@ Each chat message is a LOB-encoded packet who's JSON object has these common fie
 
 * **id** - (required) the unique message id as calculated by the sender
 * **type** - (required) "chat"
-* **text** - (required) plain text, optionally basic markdown
+* **chat** - (required) plain text, optionally basic markdown
 * **state** - (optional) senders current activity state [active, inactive, gone, composing, paused] based on [XEP-0085](http://xmpp.org/extensions/xep-0085.html)
 * **after** - (required) the most recent message id in the chat the sender has seen
 * **at** - (optional) epoch (in seconds, UTC)
 * **refs** - (optional) object, key:uri pairs, references
-* **aka** - (optional, join only) array of other participant hashnames that are the same sender
-* **alts** - (optional) object, key:string of alternate text formats (rtf, xhtml, etc)
-
-The BODY of the packet is optional and it's usage is application-specific, common usages include attaching a cryptographic signature for external validation of the senders's identity.
-
-### join (chat 0)
-
-```json
-{
-  "id":"cbaccqcqiaqca,0",
-  "type":"chat",
-  "at":1394162554,
-  "text":"Jeff Strongman",
-  "refs":{"twitter":"http://twitter.com/strongman","email":"mailto:jeff@strongman.com","pic":"thtp:///profile/thumbnail.png","nick":"strongman"},
-  "aka":["e5mwmtsvueumlqgo32j67kbyjjtk46demhj7b6iibnnq36fsylka"]
-}
-```
-
-The text is the name for display, with optional profile pic (may be a THTP url) and nickname in the refs.
-
-The aka is other hashnames that must also be in the roster, and when validated by fetching their join message with a reciprocated hashname (or they're in "invited" state), messages from either should be visually displayed as from the same sender.  Joins with identical text/nick/pic (depending on what's displayed) should be modified visually so they are distinct (add a (2), etc).
-
-### chat
+* **alts** - (optional) object, key:string of alternate text formats (rtf, xhtml, etc), if the value is a boolean `true` the alternate is attached as the BODY
 
 ```json
 {
@@ -182,7 +160,7 @@ The aka is other hashnames that must also be in the roster, and when validated b
   "id":"k46demhj7b6ii,9",
   "at":1394162554,
   "after":"qgo32j67kbyjj,14",
-  "text":"...markdown \[ref\]\[\]...",
+  "chat":"...markdown \[ref\]\[\]...",
   "refs":{"ref":"uri:foo"}
 }
 ```
@@ -193,7 +171,35 @@ Chat messages should only be updated as long as there were no other messages sen
 
 When a message text begins with "/me " the UI should display the message styled as an "action" coming from the sender.
 
-## Acknowledgement Signals
+### Join Messages
+
+A join message is required before any chat messages from any participant, it is always the sequence `0` of the message IDs.
+
+* **id** - (required) the sequence `0` id for the participant
+* **type** - (required) "join"
+* **join** - (required) plain text
+* **at** - (optional) epoch (in seconds, UTC)
+* **refs** - (optional) object, key:uri pairs, references
+* **aka** - (optional) array of other participant hashnames that are the same sender
+
+```json
+{
+  "id":"cbaccqcqiaqca",
+  "type":"join",
+  "at":1394162554,
+  "join":"Jeff Strongman",
+  "refs":{"twitter":"http://twitter.com/strongman","email":"mailto:jeff@strongman.com","pic":"thtp:///profile/thumbnail.png","nick":"strongman"},
+  "aka":["e5mwmtsvueumlqgo32j67kbyjjtk46demhj7b6iibnnq36fsylka"]
+}
+```
+
+The join text is the name for display, with optional profile pic (may be a THTP url) and nickname in the refs.
+
+The aka is other hashnames that must also be in the roster, and when validated by fetching their join message with a reciprocated hashname (or they're in "invited" state), messages from either should be visually displayed as from the same sender.  Joins with identical text/nick/pic (depending on what's displayed) should be modified visually so they are distinct (add a (2), etc).
+
+The BODY may be a signed JWT that must contain the sender's `hashname` in the claims to be independently verified by the app.
+
+## Receipt Messages
 
 The channel can carry ad-hoc receipt messages alongside chats.  These messages have a `"type":"ack"` and are only sent from the recipient back to the sender/owner of a chat message.  They only signal a current state change and are never stored, cached, or re-sent.
 
@@ -201,7 +207,7 @@ The channel can carry ad-hoc receipt messages alongside chats.  These messages h
 {
   "type":"ack",
   "id":"k46demhj7b6ii,9",
-  "state":"received"
+  "ack":"received"
 }
 ```
 
