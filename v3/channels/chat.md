@@ -18,7 +18,7 @@ The simplest form of a `chat` between two `hashnames` is a single channel sendin
 
 All chat and message IDs are 8 bytes generated using [SipHash](http://en.wikipedia.org/wiki/SipHash), then base32 encoded (identically to hashnames) when used in a string.
 
-Every chat ID created by taking the 32 bytes from the hashname and appending the 8 byte SipHash output of some arbitrary or random value, then performing another SipHash of the total 40 bytes to get a final unique 8 byte ID. The variable source value can be automatically generated on demand to be unique, or may be derived from or mapped to other application-specific data to create fixed IDs for all participants.
+Every chat ID created by taking the 32 bytes from the hashname and appending the 8 byte SipHash output of some arbitrary or random value called the `name`, then performing another SipHash of the total 40 bytes to get a final unique 8 byte mesh-wide unique ID. The variable `name` value can be automatically generated on demand or may be derived from or mapped to other application-specific data to create stable IDs for all participants.
 
 ## THTP
 
@@ -66,7 +66,7 @@ The originator may set a star entry in the roster of `"*":"invite"` to indicate 
 
 The star entry of `"*":"block"` indicates that only hashnames listed in the roster may join and retrieve data.
 
-No start entry indicates that it is `visible` chat and read-only by default, anyone can retrieve data but only the hashnames listed in the roster can join.  If the originator makes changes to the roster on a visible chat it must re-connect to notify all of the participants of the changes.
+No star entry indicates that it is a read-only `visible` chat, anyone can retrieve data but only the hashnames listed in the roster can join.  If the originator makes changes to the roster on a visible chat it must re-connect to notify anyone connected of the changes.
 
 Any hashname in the roster can either have the values of "invite", "block", or their actual/known join message id, indicating that they are blocked, allowed to join, or already joined.
 
