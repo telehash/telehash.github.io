@@ -72,6 +72,8 @@ Any hashname in the roster can either have the values of "invite", "block", or t
 
 When new participants are added to the chat the nature of them connecting to everyone will update their rosters, but when the leader changes an existing entry it must re-establish chat channels with the participants to notify them of the roster change.  Participants only need to use their cached roster to determine the permission for any other incoming connection, and if they don't have a roster yet (new chat invite) they should respond as read-only (no `from`) until they decide to join/accept and then re-connect.
 
+The joining participant should try to initiate connections to the other participants via the leader (send a `peer` request directly to the leader for each participant), since they are connected already the leader can act as a temporary router to the other hashnames.
+
 ### Interface
 
 A chat UI is determined based on the roster and participants.  When there are only two participants (after resolving all the join messages and any `aka` values validated) and the roster is default blocked to new participants joining it can be shown as a 1:1 interface to the user, otherwise it should be shown as a list of participants / chatroom.
@@ -120,7 +122,7 @@ The join ID is then saved in the roster for every participating hashname and all
 
 ## Roster
 
-When fetched via THTP, the roster is a JSON object:
+When fetched via THTP, the roster is a serialized JSON object:
 
 ```json
 {
@@ -131,15 +133,8 @@ When fetched via THTP, the roster is a JSON object:
 }
 ```
 
-The roster hash is calculated by converting each key/value to binary and sorting the keys in ascending order.  The keys and values then have their SipHash digests calculated and are sequentially rolled up to a final digest.
+The leader must ensure that the encoding is always consistent between changes so that participants can use the SipHash digest calculated from the raw response to detect versions in the chat channel.
 
-Use the following to transform the fixed string values to binary when necessary:
-
-* `*` = `0x00`
-* `invited` = `0x01`
-* `block` = `0x00`
-
-The joining participant should try to initiate connections to the other participants via the leader (send a `peer` request directly to the leader for each participant), since they are connected already the leader can act as a temporary router to the other hashnames.
 
 ## Chat Messages
 
@@ -177,7 +172,7 @@ A join message is required before any chat messages from any participant, it is 
 
 * **id** - (required) the sequence `0` id for the participant
 * **type** - (required) "join"
-* **join** - (required) plain text
+* **join** - (required) plain text visible name
 * **at** - (optional) epoch (in seconds, UTC)
 * **refs** - (optional) object, key:uri pairs, references
 * **aka** - (optional) array of other participant hashnames that are the same sender
