@@ -46,7 +46,7 @@ hash = sha256(hash + 0x97d83d1af8919874a449769145b7b3cb46359b2c12169ee53e683477b
 final = hash
 ```
 
-Here is a working example in node.js to do the calculation, results in `5ccn9gcxnj9nd7hp1m3v5pjwcu5hq80bt366bzh1ebhf9zqaxu2g`
+Here is a working example in node.js to do the calculation, results in `27ywx5e5ylzxfzxrhptowvwntqrd3jhksyxrfkzi6jfn64d3lwxa`
 
 ```js
 var crypto = require("crypto");
@@ -62,6 +62,7 @@ Object.keys(keys).sort().forEach(function(id){
   rollup = crypto.createHash("sha256").update(Buffer.concat([rollup,intermediate])).digest();
 });
 var hashname = base32.encode(rollup).toLowerCase().split("=").join(""); // normalize to lower case and remove padding
+console.log(hashname); // prints 27ywx5e5ylzxfzxrhptowvwntqrd3jhksyxrfkzi6jfn64d3lwxa
 ```
 
 ## Mapping/Addressing
