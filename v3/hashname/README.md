@@ -18,17 +18,17 @@ A hashname is calculated by combining the binary public key material of one or m
 
 The generation has three distinct steps:
 
-1. Each active key is mapped to a unique one-byte `ID` based on its algorithm to provide consistent ordering
-2. The binary key material for each `ID` is hashed into intermediate digest values
+1. Each active key is mapped to a unique one-byte `CSID` based on its algorithm to provide consistent ordering
+2. The binary key material for each `CSID` is hashed into intermediate digest values
 3. An ordered roll-up hashing of the intermediate values generates the final 32-byte digest
 
-### Key IDs
+### Key CSIDs
 
-Each public key included must have a unique single-byte `ID` with a byte array `VALUE` that is the consistent binary encoding of that public key material for a given algorithm. Only one key can be used per-algorithm to calculate a hashname.
+Each public key included must have a unique single-byte `CSID` with a byte array `VALUE` that is the consistent binary encoding of that public key material for a given algorithm. Only one key can be used per-algorithm to calculate a hashname.
 
-The current public key `ID` mappings and `VALUE` binary encodings are defined in [Cipher Sets](../e3x/cs/).
+The current public key `CSID` mappings and `VALUE` binary encodings are defined in [Cipher Sets](../e3x/cs/).
 
-Any hashname generation software does not need to know or understand the Cipher Sets or support the algorithms defined there, it only has to do the consistent hashing of any given set of `ID` and `VALUE` pair inputs.
+Any hashname generation software does not need to know or understand the Cipher Sets or support the algorithms defined there, it only has to do the consistent hashing of any given set of `CSID` and `VALUE` pair inputs.
 
 ### Intermediate Hashing
 
@@ -36,7 +36,7 @@ The binary byte array `VALUE` of each public key must first be hashed, resulting
 
 ### Final Rollup
 
-To calculate the hashname the intermediate digests are sequentially hashed in ascending order by their `ID`. Each one contributes two values: the single byte `ID` value and the 32 byte intermediate digest value. The calculated hash is rolled up, wherein each resulting 32 byte binary output is concatenated with the next binary value as the input. An example calculation would look like (in pseudo-code):
+To calculate the hashname the intermediate digests are sequentially hashed in ascending order by their `CSID`. Each one contributes two values: the single byte `CSID` value and the 32 byte intermediate digest value. The calculated hash is rolled up, wherein each resulting 32 byte binary output is concatenated with the next binary value as the input. An example calculation would look like (in pseudo-code):
 
 ```js
 hash = sha256(0x1a)
@@ -71,5 +71,3 @@ When exchanging hashnames over existing IPv4/IPv6 based systems, the 4 or 16 byt
 When the IP space must be scoped into a reserved range and the port number is also available to use, the first 2 bytes may be sent as the port and then those 2 bytes in the address are hard-coded to a reserved IP prefix.
 
 A hashname may also be used as a normal MAC address with the prefix of `42` (has the locally-assigned bit set) and the first 5 bytes of the hashname: `42:XX:XX:XX:XX:XX`.
-
-
