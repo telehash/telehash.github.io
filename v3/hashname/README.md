@@ -46,7 +46,7 @@ hash = sha256(hash + 0x97d83d1af8919874a449769145b7b3cb46359b2c12169ee53e683477b
 final = hash
 ```
 
-Here is a working example in node.js to do the calculation, results in `5ccn9gcxnj9nd7hp1m3v5pjwcu5hq80bt366bzh1ebhf9zqaxu2g`
+Here is a working example in node.js to do the calculation, results in `27ywx5e5ylzxfzxrhptowvwntqrd3jhksyxrfkzi6jfn64d3lwxa`
 
 ```js
 var crypto = require("crypto");
@@ -62,6 +62,7 @@ Object.keys(keys).sort().forEach(function(id){
   rollup = crypto.createHash("sha256").update(Buffer.concat([rollup,intermediate])).digest();
 });
 var hashname = base32.encode(rollup).toLowerCase().split("=").join(""); // normalize to lower case and remove padding
+console.log(hashname); // prints 27ywx5e5ylzxfzxrhptowvwntqrd3jhksyxrfkzi6jfn64d3lwxa
 ```
 
 ## Mapping/Addressing
@@ -71,5 +72,3 @@ When exchanging hashnames over existing IPv4/IPv6 based systems, the 4 or 16 byt
 When the IP space must be scoped into a reserved range and the port number is also available to use, the first 2 bytes may be sent as the port and then those 2 bytes in the address are hard-coded to a reserved IP prefix.
 
 A hashname may also be used as a normal MAC address with the prefix of `42` (has the locally-assigned bit set) and the first 5 bytes of the hashname: `42:XX:XX:XX:XX:XX`.
-
-
