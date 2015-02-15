@@ -147,7 +147,7 @@ Each chat message is a LOB-encoded packet who's JSON object has these common fie
 * **after** - (required) the most recent message id in the chat the sender has seen
 * **at** - (optional) epoch (in seconds, UTC)
 * **refs** - (optional) object, key:uri pairs, references
-* **alts** - (optional) object, key:string of alternate text formats (rtf, xhtml, etc), if the value is a boolean `true` the alternate is attached as the BODY
+* **alts** - (optional) object, key:string of alternate formats of the chat content (rtf, xhtml, etc), if the value is a boolean `true` the alternate is attached as the BODY
 
 ```json
 {
