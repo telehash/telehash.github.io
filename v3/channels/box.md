@@ -1,4 +1,4 @@
-# Box - Offline Signalling (Store-and-Forward)
+# `box` - Offline Signalling (Store-and-Forward)
 
 The box channel is used to asynchronously send and receive encrypted [messages](../e3x/messages.md) directly or via any shared hashname that is acting as a cache/router.  A caching entity can be selected automatically based on capacity/availability or chosen specifically based on app configuration.
 
