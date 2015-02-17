@@ -84,40 +84,7 @@ The fields are defined as:
 
 A chat channel can be opened by any hashname to another hashname that is either the leader or an existing participant, but it can only be initially started by the leader to invite a new hashname as a participant to an existing chat (participants can't invite each other directly).  An invitation from the leader always has a join value identical to the chat.
 
-Once open, chat channels carry individual synchronous messages bi-directionally with each message having its own type value defined below.
-
-
-###  Message Serialization
-
-A message is a regular [LOB](../lob) encoded packet and can be of any size, so they must be broken into segments and re-assembled if they are larger than the capacity of a single chat channel packet.
-
-To send a short message that fits in one packet it's just:
-
-```json
-{
-  "c":1,
-  "seq":1,
-  "done":true
-}
-BODY: message packet
-```
-
-To break a 1841 byte message into parts it's:
-
-```json
-{
-  "c":1,
-  "seq":1
-}
-BODY: bytes 0 to 1000
-
-{
-  "c":1,
-  "seq":2,
-  "done":true
-}
-BODY: bytes 1001 to 1841
-```
+Once open, chat channels are a normal [stream](stream.md) carrying individual synchronous `lob` encoded messages bi-directionally and chunked as needed.
 
 
 ### `"type":"chat"` - Content Messages
