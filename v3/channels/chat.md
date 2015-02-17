@@ -159,6 +159,7 @@ A join message is required before any chat messages from any participant, its ID
 * **type** - (required) "join"
 * **text** - (required) plain text visible name
 * **at** - (optional) epoch (in seconds, UTC)
+* **after** - (optional) "last" value from chat invite, if given
 * **refs** - (optional) object, key:uri pairs, references
 * **aka** - (optional) array of other participant hashnames that are the same sending entity (to support multiple participating devices as one person)
 
