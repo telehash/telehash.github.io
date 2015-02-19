@@ -81,6 +81,8 @@ A new request is initiated by creating a reliable channel of type `thtp`, multip
 
 The channel open packet includes all of or as much of the request packet as possible in the BODY, with subsequent packets if it needs to be fragmented and the last packet always including an `"end":true` to end the channel.
 
+The channel is also compatible with [streams](stream.md) such that an implementation can share the same underlying channel handler/streaming logic.
+
 ```json
 {
   "c":1,

@@ -84,7 +84,7 @@ The fields are defined as:
 
 A chat channel can be opened by any hashname to another hashname that is either the leader or an existing participant, but it can only be initially started by the leader to invite a new hashname as a participant to an existing chat (participants can't invite each other directly).  An invitation from the leader always has a join value identical to the chat.
 
-Once open, chat channels are a normal [stream](stream.md) carrying individual synchronous `lob` encoded messages bi-directionally and chunked as needed.
+Once open, chat channels are a normal [stream](stream.md) using `lob` encoding to carry individual synchronous messages bi-directionally and chunked as needed.
 
 
 ### `"type":"chat"` - Content Messages
