@@ -22,7 +22,7 @@ The message is a [packet encoding](cs/#packet) of the sender's keys, where the `
 
 ### "jwt"
 
-The message is a [JSON Web Token](../guides/jose.md#jwt) encoded packet.
+The message is a [JSON Web Token](../guides/JOSE.md#jwt) encoded packet.
 
 ### "uri"
 
