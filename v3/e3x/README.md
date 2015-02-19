@@ -30,6 +30,7 @@ These are similar low-level encrypted wire protocols:
 * [JavaScript](https://github.com/telehash/e3x-js)
 * [C](https://github.com/telehash/telehash-c/blob/master/src/e3x.h)
 * [Go](https://github.com/telehash/gogotelehash/tree/master/e3x)
+* [C#](https://github.com/telehash/telehash.net/tree/master/Telehash.Net/E3X)
 
 
 |              | base | reliable | cloaking | 1a | 1b | 1c | 2a | 2b | 3a |
@@ -39,12 +40,15 @@ These are similar low-level encrypted wire protocols:
 |   c - unix   |   ✓  |    ✓    |     ✓    |  ✓ |    |    | ✓ |    | ✓ |
 | c - embedded |   ✓  |    ✓    |     ✓    |  ✓ |    |    |    |    |    |
 |      go      |   ✓  |     ✓    |          |  ✓ |    |    |    |    |    |
+|      c#      |   ✓  |         |          |  ✓ |    |    | ✓ |    |    |
 
 ## API 
 
 The interface to use e3x is designed to minimize any accidential leakage of information by having a small explicit API.
 
 Implementations may vary depending on their platform/language but should strive for a similar common pattern of interaction and method/data language as documented here at a high level.
+
+All implementations will require a strong/secure random number generator to properly support all aspects of this API and the underlying ciphers/algorithms.
 
 ### `generate`
 

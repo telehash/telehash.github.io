@@ -20,6 +20,9 @@ Two endpoints must always create exchanges to each other using the highest commo
 
 Any `CSID` of `0x0*` (`0x01` through `0x0a`) are reserved for special use custom Cipher Sets whose definitions are entirely app-specific, the `0x00` `CSID` is not allowed and always considered invalid.
 
+Every `CS` requires a strong/secure random number generator in order to minimally function, some of them may have additional entropy requirements during endpoint key generation.
+
+
 ## Exchanging CS Keys
 
 Cipher Sets are designed to be combined together for use as [hashnames](../../hashname/) so that one local instance can simultaneously use multiple `CS`, always selecting the best one to use based on what is available to another instance.
