@@ -47,8 +47,8 @@ To handle a new `path` request, a response packet must be sent back to to every 
 
 The information about an available network transport is encoded as a JSON object that contains a `"type":"..."` to identify which type of network it describes. The current path types defined are:
 
-* `udp4` / `udp6` - [UDP](../transports/udp.md), contains `ip` and `port`, may be multiples (public and private ip's)
+* `udp4` / `udp6` - [UDP](../transports/udp.md), contains `ip` and `port`, may be multiple (public and private ip's)
 * `tcp4` / `tcp6` - [TCP](../transports/tcp.md), contains `ip` and `port` like UDP
 * `http` - contains `url` which can be http or https, see [HTTP](../transports/http.md) for details
 * `webrtc` - see [WebRTC](../transports/webrtc.md), ideal for browsers that have only HTTP support
-* `peer` - contains `hn` which is sent [peer](peer.md) requests to provide routing assistance, optional `[uri](../uri.md)` if provided by the peer
+* `peer` - contains `hn` which is sent [peer](peer.md) requests to provide routing assistance, optional [`uri`](../uri.md) if provided by the peer
