@@ -28,8 +28,12 @@ LOB encoding directly encodes/decodes from JWT/JWS/JWE:
 
 ## Public Key Algorithms
 
-Overlap between Cipher Set requirements and standard JOSE algorithms:
+Overlap between Cipher Set requirements and standard JOSE algorithms (JWA):
 
 * [CS1a](e3x/cs/1a.md) compat w/ `HS256`, `A128KW`, propose alg `ES160` for secp160r1?
 * [CS2a](e3x/cs/2a.md) is compatible with `RS256`, `RSA-OAEP`, `A256GCMKW` and `ES256`
 * [CS3a](e3x/cs/2a.md) propose `ED25519` for NaCl?
+
+## JWA/JWE for CSets
+
+> possible to define a JWA for encryption for each cipher set message format?
