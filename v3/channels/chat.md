@@ -27,22 +27,25 @@ The first participant is always the `leader` and their generated join ID also be
 
 ## Join Channel
 
-Before any participant can join a chat they must connect to the leader and send their profile message:
+Before any participant can join a chat they must connect to the leader and exchange profile messages:
 
 ```json
 {
   "c":1,
   "seq":1,
   "type":"join",
-  "join":"sgoomt3lqqkia"
+  "join":"sgoomt3lqqkia",
+  "last":"cn33wzacvwfya"
 }
 ```
 
-The join channel is a normal [stream](stream.md) using `lob` encoding and the sender immediately sends a profile message on the stream.
+The join channel is a normal [stream](stream.md) using `lob` encoding and the sender immediately sends their profile message on the stream and then ends it.
 
-If the leader accepts the join, they immediately stream back their own profile and end the channel.  The participant can then open a chat channel to start the normal messaging flow.
+If/when the leader accepts the join, they open a join channel back and send their own profile, including the participant's profile id as the (optional) `last` value.  The participant can then open a chat channel to start the normal messaging flow.  If the participant has already received the leader's profile it includes a `last`.
 
 The leader validates the profile and publishes it as a join to any other participants so that they can accept a chat channel from the new participant as well.
+
+The leader may also invite participants by initiating the first join channel to them, the `join` id must match the profile message id to be a valid invite.  A participant can then send a join back and wait for the leader to start a chat back to them once processed.
 
 ## Chat Channel
 
