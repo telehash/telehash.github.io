@@ -18,7 +18,24 @@ Any decrypted handshake message is identified with a `"type":"..."` string value
 
 ### "key" (default)
 
-The message must attach the [packet encoding](cs/#packet) of the sender's keys as the BODY.
+The message must attach the [binary packet encoding](cs/#packet) of the sender's keys as the BODY, it contains the intermediates of all supported ciphersets and the binary public key bytes so that the sender's hashname can be validated and a handshake can be generated in response.
+
+Example:
+
+```json
+{
+  "type":"key",
+  "at":123456789
+}
+BODY:
+  {
+    "3a": "eg3fxjnjkz763cjfnhyabeftyf75m2s4gll3gvmuacegax5h6nia",
+    "1a": "ckczcg2fq5hhaksfqgnm44xzheku6t7c4zksbd3dr4wffdvvem6q"
+  }
+  BODY: [2a's public key binary bytes]
+```
+
+
 
 ### "jwt"
 
