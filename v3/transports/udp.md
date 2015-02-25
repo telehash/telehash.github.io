@@ -17,3 +17,25 @@ A new keepalive handshake should be automatically triggered when no packets have
 UDP transports must always also listen on `*:42420` with broadcast enabled and also join the multicast address group `239.42.42.42` when available.
 
 When discovery is enabled, the announcement packet(s) should be broadcast to the local LAN subnets port `42420` and the multicast group once every 10 seconds.
+
+## Path JSON
+
+Example [path](../channels/path.md) JSON for IPv4:
+
+```json
+{
+    "ip": "192.168.0.55",
+    "port": 42424,
+    "type": "udp4"
+}
+```
+
+Example [path](../channels/path.md) JSON for IPv6:
+
+```json
+{
+    "ip": "fe80::bae8:56ff:fe43:3de4",
+    "port": 42424,
+    "type": "udp6"
+}
+```
