@@ -13,4 +13,13 @@ By default all packets should be sent as `volatile` events, but handshakes may b
 
 A new keepalive handshake may be automatically triggered when no packets have been sent for 60 seconds as an extra validation that the socket.io connection is valid.
 
+## Path JSON
 
+Example [path](../channels/path.md) JSON:
+
+```json
+{
+    "url": "https://192.168.0.36:42424",
+    "type": "http"
+}
+```
