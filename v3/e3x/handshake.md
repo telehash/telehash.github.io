@@ -4,7 +4,7 @@ A handshake is one or more encrypted [messages](messages.md) sent between two en
 
 Applications may send or expect more than one handshake message for additional authentication and authorization requirements beyond the basic endpoint key exchange. New handshakes are also triggered automatically for existing sessions as needed by the transport(s) in use to verify that the network paths are still valid and/or maintain any NAT mappings.
 
-The resulting size of encrypted handshake packets vary by which Cipher Sets are used and the value of the inner packet, typically it ranges from ~70 to ~1100 bytes.
+The resulting size of encrypted handshake packets vary by which [Cipher Sets](cs/) are used combined with the type of inner packet, typically it ranges from ~70 to ~1100 bytes.
 
 ## Resend/Timeout
 
@@ -14,11 +14,28 @@ At any point the transport being used to deliver packets may generate a keepaliv
 
 ## Message Types
 
-Any decrypted handshake message is identified with a `"type":"..."` string value, that if not included in the header must be defaulted to the type of `"key"`.  Only one unique type may exist concurrently with any handshake.
+Any decrypted handshake message is identified with a `"type":"..."` string value, that if not included in the header must be defaulted to the type of `"key"`.  Only one unique type may exist concurrently (same `at` value) with any handshake process.
 
 ### "key" (default)
 
-The message is a [packet encoding](cs/#packet) of the sender's keys, where the `BODY` must be the correct key bytes to use for this exchange.
+The message must attach the [binary packet encoding](cs/#packet) of the sender's keys as the BODY, it contains the intermediates of all supported ciphersets and the binary public key bytes so that the sender's hashname can be validated and a handshake can be generated in response.
+
+Example:
+
+```json
+{
+  "type":"key",
+  "at":123456789
+}
+BODY:
+  {
+    "3a": "eg3fxjnjkz763cjfnhyabeftyf75m2s4gll3gvmuacegax5h6nia",
+    "1a": "ckczcg2fq5hhaksfqgnm44xzheku6t7c4zksbd3dr4wffdvvem6q"
+  }
+  BODY: [2a's public key binary bytes]
+```
+
+
 
 ### "jwt"
 

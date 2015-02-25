@@ -10,7 +10,7 @@ Reliability is requested on a channel with the very first packet (that contains 
 
 The requirement for a reliable channel is always including a simple incrementing `"seq":1` positive integer value on every packet that contains any content (including the `end`). All `seq` values start at 1 with the open and increment per packet sent when it contains any data to be processed, with a maximum value of 4,294,967,295 (a 32-bit unsigned integer)
 
-A buffer of these packets must be kept keyed by the seq value until the recipient has responded confirming them in an `[ack](#ack)`. When the buffer is nearing full or new packets are being dropped, a `[miss](#miss)` should be sent to indicate what is missing and the capacity left.
+A buffer of these packets must be kept keyed by the seq value until the recipient has responded confirming them in an [`ack`](#ack). When the buffer is nearing full or new packets are being dropped, a [`miss`](#miss) should be sent to indicate what is missing and the capacity left.
 
 The receiving app logic must only process sequenced packets and their contents in order, any packets received with a sequence value that is older than already processed ones must be dropped, and any of order must either be buffered or dropped depending on local resources available.  
 
@@ -48,4 +48,3 @@ Given the raw list of missing `seq` ids `[78236, 78235, 78245, 78238]` and `"ack
 3. If the incoming max buffer size is 20 packets, append the highest acceptable seq (`78251`) as a final delta (`78251 - 78245`).<br/>
    `[4, 1, 2, 7, 6]`
 3. Deliver the final delta encoded `miss` array.
-
