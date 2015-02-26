@@ -53,14 +53,6 @@ BODY: {"aad":"","iv":"","tag":"","encrypted_key":""}
     BODY: ciphertext
 ```
 
-## Public Key Algorithms
-
-Overlap between Cipher Set requirements and standard JOSE algorithms (JWA):
-
-* [CS1a](e3x/cs/1a.md) compat w/ `HS256`, `A128KW`, propose alg `ES160` for secp160r1?
-* [CS2a](e3x/cs/2a.md) is compatible with `RS256`, `RSA-OAEP`, `A256GCMKW` and `ES256`
-* [CS3a](e3x/cs/2a.md) propose `ED25519` for NaCl?
-
 ## JOSE Cipher Sets
 
 The JOSE stack can be used to implement an entire [Cipher Set](../e3x/cs/) in a generic way, where a JWE is the wire format for the encrypted message and channel packets.
@@ -73,4 +65,4 @@ Applications using JOSE-based CSIDs should be careful to not use the features of
 
 * An e3x message requires both encryption and signing, so it is a JWE of a JWS payload.
 * A handshake includes the sender's key, attached as a JWK.
-* The channel encryption does not require signing, so it is just a JWE with the channel packet as the payload.
+* If the handshake used ephemeral key agreement (ECDH) then channel encryption can reference that agreement and does not require signing and it is just a JWE with the channel packet as the payload, otherwise channel encryption is identical to a message
