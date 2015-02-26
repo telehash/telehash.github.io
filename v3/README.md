@@ -40,6 +40,7 @@ Experimental implementations are being actively developed at:
 * [telehash-js](https://github.com/telehash/telehash-js)
 * [telehash-c](https://github.com/telehash/telehash-c).
 * [gogotelehash](https://github.com/telehash/gogotelehash)
+* [python](https://github.com/telehash/e3x-python)
 * [others in progress](https://github.com/telehash)
 
 
@@ -50,3 +51,4 @@ Experimental implementations are being actively developed at:
 |   c - unix   |     ✓    |   ✓  |  ✍ |    ✍   |    ✍   |    ✍   |  ✓  |  ✓  |      |     |        |           |
 | c - embedded |     ✓    |   ✓  |  ✍ |         |    ✍   |    ✍   |  ✍ |  ✍ |      |     |        |           |
 |      go      |     ✓    |   ✓  |     |         |         |         |  ✓  |     |      |     |        |           |
+|    python    |     ✓    |   ✍  |    |         |        |        |  ✍ |    |      |     |        |           |
