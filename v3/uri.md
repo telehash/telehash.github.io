@@ -17,7 +17,7 @@ A generated URI will often include additional pathname or query string values as
 Examples:
 
 ```
-chat://127.0.0.1:55772/?1a=aof7baqdudm3mmjgexy5yqxj3m23pcsupy
+chat://127.0.0.1:55772/?cs1a=aof7baqdudm3mmjgexy5yqxj3m23pcsupy
 ```
 
 ### Router / Peer
@@ -54,6 +54,33 @@ When a URI is processed that contains a fragment it generates a new [peer](chann
 The Cipher Set keys for an endpoint may be included in the query string of any existing URI.
 
 Each `CSID` is included as an individual key/value pair where the key is the format `cs??` (`cs1a`, `cs2a`, etc) and the value is always the base32 encoded key bytes.
+
+## Embedded Paths
+
+The current paths may also be included in the query string of any existing URI.  Each available path has its JSON object base32 encoded as the value and is included with a common `paths` key, multiple paths have the same key.
+
+When the paths are able to be generated from the hostname in the URI it is not necessary to include them in the query string.
+
+Example paths:
+```json
+[
+    {
+        "http": "http://192.168.0.36:42424",
+        "type": "http"
+    },
+    {
+        "ip": "192.168.0.36",
+        "port": 42424,
+        "type": "udp4"
+    },
+    {
+        "ip": "fe80::bae8:56ff:fe43:3de4",
+        "port": 42424,
+        "type": "tcp6"
+    }
+]
+URL: proto://host/path?key=value&paths=pmrgq5duoarduitior2haorpf4ytsmroge3dqlrqfyztmorugi2denbcfqrhi6lqmurduitior2hait5&paths=pmrgs4bchirdcojsfyytmobogaxdgnrcfqrha33soqrdunbsgqzdilbcor4xazjchirhkzdqgqrh2&paths=pmrgs4bchirgmzjyga5duytbmu4dunjwmztduztfgqztum3emu2celbcobxxe5bchi2denbsgqwce5dzobsseorcorrxanrcpu
+```
 
 ## Generated Paths
 
