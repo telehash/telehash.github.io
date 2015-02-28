@@ -65,7 +65,7 @@ Example paths:
 ```json
 [
     {
-        "http": "http://192.168.0.36:42424",
+        "url": "http://192.168.0.36:42424",
         "type": "http"
     },
     {
@@ -79,7 +79,7 @@ Example paths:
         "type": "tcp6"
     }
 ]
-URL: proto://host/path?key=value&paths=pmrgq5duoarduitior2haorpf4ytsmroge3dqlrqfyztmorugi2denbcfqrhi6lqmurduitior2hait5&paths=pmrgs4bchirdcojsfyytmobogaxdgnrcfqrha33soqrdunbsgqzdilbcor4xazjchirhkzdqgqrh2&paths=pmrgs4bchirgmzjyga5duytbmu4dunjwmztduztfgqztum3emu2celbcobxxe5bchi2denbsgqwce5dzobsseorcorrxanrcpu
+URL: proto://host/path?key=value&paths=pmrhk4tmei5ce2duorydulzpge4telrrgy4c4mbogm3dunbsgqzdiirmej2hs4dfei5ce2duoryce7i&paths=pmrgs4bchirdcojsfyytmobogaxdgnrcfqrha33soqrdunbsgqzdilbcor4xazjchirhkzdqgqrh2&paths=pmrgs4bchirgmzjyga5duytbmu4dunjwmztduztfgqztum3emu2celbcobxxe5bchi2denbsgqwce5dzobsseorcorrxanrcpu
 ```
 
 ## Generated Paths
