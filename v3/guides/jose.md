@@ -1,0 +1,69 @@
+# JOSE - JSON Object Signing and Encryption
+
+> WIP
+
+[JOSE](https://datatracker.ietf.org/wg/jose/charter/) interop/usage guide.
+
+
+## JWS/JWT/JWE to LOB Encoding
+
+[LOB encoding](../lob/) is directly mapped to and from JWS/JWE compact serialization.  The LOB encoding is simply a consistent binary translation of a JWS/JWE, there is no semantic changes to the contents in either direction.
+
+### JWS
+
+Any [JWS](https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41) can be mapped to two LOB packets (one attached to another):
+
+* HEAD: {JWS Protected Header (JWT Header)}
+* BODY: attached LOB
+  * HEAD: {JWS Payload (JWT Claims)}
+  * BODY: JWS Signature (binary)
+
+### JWE
+
+Any [JW#](https://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-40) can be mapped to three LOB packets (as attached descendents):
+
+* HEAD: {JWE Protected Header}
+* BODY: attached LOB
+  * HEAD: {JWE JSON (Encrypted Key, IV, Tag, AAD)}
+  * BODY: attached LOB
+    * HEAD: {optional unprotected header}
+    * BODY: JWE Ciphertext (binary)
+
+Example:
+
+```
+{"alg":"RSA-OAEP","enc":"A256GCM"}
+BODY: {"aad":"","iv":"","tag":"","encrypted_key":""}
+  BODY: (no header)
+    BODY: ciphertext
+```
+
+## JOSE-Based Cipher Sets
+
+The JOSE stack can be used to implement an entire [Cipher Set](../e3x/cs/) in a generic way, where a JWE is used directly as the wire format for the encrypted message and channel packets.
+
+Since the CSID is a simple ordering preference indicator and a JWE can internally signal its encryption algorithms, any reserved CSID can be used by applications to map their chosen `alg` value(s) to.
+
+Applications using JOSE-based CSIDs should be careful to not use the features of JWE such as unprotected headers or multiple recipients that expose significantly more metadata to the network and untrusted entities, reducing the level of expected privacy.
+
+> todo formalize and examples
+
+* The CS public key bytes are a JWK
+* An e3x message requires both encryption and signing, so it is always a JWE of a JWS payload.
+* If the handshake used ephemeral key agreement (ECDH) then channel encryption can reference that agreement and does not require signing (it is just a JWE with the channel packet as the payload), otherwise channel encryption is identical to a message
+
+## JWK Encoded Hashname Keys
+
+The public keys that compose a single hashname can be represented in a [JWK](https://tools.ietf.org/html/draft-ietf-jose-json-web-key-41) using a `kty` of `hashname`:
+
+```json
+{
+    "kty": "hashname",
+    "kid": "27ywx5e5ylzxfzxrhptowvwntqrd3jhksyxrfkzi6jfn64d3lwxa",
+    "use": "e3x",
+    "cs1a": "an7lbl5e6vk4ql6nblznjicn5rmf3lmzlm",
+    "cs3a": "eg3fxjnjkz763cjfnhyabeftyf75m2s4gll3gvmuacegax5h6nia"
+}
+```
+
+The `kid` must always be the matching/correct hashname for the included keys.  The `use` value must always be `e3x` as it can only be used to create exchanges.
