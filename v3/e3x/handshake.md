@@ -18,7 +18,7 @@ Any decrypted handshake message is identified with a `"type":"..."` string value
 
 ### "link" (default)
 
-The message must attach the [binary packet encoding](cs/#packet) of the sender's keys as the BODY, it contains the intermediates of all supported ciphersets and the binary public key bytes so that the sender's hashname can be validated and a handshake can be generated in response.
+The message must attach the [binary packet encoding](cs/#packet) of the sender's keys as the `BODY`, it contains the intermediates of all supported ciphersets and the binary public key bytes so that the sender's hashname can be validated and a handshake can be generated in response.
 
 Example:
 
@@ -56,7 +56,7 @@ BODY: [2a's public key binary bytes]
 
 ### "jwt"
 
-The message is a [JSON Web Token](../guides/jose.md#jwt) encoded packet.
+The message `BODY` is a [JSON Web Token](../guides/jose.md#jwt) encoded packet.
 
 ### "uri"
 
