@@ -10,4 +10,4 @@ Consider using [UriBeacon](https://github.com/google/uribeacon/tree/master/speci
 
 ## Connections
 
-See [chunking](../lob/chunking.md) for encoding packets as a series of PDUs.
+See [chunking](../chunking.md) for encoding packets as a series of PDUs.

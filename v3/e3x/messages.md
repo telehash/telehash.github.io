@@ -8,7 +8,7 @@ An exchange may be created on demand just to generate/process one or more messag
 
 All [handshakes](handshake.md) are message packets.
 
-The size of an encrypted message is determined by the application and context in which it is used, handshakes are usually small (<1400 bytes to maximize transport compatibility) and any messages intended to be sent over a transport with a low MTU may need to use [chunked encoding](../lob/chunking.md) as the BODY of multiple messages.
+The size of an encrypted message is determined by the application and context in which it is used, handshakes are usually small (<1400 bytes to maximize transport compatibility) and any messages intended to be sent over a transport with a low MTU may need to use [chunked encoding](../chunking.md) as the BODY of multiple messages.
 
 ## Packet Encryption
 

@@ -1,7 +1,7 @@
 TCP Transport
 =============
 
-See [chunking](../lob/chunking.md) for how to encode one or more packets on a standard TCP socket.  All packets must be [cloaked](../e3x/cloaking.md).
+See [chunking](../chunking.md) for how to encode one or more packets on a standard TCP socket.  All packets must be [cloaked](../e3x/cloaking.md).
 
 Local port binding is dynamic (bind to `0`) unless given a specific port.  Implementations should support mapping the dynamic port via NAT-PMP and UPnP when possible.
 
