@@ -14,7 +14,7 @@ Both endpoints must include identical `z` in a confirmed handshake in order for 
 
 ## `0` LOB encoded (default)
 
-All channel payload bytes are [LOB encoded](../lob).
+All channel payload bytes are [LOB encoded](../lob.md).
 
 ## `1` CBOR encoded
 

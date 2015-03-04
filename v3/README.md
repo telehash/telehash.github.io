@@ -24,7 +24,7 @@ Telehash is a project to create interoperable private mesh networking:
 The full protocol is a composite of different individual specifications:
 
 * [hashname](hashname.md) - public key fingerprint (address format)
-* [lob](lob/) - length-object-binary, json+binary serialization (packetization)
+* [lob](lob.md) - length-object-binary, json+binary serialization (packetization)
 * [e3x](e3x/) - end-to-end encrypted exchange (wire encoding, crypto)
 * [link](link.md) - establishing and maintaining connections betweent two endpoints
 * [mesh](mesh.md) - higher level tools to manage multiple links and do local discovery
