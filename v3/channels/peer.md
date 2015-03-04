@@ -2,7 +2,9 @@
 
 Any endpoint can request another to act as a router to an endpoint it is attempting to link with.  These routing requests are sent in a `"type":"peer"` unreliable channel.  A peer request is typically generated as the result of having a [peer path](path.md) for any endpoint.
 
-A peer open request requires a `"peer":"fvifxlr3bsaan2jajo5qqn4au5ldy2ypiweazmuwjtgtg43tirkq"` where the value is the hashname the sender is trying to reach. The `BODY` of the open request must contain an attached packet with information for the specified peer to qualify the original sender.  The `BODY` will be relayed by the routing endpoint.
+A peer open request contains a `"peer":"fvifxlr3bsaan2jajo5qqn4au5ldy2ypiweazmuwjtgtg43tirkq"` where the value is a the hashname the sender is trying to reach.  In some cases the hashname may not be known yet and the peer request was the result of a router-generated [URI](../uri.md), included as the `"uri":"..."` value.
+
+The `BODY` of the open request must contain an attached packet with information for the specified peer to qualify the original sender.  The `BODY` will be relayed by the routing endpoint.
 
 The recipient of the peer request is called the `router` and must qualify the specified `peer` value to make sure that it is able to establish a channel with it.  It must also ensure that either the sender or peer endpoints have an active link and are trusted to provide routing for.
 
