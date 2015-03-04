@@ -1,7 +1,7 @@
 Mesh Network
 ============
 
-A mesh network consists of one or more [links](link.md), which are active [encrypted sessions](e3x/) between two endpoints over any [transport](transports/).  Each endpoint is identified with a unique [hashname](hashname/), the fingerprint of it's public key(s).  A mesh is private to each endpoint, which has complete control over what links it accepts, there is no automatic sharing of any link state to any other link.
+A mesh network consists of one or more [links](link.md), which are active [encrypted sessions](e3x/) between two endpoints over any [transport](transports/).  Each endpoint is identified with a unique [hashname](hashname.md), the fingerprint of it's public key(s).  A mesh is private to each endpoint, which has complete control over what links it accepts, there is no automatic sharing of any link state to any other link.
 
 Once a link is up, [channels](channels/) are used to run common services over it:
 
