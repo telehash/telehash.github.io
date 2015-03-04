@@ -20,7 +20,8 @@ Examples:
 chat://127.0.0.1:55772/?cs1a=aof7baqdudm3mmjgexy5yqxj3m23pcsupy
 ```
 
-### Router / Peer
+<a name="peer" />
+### Router / Peer URI
 
 A common architecture includes a designated router that facilitates the connection process with peers.  The router can generate an authorative base URI for peers to re-use and advertises it to them in a [path](channels/path.md) request.  This allows a peer to be reachable via a URI but still remain private and not share any of its identity information (hashname, keys, or paths).
 
