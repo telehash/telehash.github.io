@@ -1,42 +1,37 @@
 # Hashnames
 
-A `hashname` is a unique fingerprint to represent one or more public keys of different formats, so that addressing and identity can be consistent across multiple PKI systems. This enables a compatibility layer for updating PKI in any application so that it can still represent and verify itself to both existing and new instances.
+A `hashname` is a unique fingerprint to represent the union of one or more public keys of different formats ([Cipher Sets](e3x/cs/)), providing consistent verifiable endpoint addresses utilizing multiple PKI systems. This enables a compatibility layer for adding or enhancing PKI in any application so that it can still represent itself securely to both existing and new endpoints.
 
-The `hashname` is always a [base 32](http://tools.ietf.org/html/rfc4648) encoded string that is 52 characters long, lower cased with [no padding](http://tools.ietf.org/html/rfc4648#section-3.2).  When decoded it is alway a 32 byte binary value result of a [SHA-256](http://en.wikipedia.org/wiki/SHA-2) hash.  An example hashname is `uvabrvfqacyvgcu8kbrrmk9apjbvgvn2wjechqr3vf9c1zm3hv7g`.
+In many ways, a `hashname` can be viewed as a portable secure [MAC address](http://en.wikipedia.org/wiki/MAC_address), it is a globally unique identifier for a network endpoint that is also self-generated and cryptographically verifiable.
 
-In many ways, a `hashname` can be used as a portable secure [MAC address](http://en.wikipedia.org/wiki/MAC_address), it is a globally unique identifier for a network endpoint that is also self-generated and cryptographically verifiable.
+The value of a `hashname` is always a [base 32](http://tools.ietf.org/html/rfc4648) encoded string that is 52 characters long, lower cased with [no padding](http://tools.ietf.org/html/rfc4648#section-3.2).  When decoded it is always a 32 byte binary value, the result of a [SHA-256](http://en.wikipedia.org/wiki/SHA-2) hash digest.  An example hashname is `kw3akwcypoedvfdquuppofpujbu7rplhj3vjvmvbkvf7z3do7kkq`.
+
+Base32 encoding was chosen to maximize compatibilty and consistency, such that it is usable in any URI component, DNS labels, is case insensitive and alphanumeric only.
 
 ## Implementations
 
 * [javascript](https://github.com/telehash/hashname) (node and browserify)
 * [c](https://github.com/telehash/telehash-c/blob/master/src/lib/hashname.c)
+* [c#](https://github.com/telehash/telehash.net/blob/master/Telehash.Net/Hashname.cs)
 * [go](https://github.com/telehash/gogotelehash/tree/master/hashname)
 
 ## Hashname Generation
 
-A hashname is calculated by combining the binary public key material of one or more different [cryptographic algorithms](http://en.wikipedia.org/wiki/Public-key_cryptography) through multiple rounds of [SHA-256](http://en.wikipedia.org/wiki/SHA-2) hashing.  
+A hashname is calculated by combining one or more Cipher Set Keys ([CSK](e3x/cs/)) through multiple rounds of [SHA-256](http://en.wikipedia.org/wiki/SHA-2) hashing.
 
-The generation has three distinct steps:
+The generation has three distinct steps, all of them operating on binary/byte inputs and outputs:
 
-1. Each active key is mapped to a unique one-byte `CSID` based on its algorithm to provide consistent ordering
-2. The binary key material for each `CSID` is hashed into intermediate digest values
-3. An ordered roll-up hashing of the intermediate values generates the final 32-byte digest
+1. Every `CSK` is identified by a single unique `CSID` and sorted by it from low to high
+2. Each `CSK` is hashed into `intermediate` digest values
+3. Roll-up hashing of the `CSIDs` and intermediate values generates the final 32-byte digest
 
-### Key CSIDs
+Any hashname generation software does not need to know or understand the Cipher Sets or support the algorithms defined there, it only has to do the consistent hashing of any given set of `CSID` and `CSK` pair inputs.
 
-Each public key included must have a unique single-byte `CSID` with a byte array `VALUE` that is the consistent binary encoding of that public key material for a given algorithm. Only one key can be used per-algorithm to calculate a hashname.
-
-The current public key `CSID` mappings and `VALUE` binary encodings are defined in [Cipher Sets](../e3x/cs/).
-
-Any hashname generation software does not need to know or understand the Cipher Sets or support the algorithms defined there, it only has to do the consistent hashing of any given set of `CSID` and `VALUE` pair inputs.
-
-### Intermediate Hashing
-
-The binary byte array `VALUE` of each public key must first be hashed, resulting in a 32 byte intermediate digest that is used in the rollup calculation.  These intermediate digests may be used by applications and exchanged instead of the full keys when necessary.
+The `intermediate` digest values may be used and exchanged directly instead of the original `CSK` to minimize the amount of data required to calculate and verify a hashname.
 
 ### Final Rollup
 
-To calculate the hashname the intermediate digests are sequentially hashed in ascending order by their `CSID`. Each one contributes two values: the single byte `CSID` value and the 32 byte intermediate digest value. The calculated hash is rolled up, wherein each resulting 32 byte binary output is concatenated with the next binary value as the input. An example calculation would look like (in pseudo-code):
+To calculate the `hashname` the `intermediate` digests are sequentially hashed in ascending order by their `CSID`. Each one contributes two values: the single byte `CSID` value and the 32 byte `intermediate` digest value. The calculated hash is rolled up, wherein each resulting 32 byte binary output is concatenated with the next binary value as the input. An example calculation would look like (in pseudo-code):
 
 ```js
 hash = sha256(0x1a)
@@ -65,10 +60,4 @@ var hashname = base32.encode(rollup).toLowerCase().split("=").join(""); // norma
 console.log(hashname); // prints 27ywx5e5ylzxfzxrhptowvwntqrd3jhksyxrfkzi6jfn64d3lwxa
 ```
 
-## Mapping/Addressing
 
-When exchanging hashnames over existing IPv4/IPv6 based systems, the 4 or 16 byte prefix of the 32 byte hashname binary value is used to provide a backward-compatible mechanism for addressing.  It does not guarantee uniqueness (which should be enforced outside of the IP-based systems) but for many use-cases it can be a helpful connectivity signalling tool.
-
-When the IP space must be scoped into a reserved range and the port number is also available to use, the first 2 bytes may be sent as the port and then those 2 bytes in the address are hard-coded to a reserved IP prefix.
-
-A hashname may also be used as a normal MAC address with the prefix of `42` (has the locally-assigned bit set) and the first 5 bytes of the hashname: `42:XX:XX:XX:XX:XX`.
