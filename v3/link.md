@@ -65,7 +65,7 @@ The Link Keys can also be represented in a standard [JWK](https://tools.ietf.org
 
 The `kid` must always be the matching/correct hashname for the included keys.  The `use` value must always be `link` as it can only be used to create links.
 
-The JWK may also contain a `"paths":[...]` array if required, typically the JWK is only used as a [validation mechanism](oidc.md#discovery) and does not require bundling of link connectivity information.
+The JWK may also contain a `"paths":[...]` array if required, often the JWK is only used as [authority validation](uri.md#discovery) and does not require bundling of the current link connectivity information.
 
 ## Resolution
 
@@ -73,10 +73,10 @@ Links can be resolved from any string:
 
 1. [JSON](#json)
 2. [Direct URI](uri.md) (no fragment)
-3. [Peer URI](uri.md) (router assisted, with fragment)
-3. hashname - [peer](channels/peer.md) to default router(s)
+3. [Peer URI](uri.md#peer) (router assisted, with fragment)
+3. hashname - [peer request](channels/peer.md) to default router(s)
 
-Once resolved, preserve all paths for future use.  If resolved via a router, also generate and preserve a `peer` path referencing it.
+Once resolved, all paths should be preserved for future use.  If resolved via a router, also generate and preserve a `peer` path referencing that router.
 
 <a name="handshake" />
 ## Handshake
