@@ -48,6 +48,25 @@ The `keys` object is always a dictionary of at least the single `CSID` for the l
 
 The `paths` array is always the list of current or recent [path values](channels/path.md) and should contain only external paths when shared or a mix of both internal and external when used locally.
 
+<a name="jwk" />
+## JSON Web Key (JWK)
+
+The Link Keys can also be represented in a standard [JWK](https://tools.ietf.org/html/draft-ietf-jose-json-web-key-41) using a `kty` of `hashname`:
+
+```json
+{
+    "kty": "hashname",
+    "kid": "27ywx5e5ylzxfzxrhptowvwntqrd3jhksyxrfkzi6jfn64d3lwxa",
+    "use": "link",
+    "cs1a": "an7lbl5e6vk4ql6nblznjicn5rmf3lmzlm",
+    "cs3a": "eg3fxjnjkz763cjfnhyabeftyf75m2s4gll3gvmuacegax5h6nia"
+}
+```
+
+The `kid` must always be the matching/correct hashname for the included keys.  The `use` value must always be `link` as it can only be used to create links.
+
+The JWK may also contain a `"paths":[...]` array if required, typically the JWK is only used as a [validation mechanism](oidc.md#discovery) and does not require bundling of link connectivity information.
+
 ## Resolution
 
 Links can be resolved from any string:

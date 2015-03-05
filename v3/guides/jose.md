@@ -50,18 +50,3 @@ Applications using JOSE-based `CSIDs` should be careful to not use the features 
 * An e3x message requires both encryption and signing, so it is always a JWE of a JWS payload.
 * If the handshake used ephemeral key agreement (ECDH) then channel encryption can reference that agreement and does not require signing (it is just a JWE with the channel packet as the payload), otherwise channel encryption is identical to a message
 
-## JWK Encoded Hashname Keys
-
-The public keys that compose a single hashname can be represented in a [JWK](https://tools.ietf.org/html/draft-ietf-jose-json-web-key-41) using a `kty` of `hashname`:
-
-```json
-{
-    "kty": "hashname",
-    "kid": "27ywx5e5ylzxfzxrhptowvwntqrd3jhksyxrfkzi6jfn64d3lwxa",
-    "use": "e3x",
-    "cs1a": "an7lbl5e6vk4ql6nblznjicn5rmf3lmzlm",
-    "cs3a": "eg3fxjnjkz763cjfnhyabeftyf75m2s4gll3gvmuacegax5h6nia"
-}
-```
-
-The `kid` must always be the matching/correct hashname for the included keys.  The `use` value must always be `e3x` as it can only be used to create exchanges.
