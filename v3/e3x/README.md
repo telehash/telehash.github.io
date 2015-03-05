@@ -7,7 +7,7 @@ It is designed to be used as a low-level software library that can be embedded i
 
 ## Index
 
-* [packet](../lob/) - all binary and JSON data encoding/encapsulation
+* [packet](../lob.md) - all binary and JSON data encoding/encapsulation
 * [Cipher Sets](cs/) - asynchronous and streaming encryption, multiple keys
 * [message](messages.md) - an asynchronous encrypted packet between two endpoints
 * [handshake](handshake.md) - a type of message used to establish a streaming encryption session for channels
@@ -58,7 +58,7 @@ Create a new set of public and private keys for all supported Cipher Sets.
 
 Load a given set of public/secret keys to create a local endpoint state.
 
-* `decrypt(message)` - take an enecrypted message received from a wire transport, return a decrypted [packet](../lob)
+* `decrypt(message)` - take an enecrypted message received from a wire transport, return a decrypted [packet](../lob.md)
 
 ### `exchange(self, public keys)`
 

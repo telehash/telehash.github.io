@@ -9,4 +9,12 @@ When an endpoint supports this it includes in it's `paths` a `{"type":"webrtc"}`
 
 All packets must be [cloaked](../e3x/cloaking.md) and are sent as base64 encoded message events over a data channel.
 
+## Path JSON
 
+Example [path](../channels/path.md) JSON:
+
+```json
+{
+    "type": "webrtc"
+}
+```

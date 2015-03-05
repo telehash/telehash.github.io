@@ -12,7 +12,7 @@ The initial request should contain an array of all of the paths the sender knows
     "type": "path",
     "paths": [
         {
-            "http": "http://192.168.0.36:42424",
+            "url": "http://192.168.0.36:42424",
             "type": "http"
         },
         {

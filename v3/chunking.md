@@ -1,5 +1,4 @@
-Chunking
-========
+# [LOB](lob.md) Chunking
 
 Sending sequential packet byte arrays over streaming transports (such as TCP/TLS) requires additional framing to indicate the size of each one. Framing is also necessary to break packets into smaller pieces for low MTU transports (such as Bluetooth LE and 802.15.4 based ) and to signal flow control (Serial).
 

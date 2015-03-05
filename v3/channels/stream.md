@@ -16,6 +16,6 @@ BODY: ...
 Once accepted (and once the open packet is acknowledged), the stream may immediately begin sending data in either direction.  All streamed data is attached as the binary `BODY` to every packet. The `JSON` may contain one of the following options:
 
 * `"chunk":true` - when set, the attached BODY should be buffered along with any other chunks in order, until a packet is received without a chunk at which time they are all processed
-* `"enc":"..."` - what encoding is the attached data, current options are: `binary` (default), `json`, and `[lob](../lob/)`.  This applies to any buffered chunks as well at the time it's processed (`enc` is not valid to be set when `chunk` is true).
+* `"enc":"..."` - what encoding is the attached data, current options are: `binary` (default), `json`, and [`lob`](../lob.md).  This applies to any buffered chunks as well at the time it's processed (`enc` is not valid to be set when `chunk` is true).
 
 Any channel `end` or `err` is processed normally and has the same implications for a stream.

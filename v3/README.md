@@ -1,7 +1,7 @@
 telehash secure mesh protocol (v3)
 ==================================
 
-> this is a draft (issues and pull requests welcome), planning for release version in 02/2015
+> this is a draft (issues and pull requests welcome), planning for release version in 03/2015
 
 ![logo](../logo/mesh-logo-128.png)
 
@@ -13,8 +13,8 @@ Telehash is a project to create interoperable private mesh networking:
 * manages active link state on all connections
 * native implementations to each language/platform
 * capable of using different transport protocols
-* supports bridging and routing privately by default and optionally via a [public DHT](https://github.com/telehash/dotPublic)
-* each endpoint has verifiable unique fingerprint
+* supports bridging and routing privately by default and optionally via a [public DHT](https://github.com/telehash/blockname)
+* each endpoint has verifiable unique fingerprint (`hashname`)
 * provides native tunneling of TCP/UDP, HTTP, WebSockets, and more
 * strict privacy, no content, identity, or metadata is ever revealed to 3rd parties
 * designed for compatibility between embedded device, mobile, and web usage
@@ -23,13 +23,14 @@ Telehash is a project to create interoperable private mesh networking:
 
 The full protocol is a composite of different individual specifications:
 
-* [hashname](hashname/) - public key fingerprint (address format)
-* [lob](lob/) - length-object-binary, json+binary serialization (packetization)
+* [hashname](hashname.md) - public key fingerprint (address format)
+* [lob](lob.md) - length-object-binary, json+binary serialization (packetization)
 * [e3x](e3x/) - end-to-end encrypted exchange (wire encoding, crypto)
-* [mesh](mesh.md) - common channels to establish links to peers and maintain a private mesh
+* [link](link.md) - establishing and maintaining connections betweent two endpoints
+* [mesh](mesh.md) - higher level tools to manage multiple links and do local discovery
 * [uri](uri.md) - how to encode/decode endpoint info via URIs for out-of-band bootstrapping
 * [transports](transports/) - details (encoding, timeouts, discovery, etc) for mapping/supporting different network transports
-* [logo](../logo/) - for use to represent telehash mesh support in apps 
+* [logo](../logo/) - for use to represent telehash support in apps 
 
 ### Implementations
 
@@ -40,6 +41,8 @@ Experimental implementations are being actively developed at:
 * [telehash-js](https://github.com/telehash/telehash-js)
 * [telehash-c](https://github.com/telehash/telehash-c).
 * [gogotelehash](https://github.com/telehash/gogotelehash)
+* [python](https://github.com/telehash/e3x-python)
+* [c#](https://github.com/telehash/telehash.net)
 * [others in progress](https://github.com/telehash)
 
 
@@ -50,3 +53,4 @@ Experimental implementations are being actively developed at:
 |   c - unix   |     ✓    |   ✓  |  ✍ |    ✍   |    ✍   |    ✍   |  ✓  |  ✓  |      |     |        |           |
 | c - embedded |     ✓    |   ✓  |  ✍ |         |    ✍   |    ✍   |  ✍ |  ✍ |      |     |        |           |
 |      go      |     ✓    |   ✓  |     |         |         |         |  ✓  |     |      |     |        |           |
+|    python    |     ✓    |   ✍  |    |         |        |        |  ✍ |    |      |     |        |           |

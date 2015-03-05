@@ -16,39 +16,13 @@ At any point the transport being used to deliver packets may generate a keepaliv
 
 Any decrypted handshake message is identified with a `"type":"..."` string value, that if not included in the header must be defaulted to the type of `"key"`.  Only one unique type may exist concurrently (same `at` value) with any handshake process.
 
-### "key" (default)
+Known types include:
 
-The message must attach the [binary packet encoding](cs/#packet) of the sender's keys as the BODY, it contains the intermediates of all supported ciphersets and the binary public key bytes so that the sender's hashname can be validated and a handshake can be generated in response.
-
-Example:
-
-```json
-{
-  "type":"key",
-  "at":123456789
-}
-BODY:
-  {
-    "3a": "eg3fxjnjkz763cjfnhyabeftyf75m2s4gll3gvmuacegax5h6nia",
-    "1a": "ckczcg2fq5hhaksfqgnm44xzheku6t7c4zksbd3dr4wffdvvem6q"
-  }
-  BODY: [2a's public key binary bytes]
-```
-
-
-
-### "jwt"
-
-The message is a [JSON Web Token](../guides/JOSE.md#jwt) encoded packet.
-
-### "uri"
-
-A [URI](../uri.md) was used to generate this handshake and it is included as the `"uri":"..."` value.
-
-### "tx"
-
-A [bitcoin transaction](../guides/bitcoin.md) is attached as the `BODY` to validate this handshake.
-
+* **[link](../link.md)** - to establish or keepalive a link
+* **[jwt](../guides/jose.md)** - message `BODY` is a JSON Web Token encoded packet
+* **[uri](../uri.md)** - a URI was used to generate this handshake and it is included as the `"uri":"..."` value.
+* **[tx](../guides/bitcoin.md)** - message `BODY` is a raw bitcoin transaction
+* **key** - deprecated (early version of the link handshake)
 
 ## Sequencing with `at`
 
