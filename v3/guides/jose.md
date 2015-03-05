@@ -1,8 +1,6 @@
 # JOSE - JSON Object Signing and Encryption
 
-> WIP
-
-[JOSE](https://datatracker.ietf.org/wg/jose/charter/) interop/usage guide.
+[JOSE](https://datatracker.ietf.org/wg/jose/charter/) interop guide.
 
 
 ## JWS/JWT/JWE to LOB Encoding
@@ -40,11 +38,11 @@ BODY: {"aad":"","iv":"","tag":"","encrypted_key":""}
 
 ## JOSE-Based Cipher Sets
 
-The JOSE stack can be used to implement an entire [Cipher Set](../e3x/cs/) in a generic way, where a JWE is used directly as the wire format for the encrypted message and channel packets.
+The JOSE stack can be used to implement an entire [Cipher Set](../e3x/cs/) dynamically, where a JWE is used directly as the wire format for the encrypted message and channel packets.
 
-Since the CSID is a simple ordering preference indicator and a JWE can internally signal its encryption algorithms, any reserved CSID can be used by applications to map their chosen `alg` value(s) to.
+Since the `CSID` is a simple ordering preference indicator and a JWE can internally signal its encryption algorithms, any [custom CSID](../e3x/cs/#custom) can be used by applications to map their chosen `alg` value(s) to.
 
-Applications using JOSE-based CSIDs should be careful to not use the features of JWE such as unprotected headers or multiple recipients that expose significantly more metadata to the network and untrusted entities, reducing the level of expected privacy.
+Applications using JOSE-based `CSIDs` should be careful to not use the features of JWE such as unprotected headers or multiple recipients that expose significantly more metadata to the network and untrusted entities, reducing the level of expected privacy.
 
 > todo formalize and examples
 
