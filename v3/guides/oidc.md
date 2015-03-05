@@ -1,14 +1,13 @@
 # OIDC - OpenID Connect
 
-> WIP
-
 [OpenID Connect](http://openid.net/connect/) can be used as the primary user/entity identification process for telehash, enabling a strongly encrypted communication medium to be easily coupled with standard identity management tools.
 
 A hashname is a unique address associated with a specific software and/or hardware instance to enable encrypted communication, it is not intended to be used as an entity or end-user identity.  Once a hashname is generated in a new context, it can be registered and associated with other portable identities.
 
+<a name="jwt" />
 ## Identity Tokens (JWT)
 
-Any JWT can be automatically included as part of the [handshake process](e3x/handshake.md) between endpoints.  This enables applications to require additional context before deciding to establish a link or apply restrictions on to what can be performed over the link.
+Any [JSON Web Token](http://tools.ietf.org/html/draft-ietf-oauth-json-web-token) can be automatically included as part of the [handshake process](e3x/handshake.md) between endpoints.  This enables applications to require additional context before deciding to establish a link or apply restrictions on to what can be performed over the link.
 
 ### Audience
 

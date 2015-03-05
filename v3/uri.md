@@ -44,7 +44,7 @@ When a URI is processed that contains a fragment it generates a new [peer](chann
 1. detect included keys in the query string and derive hashname
   * [optional] fallback to discover keys via WebFinger
   * fallback to resolve the canonical hostname to discover keys via DNS SRV
-  * fallback to discover keys via HTTPS well-known
+  * fallback to discover keys via OpenID Connect Discovery
 2. generate paths for all supported transports with any resolved IP and port
 3. create a link with the keys and path(s) including a URI handshake
 4. if there's a fragment hashname, issue a `peer` request over the link to it including a URI handshake
@@ -129,17 +129,14 @@ GET https://example.com/~user1/link.json
 }
 ```
 
-### HTTPS `well-known` Links
+<a name="discovery" />
+## OpenID Connect Discovery
 
-Return the standard [JSON](json.md) link description format under the root `/.well-known/` path:
+One or more hashnames may be advertised as part of [OpenID Connect Discovery](http://openid.net/specs/openid-connect-discovery-1_0.html) by simply including their [JWK](hashname.md#jwk) in the `jwks_uri` response.  If there are multiple keys in the response only the first one in the array should be used to resolve the URI.
 
-```
-GET https://example.com/.well-known/link.json
-{
-  "keys":{...},
-  "paths":[...]
-}
+The discovery endpoint may also be used as a default authority to validate against for incoming unknown hashnames before responding to them.
 
+<a name="handshake" />
 ## URI Handshake
 
 When a URI is the source of a new link, a `"type":"uri"` [handshake](e3x/handshake.md#uri) should be sent including the original URI.
