@@ -19,14 +19,16 @@ Telehash is a project to create interoperable private mesh networking:
 * strict privacy, no content, identity, or metadata is ever revealed to 3rd parties
 * designed for compatibility between embedded device, mobile, and web usage
 * supports an automatic discovery mode on local networks when available
+* integrates native support for [JSON
+Object Signing and Encryption (JOSE)](https://datatracker.ietf.org/wg/jose/charter/) and [OpenID Connect](http://openid.net/connect/)
 * [more background](background.md)
 
 The full protocol is a composite of different individual specifications:
 
-* [hashname](hashname.md) - public key fingerprint (address format)
+* [hashname](hashname.md) - endpoint address format (public key fingerprint)
 * [lob](lob.md) - length-object-binary, json+binary serialization (packetization)
-* [e3x](e3x/) - end-to-end encrypted exchange (wire encoding, crypto)
-* [link](link.md) - establishing and maintaining connections betweent two endpoints
+* [e3x](e3x/) - end-to-end encrypted exchange (wire encoding, crypto libraries)
+* [link](link.md) - establishing and maintaining connections between two endpoints
 * [mesh](mesh.md) - higher level tools to manage multiple links and do local discovery
 * [uri](uri.md) - how to encode/decode endpoint info via URIs for out-of-band bootstrapping
 * [transports](transports/) - details (encoding, timeouts, discovery, etc) for mapping/supporting different network transports

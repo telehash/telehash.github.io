@@ -19,11 +19,10 @@ Any decrypted handshake message is identified with a `"type":"..."` string value
 Known types include:
 
 * **[link](../link.md)** - to establish or keepalive a link
-* **[jwt](../guides/jose.md)** - message `BODY` is a JSON Web Token encoded packet
+* **[jwt](../link.md#jwt)** - message `BODY` is a JSON Web Token encoded packet
 * **[uri](../uri.md)** - a URI was used to generate this handshake and it is included as the `"uri":"..."` value.
 * **[tx](../guides/bitcoin.md)** - message `BODY` is a raw bitcoin transaction
 * **key** - deprecated (early version of the link handshake)
-
 
 ## Sequencing with `at`
 

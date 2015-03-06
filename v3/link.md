@@ -1,6 +1,6 @@
 # Links
 
-A `link` is the core connectivity mechanism between two endpoints.  An endpoint with one or more links is a `mesh`.
+A `link` is the core connectivity mechanism between two endpoints.  An endpoint with one or more links is referred to as a `mesh`.
 
 ## Terminology
 
@@ -48,16 +48,35 @@ The `keys` object is always a dictionary of at least the single `CSID` for the l
 
 The `paths` array is always the list of current or recent [path values](channels/path.md) and should contain only external paths when shared or a mix of both internal and external when used locally.
 
+<a name="jwk" />
+## JSON Web Key (JWK)
+
+The Link Keys can also be represented in a standard [JWK](https://tools.ietf.org/html/draft-ietf-jose-json-web-key-41) using a `kty` of `hashname`:
+
+```json
+{
+    "kty": "hashname",
+    "kid": "27ywx5e5ylzxfzxrhptowvwntqrd3jhksyxrfkzi6jfn64d3lwxa",
+    "use": "link",
+    "cs1a": "an7lbl5e6vk4ql6nblznjicn5rmf3lmzlm",
+    "cs3a": "eg3fxjnjkz763cjfnhyabeftyf75m2s4gll3gvmuacegax5h6nia"
+}
+```
+
+The `kid` must always be the matching/correct hashname for the included keys.  The `use` value must always be `link` as it can only be used to create links.
+
+The JWK may also contain a `"paths":[...]` array if required, often the JWK is only used as [authority validation](uri.md#discovery) and does not require bundling of the current link connectivity information.
+
 ## Resolution
 
 Links can be resolved from any string:
 
 1. [JSON](#json)
 2. [Direct URI](uri.md) (no fragment)
-3. [Peer URI](uri.md) (router assisted, with fragment)
-3. hashname - [peer](channels/peer.md) to default router(s)
+3. [Peer URI](uri.md#peer) (router assisted, with fragment)
+3. hashname - [peer request](channels/peer.md) to default router(s)
 
-Once resolved, preserve all paths for future use.  If resolved via a router, also generate and preserve a `peer` path referencing it.
+Once resolved, all paths should be preserved for future use.  If resolved via a router, also generate and preserve a `peer` path referencing that router.
 
 <a name="handshake" />
 ## Handshake
@@ -81,4 +100,25 @@ BODY:
   }
   BODY: [2a's CSK binary bytes]
 ```
+
+<a name="jwt" />
+## Identity (JWT)
+
+The endpoints connected over a link are always uniquely identified by their hashnames, which serves as a stable globally unique and verifiable address, but is not intended to be used as a higher level identity for an end-user or other entity beyond the single instance/device.  Once a hashname is generated in a new context, it should be registered and associated with other portable identities by the application.
+
+[OpenID Connect](http://openid.net/connect/) or any service that can generate a [JSON Web Token](http://tools.ietf.org/html/draft-ietf-oauth-json-web-token) can be used as the primary user/entity identification process, enabling a strongly encrypted communication medium to be easily coupled with standard identity management tools.
+
+Just as a JWT is sent as a Bearer token over HTTP, it can be automatically included as part of the [handshake process](e3x/handshake.md) between endpoints.  This enables applications to require additional context before deciding to establish a link or apply restrictions on to what can be performed over the link once connected.
+
+### Audience
+
+When an [ID Token](http://openid.net/specs/openid-connect-basic-1_0.html#IDToken) is generated specifically for one or more known hashnames, the hashname must be included in the `aud` as one of the items in the array value.
+
+### Scope
+
+When a client is requesting to establish a new link to an identity, it must include the scope value `link` during authorization.
+
+### Claims
+
+An identity may advertise its connectivity by including a `link` member in the [Standard Claims](http://openid.net/specs/openid-connect-basic-1_0.html#StandardClaims).  The value must be a valid [URI](uri.md) that can be resolved to establish a link, and any resulting linked hashname must be included in the token's `aud` audience values.
 
