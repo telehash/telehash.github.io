@@ -1,5 +1,7 @@
 # `chat` - Direct and Group Private Messaging
 
+> [DRAFT](https://github.com/telehash/telehash.org/labels/draft)
+
 This is a lightweight chat protocol designed to encourage minimal interoperable communication support in future telehash based apps and devices.  It is based the following principles:
 
 * learn from the experiences with XMPP

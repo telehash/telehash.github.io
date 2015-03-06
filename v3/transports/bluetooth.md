@@ -1,6 +1,6 @@
 # Bluetooth
 
-> this is a work-in-progress
+> [DRAFT](https://github.com/telehash/telehash.org/labels/draft)
 
 The goal is to enable any device to discover, connect, and then send and receive encrypted packets over BLE.
 

@@ -11,7 +11,6 @@ Once a link is up, [channels](channels/) are used to run common services over it
   * sock: tcp/udp socket tunneling 
   * stream: binary streams
   * thtp: mapping/proxying of http requests/responses
-  * ws: websocket api
   * chat: personal messaging
   * box: async/offline messaging
 

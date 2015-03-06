@@ -1,6 +1,8 @@
 HTTP Transport
 ==============
 
+> [DRAFT](https://github.com/telehash/telehash.org/labels/draft)
+
 Any endpoint may support a `http` path to maximize connectivity.  This is specifically useful when running inside a browser, or when an app needs to operate inside a highly restricted network that offers only HTTP/HTTPS.
 
 This path is implemented using [socket.io](http://socket.io) (which handles all of the fallback and reconnect logic), and the only information needed to be exchanged is a `url` that can be `http://` or `https://`.

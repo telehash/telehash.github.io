@@ -1,5 +1,7 @@
 # `box` - Offline Signalling (Store-and-Forward)
 
+> [DRAFT](https://github.com/telehash/telehash.org/labels/draft)
+
 The box channel is used to asynchronously send and receive encrypted [messages](../e3x/messages.md) directly or via any shared hashname that is acting as a cache/router.  A caching entity can be selected automatically based on capacity/availability or chosen specifically based on app configuration.
 
 The use of remote entities to provide caching should be considered carefully and minimized, they must be trusted to not collect metadata about the status and volume of signalling between any hashnames using them, as well as to not archive the encrypted payloads for future analysis.  When providing caching for other hashnames, the existence of and contents of all boxes must never be stored at rest and only kept in dynamic memory.

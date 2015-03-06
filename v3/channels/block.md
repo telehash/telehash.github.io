@@ -1,5 +1,7 @@
 # `block` - Lossy Block Transfer
 
+> [DRAFT](https://github.com/telehash/telehash.org/labels/draft)
+
 For transferring lossy data with block sizes larger than the default packet MTU (1400), such as [802.3 Ethernet Frames](http://en.wikipedia.org/wiki/Ethernet_frame).
 
 The `"type":"block"` channel is unidirectional, blocks only flow in one direction, and multiple block channels may be open in either direction.

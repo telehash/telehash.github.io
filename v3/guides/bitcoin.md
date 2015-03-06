@@ -1,7 +1,7 @@
 Bitcoin Integration Guide
 =========================
 
-> This is a work-in-progress
+> [DRAFT](https://github.com/telehash/telehash.org/labels/draft)
 
 ## Encrypted Peer Connections
 

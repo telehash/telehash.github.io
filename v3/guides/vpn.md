@@ -1,6 +1,8 @@
 Virtual Private Networking
 ==========================
 
+> [DRAFT](https://github.com/telehash/telehash.org/labels/draft)
+
 > TODO, document here how to use TUN/TAP interfaces, the block channel, and map hashnames to IPv4/IPv6/MAC addresses so that tools building VPNs with telehash are interoperable
 
 ## Mapping/Addressing

@@ -1,6 +1,8 @@
 WebRTC Transport
 ================
 
+> [DRAFT](https://github.com/telehash/telehash.org/labels/draft)
+
 > This is currently being implemented experimentally at [telehash-webrtc](https://github.com/quartzjer/telehash-webrtc)
 
 When telehash is running inside a browser it is very restricted in forming direct peer-to-peer connections, but if the browser supports WebRTC it should attempt to use that as a more direct transport.
