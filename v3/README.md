@@ -34,6 +34,9 @@ The full protocol is a composite of different individual specifications:
 * [transports](transports/) - details (encoding, timeouts, discovery, etc) for mapping/supporting different network transports
 * [logo](../logo/) - for use to represent telehash support in apps 
 
+The primary discussion area is currently via Slack, anyone can join by getting an [automated invite](http://6.telehash.org:3000).
+
+<a name="implementations" />
 ### Implementations
 
 Each implementation provides a library API adapted to its platform or language but they all strive to offer similar functionality including handling hashnames, URIs, and packets (lob), higher level interfaces to create a mesh and links within it, and lower level tools for e3x, transports/pipes, managing keys, etc.  Refer to the [implementers guide](guides/implementers.md) for an overview of the typical methods and patterns.

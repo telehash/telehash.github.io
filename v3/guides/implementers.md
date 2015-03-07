@@ -3,6 +3,10 @@ Implementers Guide
 
 > Work-In-Progress
 
+Most active implementations are in the [telehash org](https://github.com/telehash/) github and listed [here](../#implementations).
+
+Anyone implementing or interested in contributing should join the [telehash slack](http://6.telehash.org:3000).
+
 ## Hashname
 
 ```c

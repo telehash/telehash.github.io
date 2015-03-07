@@ -10,3 +10,5 @@ Quick links to the specs:
 * [v3 (draft, 2014)](v3/)
 * [v2 (2013)](v2/protocol.md)
 * [v1 (2010)](https://github.com/quartzjer/telehash)
+
+The primary discussion area is currently via Slack, anyone can join by getting an [automated invite](http://6.telehash.org:3000).
