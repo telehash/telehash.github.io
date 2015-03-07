@@ -24,6 +24,7 @@ These are similar low-level encrypted wire protocols:
 * [CurveCP](http://curvecp.org)
 * [QUIC](http://en.wikipedia.org/wiki/QUIC) ([spec](https://docs.google.com/document/d/1g5nIXAIkN_Y-7XJW5K45IblHd_L2f5LTaDUDwvZ5L6g/edit))
 * [SRTP](http://en.wikipedia.org/wiki/Secure_Real-time_Transport_Protocol) ([spec](http://tools.ietf.org/html/rfc3711))
+* [MinimaLT](https://www.ethos-os.org/~solworth/minimalt-20131031.pdf)
 
 ## Implementations
 
