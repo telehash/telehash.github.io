@@ -47,6 +47,8 @@ Any `CSID` with the mask of `11110111` (`0x10` through `0x17`, `0x20` through `0
 <a name="jose" />
 ## JOSE Based
 
+> [DRAFT](https://github.com/telehash/telehash.org/labels/draft)
+
 The [JOSE standards](https://datatracker.ietf.org/wg/jose/charter/) can be used to implement an entire [Cipher Set](../e3x/cs/) dynamically, where [JWE and JWS encoding](../../lob.md#jwe) is used directly as the wire format for the encrypted message and channel packets.
 
 Since the `CSID` is a simple ordering preference indicator and a JWE can internally signal its encryption algorithms, the [custom](#custom) range can be used by applications to map the chosen JWE `alg` value(s) to.
