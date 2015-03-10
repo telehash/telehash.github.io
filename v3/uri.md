@@ -108,7 +108,7 @@ No other DNS record type is supported, only SRV records resulting in one or more
 
 ### WebFinger Links
 
-Use [WebFinger](https://tools.ietf.org/html/rfc7033) against the canonical hostname, passing the given URI in as the `resource` and a `rel` value of `http://telehash.org/link`.  If successful, it will result in a valid `href` that must return the standard [JSON](json.md) link description format.
+Use [WebFinger](https://tools.ietf.org/html/rfc7033) against the canonical hostname, passing the given URI in as the `resource` and a `rel` value of `http://telehash.org/link`.  If successful, it will result in a valid `href` that must return the standard [JSON link](link.md#json) description format.
 
 ```
 GET https://example.com/.well-known/webfinger?resource=http://example.com/~user1&ref=http://telehash.org/link
@@ -131,7 +131,7 @@ GET https://example.com/~user1/link.json
 
 ### HTTPS `well-known` Links
 
-Return the standard [JSON](json.md) link description format under the root `/.well-known/` path:
+Return the standard [JSON link](link.md#json) description format under the root `/.well-known/` path:
 
 ```
 GET https://example.com/.well-known/link.json
