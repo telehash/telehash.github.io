@@ -38,7 +38,7 @@ When a new unknown hashname is discovered at any point (from transports or a con
 
 ### `link = mesh.link(to)`
 
-Establish a link to the given hashname.  The `to` may be a [URI](uri.md), [JSON](json.md), or just a plain hashname.
+Establish a link to the given hashname.  The `to` may be a [URI](uri.md), [JSON link](link.md#json), or just a plain hashname.
 
 ### `link.onLink = function (state) {...}`
 
