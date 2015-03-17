@@ -9,6 +9,8 @@ This is a simple encoding scheme to combine any JSON object with any binary data
 
 It is common to also support [cloaking](e3x/cloaking.md) within a LOB library as a convenience.
 
+For easier debugging and testing, libraries should also support [base 32](base32.md) encoding and decoding for easy visual identification/separation and to allow simple cutting/pasting of packets.
+
 ## Definition
 
 The wire-format byte array (a packet) is created by combining three distinct parts, the `LENGTH`, an optional `HEAD`, and an optional `BODY`.

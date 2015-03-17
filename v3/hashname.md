@@ -4,9 +4,7 @@ A `hashname` is a unique fingerprint to represent the union of one or more publi
 
 In many ways, a `hashname` can be viewed as a portable secure [MAC address](http://en.wikipedia.org/wiki/MAC_address), it is a globally unique identifier for a network endpoint that is also self-generated and cryptographically verifiable.
 
-The value of a `hashname` is always a [base 32](http://tools.ietf.org/html/rfc4648) encoded string that is 52 characters long, lower cased with [no padding](http://tools.ietf.org/html/rfc4648#section-3.2).  When decoded it is always a 32 byte binary value, the result of a [SHA-256](http://en.wikipedia.org/wiki/SHA-2) hash digest.  An example hashname is `kw3akwcypoedvfdquuppofpujbu7rplhj3vjvmvbkvf7z3do7kkq`.
-
-Base32 encoding was chosen to maximize compatibilty and consistency, such that it is usable in any URI component, DNS labels, is case insensitive and alphanumeric only.
+The value of a `hashname` is always a [base 32](base32.md) encoded string that is 52 characters long.  When decoded it is always a 32 byte binary value, the result of a [SHA-256](http://en.wikipedia.org/wiki/SHA-2) hash digest.  An example hashname is `kw3akwcypoedvfdquuppofpujbu7rplhj3vjvmvbkvf7z3do7kkq`.
 
 ## Implementations
 
