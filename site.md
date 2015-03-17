@@ -59,7 +59,7 @@ The need for privacy in our communication technologies has never been more impor
 
 ### Commerce
 
-Talk about blockchain and bitcoin integration, used to exchange transactions securely.
+Bitcoin and blockchain-based technologies are fueling a new generation of online commerce and distributed digital value innovations, and often these transactions are either sent insecurely or limited to server-based encryption.  Telehash enables any two parties to both send the transactions encrypted directly as well as facilitate private communication to negotiate or deliver assets related to transactions.
 
 ### Gaming
 
