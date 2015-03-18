@@ -44,7 +44,7 @@ It's common to have a `hashname` field as well for convenience or as the verifie
   }
 ```
 
-The `keys` object is always a dictionary of at least the single `CSID` for the link, with all string values being a [base32](hashname.md) encoding of the binary `CSK` for that given `CSID`.
+The `keys` object is always a dictionary of at least the single `CSID` for the link, with all string values being a [base 32](base32.md) encoding of the binary `CSK` for that given `CSID`.
 
 The `paths` array is always the list of current or recent [path values](channels/path.md) and should contain only external paths when shared or a mix of both internal and external when used locally.
 
