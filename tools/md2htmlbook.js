@@ -1,6 +1,7 @@
 var marked = require("marked");
 var fs = require("fs");
 var path = require("path");
+var nsh = require('node-syntaxhighlighter');
 
 var options = {
     gfm:true,
@@ -99,8 +100,7 @@ renderer.heading = function(text, level, raw) {
 }
 
 var prevLinkRenderer = renderer.link;
-renderer.link = function(href, title, text)
-{
+renderer.link = function(href, title, text) {
     // Passthrough absolute urls but inline link relatives
     var absUrlPattern = /^https?:\/\//i;
     if (absUrlPattern.test(href)) {
@@ -115,11 +115,24 @@ renderer.link = function(href, title, text)
     return out;
 }
 
+var prevCodeRenderer = renderer.code;
+renderer.code = function(code, language) {
+    if (!code) return "";
+    if (!language) {
+        return prevCodeRenderer.call(this, code, language);
+    }
+    //console.log("language is " + language + " on " + code);
+    return nsh.highlight(code, nsh.getLanguage(language));
+}
+
 
 options.renderer = renderer;
 marked.setOptions(options);
 
-outHTML = "<html><head><title>" + bookOrg.title + "</title><link href='tools/pdf.css' type='text/css'></link></head><body data-type='book'>";
+nsh.copyStyle("default", "tools/code-style", function(err) {
+});
+
+outHTML = "<html><head><title>" + bookOrg.title + "</title><link href='tools/pdf.css' type='text/css'></link><link href='tools/code-style/default.css' type='text/css'></link></head><body data-type='book'>";
 var cnt = 1;
 bookOrg.sections.forEach(function(section) {
     processSection(cnt, 1, "chapter", section);
