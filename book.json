@@ -13,9 +13,52 @@
         },
         {
             "content":"v3/e3x/README.md",
+            "prefix":"e3x",
             "sections":[
                 {
-                    "content":"v3/e3x/cs/README.md"
+                    "content":"v3/e3x/cs/README.md",
+                    "prefix":"e3x_cs",
+                    "sections":[
+                        {
+                            "content":"v3/e3x/cs/1a.md"
+                        },
+                        {
+                            "content":"v3/e3x/cs/1b.md"
+                        },
+                        {
+                            "content":"v3/e3x/cs/1c.md"
+                        },
+                        {
+                            "content":"v3/e3x/cs/2a.md"
+                        },
+                        {
+                            "content":"v3/e3x/cs/2b.md"
+                        },
+                        {
+                            "content":"v3/e3x/cs/3a.md"
+                        }
+                    ]
+                },
+                {
+                    "content":"v3/e3x/messages.md"
+                },
+                {
+                    "content":"v3/e3x/handshake.md"
+                },
+                {
+                    "content":"v3/e3x/channels.md"
+                },
+                {
+                    "content":"v3/e3x/cloaking.md"
+                },
+                {
+                    "content":"v3/e3x/compression.md"
+                },
+                {
+                    "content":"v3/e3x/order.md"
+                },
+                {
+                    "content":"v3/e3x/reliable.md"
                 }
             ]
         },
