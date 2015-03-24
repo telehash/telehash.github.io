@@ -1,0 +1,10 @@
+{
+  "name": "telehash.org",
+  "version": "0.0.0",
+  "scripts": {
+    "book": "node tools/md2htmlbook.js > v3.html"
+  },
+  "dependencies": {
+    "marked": "^0.3.3"
+  }
+}
