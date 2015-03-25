@@ -1,10 +1,26 @@
 {
   "name": "telehash.org",
-  "version": "0.0.0",
-  "scripts": {
-    "book": "node tools/md2htmlbook.js > v3.html"
-  },
+  "version": "0.3.0",
+  "description": "The telehash website and docs",
+  "main": "index.js",
   "dependencies": {
-    "marked": "^0.3.3"
-  }
+    "marked": "^0.3.3",
+    "node-syntaxhighlighter": "^0.8.1",
+    "pygments": "^0.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "book": "node tools/md2htmlbook.js > book.html && prince -s tools/pdf.css book.html -o book.pdf"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/telehash/telehash.org.git"
+  },
+  "author": "",
+  "license": "TBD",
+  "bugs": {
+    "url": "https://github.com/telehash/telehash.org/issues"
+  },
+  "homepage": "https://github.com/telehash/telehash.org"
 }
