@@ -11,7 +11,7 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "book": "node tools/md2htmlbook.js > book.html && prince -s tools/pdf.css book.html -o book.pdf"
+    "book": "node tools/md2htmlbook.js > v3/spec/v3.0.0-beta.html && prince --baseurl=./v3/ -s tools/pdf.css v3/spec/v3.0.0-beta.html -o v3/spec/v3.0.0-beta.pdf"
   },
   "repository": {
     "type": "git",

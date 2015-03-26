@@ -1,0 +1,1044 @@
+<html><head><title>Telehash Secure Mesh Protocol</title><link href='tools/pdf.css' type='text/css'></link><link href='tools/code-style/default.css' type='text/css'></link></head><body data-type='book'><a id='' name=''></a><a id='chapter-1-1' name='chapter-1-1'></a><section data-type='chapter'><h1>telehash secure mesh protocol (v3)</h1>
+<blockquote>
+<p>this is a draft (issues and pull requests welcome), planning for release version in 03/2015</p>
+</blockquote>
+<p><img src="logo/mesh-logo-128.png" alt="logo"/></p>
+<p>Telehash is a project to create interoperable private mesh networking:</p>
+<ul>
+<li>100% end-to-end encrypted at all times</li>
+<li>designed to complement and add to existing transport security</li>
+<li>easy to use for developers to encourage wider adoption of privacy</li>
+<li>manages active link state on all connections</li>
+<li>native implementations to each language/platform</li>
+<li>capable of using different transport protocols</li>
+<li>supports bridging and routing privately by default and optionally via a <a href="https://github.com/telehash/blockname">public DHT</a></li>
+<li>each endpoint has verifiable unique fingerprint (<code>hashname</code>)</li>
+<li>provides native tunneling of TCP/UDP, HTTP, WebSockets, and more</li>
+<li>strict privacy, no content, identity, or metadata is ever revealed to 3rd parties</li>
+<li>designed for compatibility between embedded device, mobile, and web usage</li>
+<li>supports an automatic discovery mode on local networks when available</li>
+<li>integrates native support for <a href="https://datatracker.ietf.org/wg/jose/charter/">JSON
+Object Signing and Encryption (JOSE)</a> and <a href="http://openid.net/connect/">OpenID Connect</a></li>
+<li><a class="xref" href="#background">more background</a></li>
+</ul>
+<p>The full protocol is a composite of different individual specifications:</p>
+<ul>
+<li><a class="xref" href="#hashname">hashname</a> - endpoint address format (public key fingerprint)</li>
+<li><a class="xref" href="#lob">lob</a> - length-object-binary, json+binary serialization (packetization)</li>
+<li><a class="xref" href="#e3x_">e3x</a> - end-to-end encrypted exchange (wire encoding, crypto libraries)</li>
+<li><a class="xref" href="#link">link</a> - establishing and maintaining connections between two endpoints</li>
+<li><a class="xref" href="#mesh">mesh</a> - higher level tools to manage multiple links and do local discovery</li>
+<li><a class="xref" href="#uri">uri</a> - how to encode/decode endpoint info via URIs for out-of-band bootstrapping</li>
+<li><a class="xref" href="#transports_">transports</a> - details (encoding, timeouts, discovery, etc) for mapping/supporting different network transports</li>
+<li><a class="xref" href="#logo_">logo</a> - for use to represent telehash support in apps </li>
+</ul>
+<p>The primary discussion area is currently via Slack, anyone can join by getting an <a href="http://6.telehash.org:3000">automated invite</a>.</p>
+<p><a name="implementations" /></p>
+<h3>Implementations</h3>
+<p>Each implementation provides a library API adapted to its platform or language but they all strive to offer similar functionality including handling hashnames, URIs, and packets (lob), higher level interfaces to create a mesh and links within it, and lower level tools for e3x, transports/pipes, managing keys, etc.  Refer to the <a class="xref" href="#guides_implementers">implementers guide</a> for an overview of the typical methods and patterns.</p>
+<p>Experimental implementations are being actively developed at:</p>
+<ul>
+<li><a href="https://github.com/telehash/telehash-js">telehash-js</a></li>
+<li><a href="https://github.com/telehash/telehash-c">telehash-c</a>.</li>
+<li><a href="https://github.com/telehash/gogotelehash">gogotelehash</a></li>
+<li><a href="https://github.com/telehash/e3x-python">python</a></li>
+<li><a href="https://github.com/telehash/telehash.net">c#</a></li>
+<li><a href="https://github.com/telehash">others in progress</a></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:center"></th>
+<th style="text-align:center">hashname</th>
+<th style="text-align:center">link</th>
+<th style="text-align:center">uri</th>
+<th style="text-align:center">routing</th>
+<th style="text-align:center">streams</th>
+<th style="text-align:center">sockets</th>
+<th style="text-align:center">udp</th>
+<th style="text-align:center">tcp</th>
+<th style="text-align:center">http</th>
+<th style="text-align:center">tls</th>
+<th style="text-align:center">webrtc</th>
+<th style="text-align:center">bluetooth</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">node.js</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✍</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✍</td>
+<td style="text-align:center">✍</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">browser js</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✍</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center">✍</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">✍</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">c - unix</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✍</td>
+<td style="text-align:center">✍</td>
+<td style="text-align:center">✍</td>
+<td style="text-align:center">✍</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">c - embedded</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✍</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">✍</td>
+<td style="text-align:center">✍</td>
+<td style="text-align:center">✍</td>
+<td style="text-align:center">✍</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">go</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">python</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✍</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center">✍</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+</section><a id='background' name='background'></a><a id='chapter-2-1' name='chapter-2-1'></a><section data-type='chapter'><h1 id="background">Background</h1>
+<p>The principle idea that drove the creation and development of telehash
+is the belief that any application instance should be able to easily and
+securely talk to any other application instance or device, whether they are two
+instances of the same application, or completely different
+applications. They should be able to do so directly, and in any
+environment, from servers to mobile devices down to embedded systems
+and sensors.</p>
+<p>By enabling this freedom for developers as a foundation for their
+applications, telehash enables the same freedom for the people using
+them - that the user can connect, share, and communicate more easily
+and with control of their privacy.</p>
+<p>The challenges and complexity today in connecting applications via
+existing technologies such as APIs, OAuth, and REST is only increasing,
+often forcing fundamentally insecure, centralized, and closed/gated
+communication platforms.  By adopting telehash in any application, that
+application immediately has a powerful set of open tools for not only
+its own needs, but can then also enable connectivity to and from
+applications created by others easily. These tools include the ability
+to have friends, sharing, feeds, tagging, search, notifications,
+discovery, and other social patterns.</p>
+<p>Telehash has a fundamental requirement to remain simple and
+light-weight in order to support applications running on networked
+devices and sensors. The design goals also include not forcing any
+particular architectural design such as client-server,
+centralized/federated/distributed, polling/push, REST, streaming,
+publish-subscribe, or message passing... any can be used, as telehash
+simply facilitates secure reliable connectivity between any two or more
+applications in any networking environment.</p>
+<p><a name="name" /></p>
+<h1>The Name</h1>
+<p>The name is a simple combination of <strong>tele</strong> from telegraph, and <strong>hash</strong> from hashtable, and pronounced as the parts of those words normally would be.</p>
+<p>It is usually used in all lower-case to re-affirm the long term vision of it being used as a modern version of the word &quot;telephone&quot;, both as a generic private communication system that is federated and compatible, and the act of two application instances communicating privately and directly.</p>
+<h1>History</h1>
+<p>The name and first version of the protocol was established in <a href="https://github.com/quartzjer/Telehash">2009</a> by <a href="http://en.wikipedia.org/wiki/Jeremie_Miller">Jeremie Miller</a> and was a research project until <a href="https://github.com/telehash/telehash.org/tree/master/v2">2013 (v2)</a> when it was significantly updated with a privacy focus.</p>
+<p>In <a href="https://github.com/telehash/telehash.org/tree/master/v3">2014 (v3)</a> the protocol was refactored into <a href="https://github.com/telehash/telehash.org/tree/master/v3/e3x">e3x</a>, <a href="https://github.com/telehash/telehash.org/blob/master/v3/mesh.md">mesh</a>, and <a href="https://github.com/telehash/dotPublic">dotPublic</a>, to focus on being a set of easy to use end-to-end encrypted mesh communication tools.</p>
+<p>See this <a href="http://quartzjer.tumblr.com/post/71784515314/telehash-history">blog post</a> for some more history on its development.</p>
+</section><a id='hashname' name='hashname'></a><a id='chapter-3-1' name='chapter-3-1'></a><section data-type='chapter'><h1 id="hashname">Hashnames</h1>
+<p>A <code>hashname</code> is a unique fingerprint to represent the union of one or more public keys of different formats (<a class="xref" href="#e3x_cs_">Cipher Sets</a>), providing consistent verifiable endpoint addresses utilizing multiple PKI systems. This enables a compatibility layer for adding or enhancing PKI in any application so that it can still represent itself securely to both existing and new endpoints.</p>
+<p>In many ways, a <code>hashname</code> can be viewed as a portable secure <a href="http://en.wikipedia.org/wiki/MAC_address">MAC address</a>, it is a globally unique identifier for a network endpoint that is also self-generated and cryptographically verifiable.</p>
+<p>The value of a <code>hashname</code> is always a <a class="xref" href="#base32">base 32</a> encoded string that is 52 characters long.  When decoded it is always a 32 byte binary value, the result of a <a href="http://en.wikipedia.org/wiki/SHA-2">SHA-256</a> hash digest.  An example hashname is <code>kw3akwcypoedvfdquuppofpujbu7rplhj3vjvmvbkvf7z3do7kkq</code>.</p>
+<h2>Implementations</h2>
+<ul>
+<li><a href="https://github.com/telehash/hashname">javascript</a> (node and browserify)</li>
+<li><a href="https://github.com/telehash/telehash-c/blob/master/src/lib/hashname.c">c</a></li>
+<li><a href="https://github.com/telehash/telehash.net/blob/master/Telehash.Net/Hashname.cs">c#</a></li>
+<li><a href="https://github.com/telehash/gogotelehash/tree/master/hashname">go</a></li>
+</ul>
+<h2>Hashname Generation</h2>
+<p>A hashname is calculated by combining one or more Cipher Set Keys (<a class="xref" href="#e3x_cs_">CSK</a>) through multiple rounds of <a href="http://en.wikipedia.org/wiki/SHA-2">SHA-256</a> hashing.</p>
+<p>The generation has three distinct steps, all of them operating on binary/byte inputs and outputs:</p>
+<ol>
+<li>Every <code>CSK</code> is identified by a single unique <code>CSID</code> and sorted by it from low to high</li>
+<li>Each <code>CSK</code> is hashed into <code>intermediate</code> digest values</li>
+<li>Roll-up hashing of the <code>CSIDs</code> and intermediate values generates the final 32-byte digest</li>
+</ol>
+<p>Any hashname generation software does not need to know or understand the Cipher Sets or support the algorithms defined there, it only has to do the consistent hashing of any given set of <code>CSID</code> and <code>CSK</code> pair inputs.</p>
+<p>The <code>intermediate</code> digest values may be used and exchanged directly instead of the original <code>CSK</code> to minimize the amount of data required to calculate and verify a hashname.</p>
+<h3>Final Rollup</h3>
+<p>To calculate the <code>hashname</code> the <code>intermediate</code> digests are sequentially hashed in ascending order by their <code>CSID</code>. Each one contributes two values: the single byte <code>CSID</code> value and the 32 byte <code>intermediate</code> digest value. The calculated hash is rolled up, wherein each resulting 32 byte binary output is concatenated with the next binary value as the input. An example calculation would look like (in pseudo-code):</p>
+<div id="highlighter_168007" class="syntaxhighlighter  "><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="plain">hash = sha256(0x1a)</code></div><div class="line number2 index1 alt1"><code class="plain">hash = sha256(hash + 0x21b65ba5a9567fed892569f00090b3c17fd66a5c32d7b355940088605fa7f350)</code></div><div class="line number3 index2 alt2"><code class="plain">hash = sha256(hash + 0x3a)</code></div><div class="line number4 index3 alt1"><code class="plain">hash = sha256(hash + 0x97d83d1af8919874a449769145b7b3cb46359b2c12169ee53e683477bec47101)</code></div><div class="line number5 index4 alt2"><code class="plain">final = hash</code></div></div></td></tr></tbody></table></div><p>Here is a working example in node.js to do the calculation, results in <code>27ywx5e5ylzxfzxrhptowvwntqrd3jhksyxrfkzi6jfn64d3lwxa</code></p>
+<div id="highlighter_922642" class="syntaxhighlighter  "><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div><div class="line number11 index10 alt2">11</div><div class="line number12 index11 alt1">12</div><div class="line number13 index12 alt2">13</div><div class="line number14 index13 alt1">14</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="keyword">var</code> <code class="plain">crypto = require(</code><code class="string">"crypto"</code><code class="plain">);</code></div><div class="line number2 index1 alt1"><code class="keyword">var</code> <code class="plain">base32 = require(</code><code class="string">"rfc-3548-b32"</code><code class="plain">); </code><code class="comments">// <a href="https://github.com/sehrope/node-rfc-3548-b32">https://github.com/sehrope/node-rfc-3548-b32</a></code></div><div class="line number3 index2 alt2"><code class="keyword">var</code> <code class="plain">keys = {</code></div><div class="line number4 index3 alt1"><code class="undefined spaces">&nbsp;&nbsp;</code><code class="string">"3a"</code><code class="plain">:</code><code class="string">"eg3fxjnjkz763cjfnhyabeftyf75m2s4gll3gvmuacegax5h6nia"</code><code class="plain">,</code></div><div class="line number5 index4 alt2"><code class="undefined spaces">&nbsp;&nbsp;</code><code class="string">"1a"</code><code class="plain">: </code><code class="string">"an7lbl5e6vk4ql6nblznjicn5rmf3lmzlm"</code></div><div class="line number6 index5 alt1"><code class="plain">};</code></div><div class="line number7 index6 alt2"><code class="keyword">var</code> <code class="plain">rollup = </code><code class="keyword">new</code> <code class="plain">Buffer(0);</code></div><div class="line number8 index7 alt1"><code class="plain">Object.keys(keys).sort().forEach(</code><code class="keyword">function</code><code class="plain">(id){</code></div><div class="line number9 index8 alt2"><code class="undefined spaces">&nbsp;&nbsp;</code><code class="plain">rollup = crypto.createHash(</code><code class="string">"sha256"</code><code class="plain">).update(Buffer.concat([rollup,</code><code class="keyword">new</code> <code class="plain">Buffer(id,</code><code class="string">"hex"</code><code class="plain">)])).digest();</code></div><div class="line number10 index9 alt1"><code class="undefined spaces">&nbsp;&nbsp;</code><code class="keyword">var</code> <code class="plain">intermediate = crypto.createHash(</code><code class="string">"sha256"</code><code class="plain">).update(</code><code class="keyword">new</code> <code class="plain">Buffer(base32.decode(keys[id]),</code><code class="string">"binary"</code><code class="plain">)).digest();</code></div><div class="line number11 index10 alt2"><code class="undefined spaces">&nbsp;&nbsp;</code><code class="plain">rollup = crypto.createHash(</code><code class="string">"sha256"</code><code class="plain">).update(Buffer.concat([rollup,intermediate])).digest();</code></div><div class="line number12 index11 alt1"><code class="plain">});</code></div><div class="line number13 index12 alt2"><code class="keyword">var</code> <code class="plain">hashname = base32.encode(rollup).toLowerCase().split(</code><code class="string">"="</code><code class="plain">).join(</code><code class="string">""</code><code class="plain">); </code><code class="comments">// normalize to lower case and remove padding</code></div><div class="line number14 index13 alt1"><code class="plain">console.log(hashname); </code><code class="comments">// prints 27ywx5e5ylzxfzxrhptowvwntqrd3jhksyxrfkzi6jfn64d3lwxa</code></div></div></td></tr></tbody></table></div></section><a id='lob' name='lob'></a><a id='chapter-4-1' name='chapter-4-1'></a><section data-type='chapter'><h1 id="lob">Length-Object-Binary Encoding (Packet Format)</h1>
+<p>This is a simple encoding scheme to combine any JSON object with any binary data (both are optional) into one byte array, often referred to as a single <code>packet</code>.  This encoding does not include any total packet size or checksums, and expects the context where it&#39;s used to provide those when necessary (see <a class="xref" href="#chunking">chunking</a>).</p>
+<h2>Implementations</h2>
+<ul>
+<li><a href="https://github.com/quartzjer/lob-enc">javascript</a> (node and browserify)</li>
+<li><a href="https://github.com/telehash/telehash-c/blob/master/src/lib/lob.h">c</a></li>
+</ul>
+<p>It is common to also support <a class="xref" href="#e3x_cloaking">cloaking</a> within a LOB library as a convenience.</p>
+<p>For easier debugging and testing, libraries should also support <a class="xref" href="#base32">base 32</a> encoding and decoding for easy visual identification/separation and to allow simple cutting/pasting of packets.</p>
+<h2>Definition</h2>
+<p>The wire-format byte array (a packet) is created by combining three distinct parts, the <code>LENGTH</code>, an optional <code>HEAD</code>, and an optional <code>BODY</code>.</p>
+<p>The <code>LENGTH</code> is always two bytes which are a network-order short unsigned integer that represents the number of bytes for the <code>HEAD</code>.  When the <code>HEAD</code> is greather than 6 bytes then they are always parsed and represented as a UTF-8 JSON object.  Any bytes remaining after the <code>HEAD</code> are the <code>BODY</code> and always handled as binary.</p>
+<p>The format is thus:</p>
+<pre><code>&lt;LENGTH&gt;[HEAD][BODY]
+</code></pre><p>A simplified example of how to decode a packet, written in Node.js:</p>
+<div id="highlighter_450830" class="syntaxhighlighter  "><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="plain">dgram.createSocket(</code><code class="string">"udp4"</code><code class="plain">, </code><code class="keyword">function</code><code class="plain">(msg){</code></div><div class="line number2 index1 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="keyword">var</code> <code class="plain">head_length = msg.readUInt16BE(0);</code></div><div class="line number3 index2 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="keyword">var</code> <code class="plain">head = msg.slice(2, head_length + 2);</code></div><div class="line number4 index3 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="keyword">var</code> <code class="plain">body_length = msg.length - (head_length + 2);</code></div><div class="line number5 index4 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="keyword">var</code> <code class="plain">body = msg.slice(head_length + 2, body_length);</code></div><div class="line number6 index5 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="keyword">var</code> <code class="plain">json = (head_length >= 7) ? JSON.parse(head.toString(</code><code class="string">"utf8"</code><code class="plain">)) : undefined;</code></div><div class="line number7 index6 alt2"><code class="plain">});</code></div></div></td></tr></tbody></table></div><p>It is only a parsing error when the <code>LENGTH</code> is greater than the size of the packet or when the JSON parsing fails.  When successful, parsers must always return five values:</p>
+<ul>
+<li><code>HEAD LENGTH</code> - 0 to packet length - 2</li>
+<li><code>HEAD</code> - undefined/null or binary</li>
+<li><code>JSON</code> - undefined/null or decoded object</li>
+<li><code>BODY LENGTH</code> - 0 to packet length - (2 + HEAD LENGTH)</li>
+<li><code>BODY</code> - undefined/null or binary</li>
+</ul>
+<h2>LENGTH / HEAD</h2>
+<p>A <code>LENGTH</code> of 0 means there is no <code>HEAD</code> included and the packet is all binary (only <code>BODY</code>).</p>
+<p>A <code>LENGTH</code> of 1-6 means the <code>HEAD</code> is only binary (no JSON).</p>
+<p>A <code>LENGTH</code> of 7+ means the <code>HEAD</code> may be a UTF-8 encoded JSON object (not any bare string/bool/number/array value) within the guidelines of <a href="https://datatracker.ietf.org/doc/draft-ietf-json-i-json/?include_text=1">I-JSON</a> beginning with a <code>{</code> and ending with a <code>}</code> character.  If the JSON object parsing fails, the parser must include an error but still return the decoded <code>HEAD</code>/<code>BODY</code> byte structures and lengths.</p>
+<h2>BODY</h2>
+<p>The optional <code>BODY</code> is always a raw binary of the remainder bytes between the packet&#39;s total length and that of the <code>HEAD</code>. </p>
+<p>Often packets are attached inside other packets as the <code>BODY</code>, enabling simple packet wrapping/relaying usage patterns.</p>
+<p><a name="jose" /></p>
+<h2>JSON Web Encryption / Signing (JWE/JWS)</h2>
+<p>LOB encoding can be used as an optimized serialization of the <a href="https://datatracker.ietf.org/wg/jose/charter/">JOSE</a> based <a href="https://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-40">JWE</a>  and <a href="https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41">JWS</a> standards.</p>
+<p>The LOB encoding is simply a consistent binary translation of the JWS/JWE compact serialization, there are no semantic changes to the contents in either direction.</p>
+<p><a name="jws" /></p>
+<h3>JWS</h3>
+<p>Any <a href="https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41">JWS</a> can be mapped to two LOB packets (one attached to another):</p>
+<ul>
+<li>HEAD: {JWS Protected Header (JWT Header)}</li>
+<li>BODY: attached LOB<ul>
+<li>HEAD: {JWS Payload (JWT Claims)}</li>
+<li>BODY: JWS Signature (binary)</li>
+</ul>
+</li>
+</ul>
+<p>The attached HEAD is treated as a binary octet string when translating, even though it is frequently JSON it must be preserved as the original bytes for signature validation and non-JSON use cases.</p>
+<p><a name="jwe" /></p>
+<h3>JWE</h3>
+<p>Any <a href="https://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-40">JWE</a> can be mapped to three LOB packets (as attached descendents):</p>
+<ul>
+<li>HEAD: {JWE Protected Header}</li>
+<li>BODY: attached LOB<ul>
+<li>HEAD: {JWE JSON (Encrypted Key, IV, Tag, AAD)}</li>
+<li>BODY: attached LOB<ul>
+<li>HEAD: {optional unprotected header}</li>
+<li>BODY: JWE Ciphertext (binary)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code>{&quot;alg&quot;:&quot;RSA-OAEP&quot;,&quot;enc&quot;:&quot;A256GCM&quot;}
+BODY: {&quot;aad&quot;:&quot;&quot;,&quot;iv&quot;:&quot;&quot;,&quot;tag&quot;:&quot;&quot;,&quot;encrypted_key&quot;:&quot;&quot;}
+  BODY: (no header)
+    BODY: ciphertext
+</code></pre></section><a id='e3x_' name='e3x_'></a><a id='chapter-5-1' name='chapter-5-1'></a><section data-type='chapter'><h1 id="e3x_">e3x - End-to-End Encrypted eXchange</h1>
+<p>This is the definition of a flexible end-to-end encrypted exchange wire protocol, specifying a compatible way for applications to route packetized content over any transport while protecting the privacy of those communications from any network monitoring.</p>
+<p>It is designed to be used as a low-level software library that can be embedded in any app.  It exposes <em>all</em> trust decisions to app layer, zero information or metadata is revealed to any network or endpoint without explicit instructions from the app.</p>
+<h2>Index</h2>
+<ul>
+<li><a class="xref" href="#lob">packet</a> - all binary and JSON data encoding/encapsulation</li>
+<li><a class="xref" href="#e3x_cs_">Cipher Sets</a> - asynchronous and streaming encryption, multiple keys</li>
+<li><a class="xref" href="#e3x_messages">message</a> - an asynchronous encrypted packet between two endpoints</li>
+<li><a class="xref" href="#e3x_handshake">handshake</a> - a type of message used to establish a streaming encryption session for channels</li>
+<li><a class="xref" href="#e3x_channels">channel</a> - small (max 1400 bytes) synchronous encrypted packets, proxies larger reliable and unreliable data streams</li>
+<li><a class="xref" href="#e3x_cloaking">cloaking</a> - randomize all bytes on the wire</li>
+</ul>
+<p>An <code>endpoint</code> generates local keys to uniquely identify itself (one or more keys, depending on what Cipher Sets it supports), and requires another endpoint&#39;s public key(s) to create an <code>exchange</code> to it. The exchange can then be used to create encrypted <code>messages</code> and generate <code>handshakes</code> in both directions.  Once the handshakes have been received and verified, encrypted <code>channels</code> can stream reliable or unreliable data between the two connected endpoints.  All data is encoded as <code>packets</code> both before (app layer) and after encryption (wire transport layer).</p>
+<h2>Comparisons</h2>
+<p>These are similar low-level encrypted wire protocols:</p>
+<ul>
+<li><a href="http://en.wikipedia.org/wiki/Off-the-Record_Messaging">OTR</a>, (<a href="https://otr.cypherpunks.ca/Protocol-v3-4.0.0.html">spec</a>)</li>
+<li><a href="http://curvecp.org">CurveCP</a></li>
+<li><a href="http://en.wikipedia.org/wiki/QUIC">QUIC</a> (<a href="https://docs.google.com/document/d/1g5nIXAIkN_Y-7XJW5K45IblHd_L2f5LTaDUDwvZ5L6g/edit">spec</a>)</li>
+<li><a href="http://en.wikipedia.org/wiki/Secure_Real-time_Transport_Protocol">SRTP</a> (<a href="http://tools.ietf.org/html/rfc3711">spec</a>)</li>
+<li><a href="https://www.ethos-os.org/~solworth/minimalt-20131031.pdf">MinimaLT</a></li>
+</ul>
+<h2>Implementations</h2>
+<ul>
+<li><a href="https://github.com/telehash/e3x-js">JavaScript</a></li>
+<li><a href="https://github.com/telehash/telehash-c/blob/master/src/e3x.h">C</a></li>
+<li><a href="https://github.com/telehash/gogotelehash/tree/master/e3x">Go</a></li>
+<li><a href="https://github.com/telehash/telehash.net/tree/master/Telehash.Net/E3X">C#</a></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:center"></th>
+<th style="text-align:center">base</th>
+<th style="text-align:center">reliable</th>
+<th style="text-align:center">cloaking</th>
+<th style="text-align:center">1a</th>
+<th style="text-align:center">1b</th>
+<th style="text-align:center">1c</th>
+<th style="text-align:center">2a</th>
+<th style="text-align:center">2b</th>
+<th style="text-align:center">3a</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">node.js</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td style="text-align:center">browser js</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">c - unix</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">✓</td>
+</tr>
+<tr>
+<td style="text-align:center">c - embedded</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">go</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">c#</td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center">✓</td>
+<td style="text-align:center"></td>
+</tr>
+</tbody>
+</table>
+<h2>API</h2>
+<p>The interface to use e3x is designed to minimize any accidential leakage of information by having a small explicit API.</p>
+<p>Implementations may vary depending on their platform/language but should strive for a similar common pattern of interaction and method/data language as documented here at a high level.</p>
+<p>All implementations will require a strong/secure random number generator to properly support all aspects of this API and the underlying ciphers/algorithms.</p>
+<h3><code>generate</code></h3>
+<p>Create a new set of public and private keys for all supported Cipher Sets.</p>
+<h3><code>self(keypairs)</code></h3>
+<p>Load a given set of public/secret keys to create a local endpoint state.</p>
+<ul>
+<li><code>decrypt(message)</code> - take an enecrypted message received from a wire transport, return a decrypted <a class="xref" href="#lob">packet</a></li>
+</ul>
+<h3><code>exchange(self, public keys)</code></h3>
+<p>Load a given set of another endpoint&#39;s public keys to create an exchange state object between the <code>self</code> and that endpoint.</p>
+<ul>
+<li><code>token</code> - 16 byte ephemeral exchange identifier</li>
+<li><code>verify(message)</code> - validate that this message was sent from this exchange</li>
+<li><code>encrypt(packet)</code> - return encrypted message to this endpoint</li>
+<li><code>handshake(at)</code> - return a handshake with the given at value</li>
+<li><code>sync(handshake)</code> - process incoming handshake, returns current at value</li>
+<li><code>receive(channel)</code> - process/validate an incoming encrypted channel packet, return decrypted packet</li>
+</ul>
+<h3><code>channel(exchange, open)</code></h3>
+<p>Requires an exchange that has sent/received a handshake and is in sync.</p>
+<ul>
+<li><code>id</code> - unique numeric id</li>
+<li><code>state</code> - current state of the channel (<code>ENDED</code>, <code>OPENING</code>, <code>OPEN</code>)</li>
+<li><code>timeout</code> - get/set the current timeout value of this channel</li>
+<li><code>send(packet)</code> - return encrypted channel packet</li>
+</ul>
+<a id='e3x_cs_' name='e3x_cs_'></a><a id='section-5-2' name='section-5-2'></a><section data-type='section'><h3 id="e3x_cs_">Cipher Sets</h3>
+<p>A Cipher Set (<code>CS</code>) is a group of crypto algrithms that are used to implement the core security functions as required by e3x.  Multiple sets exist to allow an evolution of supporting newer techniques as well as adapting to different system and deployment requirements.</p>
+<p>A set always contains an endpoint public key cipher, an ephemeral public key cipher (for forward secrecy), and an authenticated streaming cipher.  Often a set uses the same public key algorithm for both the endpoint and epehemeral ciphers with different keys for each.</p>
+<p><a name="csk" /></p>
+<h4>Cipher Set Key (CSK)</h4>
+<p>Each set can generate a single public key byte array called the Cipher Set Key (<code>CSK</code>) that is shared to other entities in order to generate outgoing or validate incoming messages.</p>
+<p>The <code>CSK</code> is a consistent opaque value intended for use only by a given <code>CS</code>.  It must be tread as an arbitrary <em>binary octet string</em> when transferred, imported, or exported.</p>
+<p><a name="csid" /></p>
+<h4>Cipher Set ID (CSID)</h4>
+<p>Each <code>CSK</code> is identified with a unique identifier (<code>CSID</code>) that represents its overall selection priority. The <code>CSID</code> is a single byte, typically represented in lower case hex. The <code>CSIDs</code> are always sorted from lowest to highest preference.</p>
+<p>Two endpoints must always create exchanges to each other using the highest common <code>CSID</code> between them.  Apps may choose which one or more <code>CSIDs</code> they want to support when they create an endpoint and know that a lower one will only ever be used to communicate with other endpoints that only support that <code>CS</code>.</p>
+<p>Every <code>CS</code> requires a strong/secure random number generator in order to minimally function, some of them may have additional entropy requirements during <code>CSK</code> generation.</p>
+<p>The <code>0x00</code> <code>CSID</code> is not allowed and always considered invalid.</p>
+<p>Any <code>CSID</code> of <code>0x0*</code> (<code>0x01</code> through <code>0x0f</code>) is for experimental use when developing custom Cipher Sets and should not be used in production.</p>
+<p><a name="reserved" /></p>
+<h5>Reserved</h5>
+<p>All <code>CSIDs</code> with the mask of <code>11111000</code> (<code>0x18</code> through <code>0x1f</code>, <code>0x28</code> through <code>0x2f</code>, etc) are reserved and their usage is specified in this table:</p>
+<table>
+<thead>
+<tr>
+<th>CSID</th>
+<th>Status</th>
+<th>Crypto</th>
+<th>Uses</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="#e3x_cs_1a">CS1a</a></td>
+<td>Active</td>
+<td>ECC-160, AES-128</td>
+<td>Embedded, Browser</td>
+</tr>
+<tr>
+<td><a class="xref" href="#e3x_cs_1b">CS1b</a></td>
+<td>Draft</td>
+<td>ECC-256, AES-128</td>
+<td>Hardware-Accelerated</td>
+</tr>
+<tr>
+<td><a class="xref" href="#e3x_cs_1c">CS1c</a></td>
+<td>Draft</td>
+<td>ECC-256k, AES-256</td>
+<td>Bitcoin-based Apps</td>
+</tr>
+<tr>
+<td><a class="xref" href="#e3x_cs_2a">CS2a</a></td>
+<td>Active</td>
+<td>RSA-2048, ECC-256, AES-256</td>
+<td>Server, Apps</td>
+</tr>
+<tr>
+<td><a class="xref" href="#e3x_cs_2b">CS2b</a></td>
+<td>Draft</td>
+<td>RSA-4096, ECC-521, AES-256</td>
+<td>High-Security</td>
+</tr>
+<tr>
+<td><a class="xref" href="#e3x_cs_3a">CS3a</a></td>
+<td>Active</td>
+<td><a href="http://nacl.cr.yp.to/">NaCl</a></td>
+<td>Server, Apps</td>
+</tr>
+</tbody>
+</table>
+<p><a name="custom" /></p>
+<h5>Custom</h5>
+<p>Any <code>CSID</code> with the mask of <code>11110111</code> (<code>0x10</code> through <code>0x17</code>, <code>0x20</code> through <code>0x27</code>, etc) are for custom application usage, these Cipher Sets definitions are entirely app-specific.  Implementations are responsible for ensuring that the ordering matches their security preferences.</p>
+<p><a name="jose" /></p>
+<h4>JOSE Based</h4>
+<blockquote>
+<p><a href="https://github.com/telehash/telehash.org/labels/draft">DRAFT</a></p>
+</blockquote>
+<p>The <a href="https://datatracker.ietf.org/wg/jose/charter/">JOSE standards</a> can be used to implement an entire <a class="xref" href="#e3x_e3x_cs_">Cipher Set</a> dynamically, where <a class="xref" href="#e3x_.._lob#jwe">JWE and JWS encoding</a> is used directly as the wire format for the encrypted message and channel packets.</p>
+<p>Since the <code>CSID</code> is a simple ordering preference indicator and a JWE can internally signal its encryption algorithms, the <a class="xref" href="#e3x_cs_#custom">custom</a> range can be used by applications to map the chosen JWE <code>alg</code> value(s) to.</p>
+<p>Applications using JOSE-based <code>CSIDs</code> should be careful to not use the features of JWE such as unprotected headers or multiple recipients that expose significantly more metadata to the network and untrusted entities, reducing the level of expected privacy.</p>
+<ul>
+<li>The <code>CSK</code> is a serialized JWK</li>
+<li>The message BODY is a JWE that contains a  requires both encryption and signing, so it is always a JWE of a JWS, and the JWS payload is the inner message packet (binary HEAD)</li>
+<li>If the handshake used ephemeral key agreement (ECDH) then channel JWEs can reference that agreement and contain the channel packet as the payload instead of a JWS</li>
+</ul>
+<a id='e3x_cs_1a' name='e3x_cs_1a'></a><a id='section-5-3' name='section-5-3'></a><section data-type='section'><h4 id="e3x_cs_1a">Cipher Set 1a</h4>
+<p>This is a minimum lightweight profile to support embedded devices and low resource environments.  It has additional constraints in place to minimize the code size and bytes on the wire (over speed) while maintaining a modern level of privacy.</p>
+<p>The base algorithms used in this set are chosen to be readily implementable on embedded hardware (8bit 16mhz 32k AVR in &lt; 1 second) and are considered minimum-grade security:</p>
+<ul>
+<li><strong>ECC secp160r1</strong> - small key sizes, balance of relatively strong crypto and still supportable with low cpu</li>
+<li><strong>HMAC-SHA256</strong> - common implementations available for embedded environments</li>
+<li><strong>AES-128-CTR</strong> - low impact streaming cipher, many implementations including hardware ones</li>
+</ul>
+<h5>Keys</h5>
+<p>When generating an endpoint including <code>CS1a</code>, the public/private keypair is an ECC <code>secp160r1</code> curve and the binary public key format is <a href="https://www.secg.org/collateral/sec1_final.pdf">compressed</a>, 21 bytes in length.</p>
+<p>One key is generated permanently to identify the local endpoint, and one ephemeral key is generated on demand for every exchange created.</p>
+<h5>Message BODY</h5>
+<p>The BODY of any message packet is binary and defined with the following byte sections in sequential order:</p>
+<ul>
+<li><code>KEY</code> - 21 bytes, the sender&#39;s ephemeral exchange public key in compressed format</li>
+<li><code>IV</code> - 4 bytes, a random but unique value determined by the sender</li>
+<li><code>INNER</code> - the AES-128-CTR encrypted inner packet ciphertext</li>
+<li><code>HMAC</code> - 4 bytes, the calculated HMAC of all of the previous KEY+IV+INNER bytes</li>
+</ul>
+<p>By performing ECDH with the received ephemeral key and the recipient&#39;s identity key, the resulting 20 byte secret is SHA-256 hashed and folded once to create the 16 byte AES-128 key along with the given IV (right-zero-padded to 16 bytes).</p>
+<p>Another ECDH is performed with the sender and recipients identity key, and that 20 byte secret is combined with the given IV and input to HMAC-SHA256 of the entire BODY bytes (KEY+IV+INNER) minus the HMAC, then folded three times to get the 4 byte verification value that must match/be the last 4 bytes in the BODY.</p>
+<h5>Channel Setup</h5>
+<p>An exchange can generate or process channel packets once it has received a valid handshake.  The channel encryption is generated by using ECDH with the sent and received ephemeral keys from the handshakes, then performing a SHA-256 of the resulting 20 byte secret combined with the 21 byte compressed key values in each direction, and folding the 32 byte digests once to get the required 16 byte encryption and decryption key values for AES-128.</p>
+<ul>
+<li>channel encryption key: SHA256(secret, sent-KEY, received-KEY) / 2</li>
+<li>channel decryption key: SHA256(secret, received-KEY, sent-KEY) / 2</li>
+</ul>
+<h5>Channel BODY</h5>
+<p>CS1a channel packets are designed to be very lightweight with minimum overhead for use on networks such as 802.15.4 where there is a very low MTU.  The BODY is binary and defined as:</p>
+<ul>
+<li><code>TOKEN</code> - 16 bytes, from the handshake, required for all channel packets</li>
+<li><code>IV</code> - 4 bytes, incremented sequence</li>
+<li><code>INNER</code> - the AES-128-CTR encrypted inner packet ciphertext</li>
+<li><code>HMAC</code> - 4 bytes, the SHA-256 HMAC folded three times</li>
+</ul>
+<p>The IV must be initialized to 4 random bytes during channel setup to make the individual channel packets less identifiable, and then incremented for every new channel packet created.</p>
+<p>Using the correct channel 16 byte key with the given IV (right-zero-padded to the required 16 bytes), the channel packet can be encrypted/decrypted with AES-128-CTR.</p>
+<p>The ciphertext then has a HMAC value calculated, with the input key being the same 16 byte key used for AES concatenated with the 4 byte IV to be a 20 byte secret key, and the body being the output of AES.</p>
+<h5>Folding</h5>
+<p>In order to minimize the over-the-wire footprint and match key sizes while using the same SHA-256 hashing algorithm that is required elsewhere, a 32-byte hash is folded once into a 16-byte value for usage as the fingerprint and as the input key for AES-128, and the 32-byte HMAC digest is folded three times into a smaller 4-byte value for usage as the MAC on message and channel packets.</p>
+<p>The folding is a simple XOR of the lower half bytes with the upper ones, example pseudocode:</p>
+<div id="highlighter_91235" class="syntaxhighlighter  "><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="keyword">var</code> <code class="plain">digest = sha256(</code><code class="string">"foo"</code><code class="plain">);</code></div><div class="line number2 index1 alt1"><code class="keyword">var</code> <code class="plain">folded = digest.slice(0,16);</code></div><div class="line number3 index2 alt2"><code class="keyword">for</code><code class="plain">(i = 0; i &lt; 16; i++) folded[i] = folded[i] ^ digest[i+16];</code></div></div></td></tr></tbody></table></div><p>The triple fold uses progressively smaller chunks of the input, as in this C code</p>
+<div id="highlighter_655863" class="syntaxhighlighter  "><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="keyword bold">void</code> <code class="plain">fold3(unsigned </code><code class="color1 bold">char</code> <code class="plain">in[32], unsigned </code><code class="color1 bold">char</code> <code class="plain">out[4])</code></div><div class="line number2 index1 alt1"><code class="plain">{</code></div><div class="line number3 index2 alt2"><code class="undefined spaces">&nbsp;&nbsp;</code><code class="plain">unsigned </code><code class="color1 bold">char</code> <code class="plain">i, buf[16];</code></div><div class="line number4 index3 alt1"><code class="undefined spaces">&nbsp;&nbsp;</code><code class="keyword bold">for</code><code class="plain">(i=0;i&lt;16;i++) buf[i] = in[i] ^ in[i+16];</code></div><div class="line number5 index4 alt2"><code class="undefined spaces">&nbsp;&nbsp;</code><code class="keyword bold">for</code><code class="plain">(i=0;i&lt;8;i++) buf[i] ^= buf[i+8];</code></div><div class="line number6 index5 alt1"><code class="undefined spaces">&nbsp;&nbsp;</code><code class="keyword bold">for</code><code class="plain">(i=0;i&lt;4;i++) out[i] = buf[i] ^ buf[i+4];</code></div><div class="line number7 index6 alt2"><code class="plain">}</code></div></div></td></tr></tbody></table></div></section><a id='e3x_cs_1b' name='e3x_cs_1b'></a><a id='section-5-3' name='section-5-3'></a><section data-type='section'><h4 id="e3x_cs_1b">Cipher Set 1b</h4>
+<blockquote>
+<p><a href="https://github.com/telehash/telehash.org/labels/draft">DRAFT</a></p>
+</blockquote>
+<p>This is just a placeholder to define a hardware-accelerated friendly embedded CS.</p>
+<hr/>
+<p>The base algorithms used in this set are chosen to be supported by commonly available hardware-accelerated-crypto on embedded hardware.</p>
+<ul>
+<li><strong>ECC NIST-P256</strong></li>
+<li><strong>HMAC-SHA256</strong></li>
+<li><strong>AES-128-CTR</strong></li>
+<li>or <a href="http://en.wikipedia.org/wiki/CCM_mode">CCM</a> to replace CTR and HMAC? Contiki has started a <a href="https://github.com/contiki-os/contiki/pull/557">hardware-driver layer providing CCM</a></li>
+</ul>
+<blockquote>
+<p>Inhereit from <a class="xref" href="#e3x_cs_1a">CS1a</a></p>
+</blockquote>
+</section><a id='e3x_cs_1c' name='e3x_cs_1c'></a><a id='section-5-3' name='section-5-3'></a><section data-type='section'><h4 id="e3x_cs_1c">Cipher Set 1c</h4>
+<blockquote>
+<p><a href="https://github.com/telehash/telehash.org/labels/draft">DRAFT</a></p>
+</blockquote>
+<p>This is just a placeholder to define a CS easily supported by bitcoin based apps.</p>
+<hr/>
+<p>The base algorithms used in this set are chosen to be supported easily by bitcoin apps and libraries.</p>
+<ul>
+<li><strong>ECC 256k</strong></li>
+<li><strong>HMAC-SHA256</strong></li>
+<li><strong>AES-256-CTR</strong></li>
+</ul>
+<blockquote>
+<p>Inhereit from <a class="xref" href="#e3x_cs_1a">CS1a</a></p>
+</blockquote>
+</section><a id='e3x_cs_2a' name='e3x_cs_2a'></a><a id='section-5-3' name='section-5-3'></a><section data-type='section'><h4 id="e3x_cs_2a">Cipher Set 2a</h4>
+<p>This profile is based on the algorithms used during the telehash development process in 2013.</p>
+<p>The required algorithms in this set are:</p>
+<ul>
+<li><strong>RSA 2048</strong> - selected as a well known and highly trusted public key algorithm and size, used as the long-lived identity</li>
+<li><strong>ECC P-256</strong> - a well known curve with many implementations, used for the ephemeral identity</li>
+<li><strong>AES 256-GCM</strong> - trusted common implementations available</li>
+</ul>
+<h5>Keys</h5>
+<p>When generating an endpoint including <code>CS2a</code>, the public/private keypair is <a href="https://en.wikipedia.org/wiki/RSA_(algorithm">RSA 2048</a>).</p>
+<p>Binary public keys are encoded in <a href="https://en.wikipedia.org/wiki/Distinguished_Encoding_Rules">DER</a> as X.509 SubjectPublicKeyInfo structures.  (Most cryptographic libraries support this encoding; see <a href="https://tools.ietf.org/html/rfc5280#section-4.1">RFC 5280 section 4.1</a> and <a href="https://tools.ietf.org/html/rfc3279#section-2.3.1">RFC 3279 section 2.3.1</a> for more details.) </p>
+<p>The exchange ephemeral key is generated using <a href="https://en.wikipedia.org/wiki/Elliptic_curve_cryptography">ECC</a> and the <a href="http://csrc.nist.gov/groups/ST/toolkit/documents/dss/NISTReCur.pdf">p-256</a> curve, the resulting binary public key is <a href="https://www.secg.org/collateral/sec1_final.pdf">uncompressed</a> (65 bytes).</p>
+<h5>Message BODY</h5>
+<p>BODY bytes:</p>
+<ul>
+<li><code>KEYS</code> - 256 bytes, PKCS1 <a href="https://en.wikipedia.org/wiki/Optimal_asymmetric_encryption_padding">OAEP</a> (v2) RSA encrpyted ciphertext of the 65 byte uncompressed ECC P-256 ephemeral public key and a 32 byte random AES key</li>
+<li><code>IV</code> - 12 bytes, a random but unique value determined by the sender for each message</li>
+<li><code>CIPHERTEXT</code> - <a href="http://en.wikipedia.org/wiki/Galois/Counter_Mode">AES-256-GCM</a> encrypted inner packet and sender signature</li>
+<li><code>MAC</code> - 16 bytes, GCM 128-bit MAC/tag digest (some GCM implementations auto-append this)</li>
+</ul>
+<p>The <code>CIPHERTEXT</code> once deciphered contains:</p>
+<ul>
+<li><code>INNER</code> - inner packet raw bytes</li>
+<li><code>SIG</code> - 256 bytes, PKCS1 v1.5 RSA signature of the KEYS+IV+INNER</li>
+</ul>
+<p>The <code>KEYS</code> is created by first generating a new ephemeral elliptic (ECC) public key for this exchange and a random 32 byte AES <code>KEY</code>, and then using the endpoint&#39;s RSA key to encrypt it <em>to</em> the recipient&#39;s RSA public key. The ECC keypair should be generated using the P-256 (<a href="http://tools.ietf.org/html/rfc6239#page-4">nistp256/secp256r/X9.62 prime256v1</a>) curve. The ECC public key should be in the uncompressed form 65 bytes in length (ANSI X9.63 format) followed by the 32 byte AES <code>KEY</code> bytes. The RSA encryption should use PKCS1 OAEP (v2) padding. The result is always padded to 256 bytes by OAEP.</p>
+<p>The SIG is calculated from the concatenation of the <code>KEYS</code> (256 bytes of ciphertext), <code>IV</code> (12 bytes), and <code>INNER</code> (raw packet) together and then using the sender&#39;s RSA public key (SHA-256 hash and PKCS1 v1.5 padding) to create a signature of it, resulting in a 256 byte <code>SIG</code> value.</p>
+<p>The <code>CIPHERTEXT</code> is created by encrypting the <code>INNER</code> and <code>SIG</code> (concatenated together) using AES-256-GCM.  The GCM IV/nonce parameter is the 12 byte (96-bit) <code>IV</code> value, and the key parameter is the 32 byte secret value following the ECC public key from the decrypted <code>KEYS</code>. The &quot;tag&quot; size for GCM is 16 bytes (128 bits), and the additional/auth data used to compute it is the 256 <code>KEYS</code> bytes, resulting in the <code>MAC</code> value appended to the original packet.</p>
+<h5>Channel Setup</h5>
+<p>The channel encryption/decryption secret keys are generated by using <a href="https://en.wikipedia.org/wiki/Elliptic_curve_Diffie–Hellman">ECDH</a> with the local ephemeral ECC private key, and the remote ephemeral ECC public key. Two secret keys are generated by performing a SHA-256 with the derived ECDH derived secret (32 bytes) and sent/received decrypted secret keys from the <code>KEYS</code> value (32 bytes each):</p>
+<ul>
+<li>channel encryption key: SHA256(ecdh-secret, sent-KEY, received-KEY)</li>
+<li>channel decryption key: SHA256(ecdh-secret, received-KEY, sent-KEY)</li>
+</ul>
+<h5>Channel BODY</h5>
+<p>Channel packet binary <code>BODY</code> is defined as:</p>
+<ul>
+<li><code>TOKEN</code> - 16 bytes, from the handshake, required for all channel packets</li>
+<li><code>IV</code> - 12 bytes, a random but unique value determined by the sender for each message</li>
+<li><code>CHANNEL CIPHERTEXT</code> - the AES-256-GCM encrypted channel packet</li>
+<li><code>GCM TAG/MAC</code> - (GMAC) - 16 bytes, GCM MAC digest (some GCM libraries auto-append this with the AES-256-GCM cipher output)</li>
+</ul>
+<p>The IV is 12 random bytes that must be different for every channel packet sent (incremented from a random seed) and used as the input to the GCM calculation, along with the appropriate encryption/decryption keys calculated for the exchange during setup.  The tag size for GCM is 12 bytes (96 bits) and no additiona/auth data is included as input to it.</p>
+</section><a id='e3x_cs_2b' name='e3x_cs_2b'></a><a id='section-5-3' name='section-5-3'></a><section data-type='section'><h4 id="e3x_cs_2b">Cipher Set 1c</h4>
+<blockquote>
+<p><a href="https://github.com/telehash/telehash.org/labels/draft">DRAFT</a></p>
+</blockquote>
+<p>Identical to <a class="xref" href="#e3x_cs_2a">CS2a</a> but significantly increasing the key-sizes.</p>
+<ul>
+<li><strong>RSA 4096</strong></li>
+<li><strong>ECC P-521</strong></li>
+<li><strong>AES 256-GCM</strong></li>
+</ul>
+</section><a id='e3x_cs_3a' name='e3x_cs_3a'></a><a id='section-5-3' name='section-5-3'></a><section data-type='section'><h4 id="e3x_cs_3a">Cipher Set 3a</h4>
+<p>Cipher Set 3a is based on Daniel J. Bernstein&#39;s <a href="http://nacl.cr.yp.to/index.html">NaCl: Networking and Cryptography library</a>.  The cipher set leverages the public-key and secret-key portions of NaCl.  Implementations will need to support the crypto_box, crypto_secretbox, and crypto_onetimeauth related functions.</p>
+<p>The version of NaCl used for 3a is implemented with <code>crypto_box_curve25519xsalsa20poly1305</code>, future versions of NaCl with other configurations will likely be defined in different Cipher Sets.</p>
+<h5>Keys</h5>
+<p>All CS3a key pairs are generated using NaCl&#39;s <a href="http://nacl.cr.yp.to/box.html">crypto_box</a> from the components for public-key cryptography.</p>
+<p>Here is some example code:</p>
+<div id="highlighter_2021" class="syntaxhighlighter  "><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="keyword">var</code> <code class="plain">sodium = require(</code><code class="string">"sodium"</code><code class="plain">).api;</code></div><div class="line number2 index1 alt1"><code class="keyword">var</code> <code class="plain">keys = sodium.crypto_box_keypair();</code></div><div class="line number3 index2 alt2"><code class="plain">console.log(keys.publicKey); </code><code class="comments">// binary public key, 32 bytes</code></div></div></td></tr></tbody></table></div><h5>Message BODY</h5>
+<p>The BODY of a message packet is binary and defined as the following byte sections in sequential order:</p>
+<ul>
+<li><code>KEY</code> - 32 bytes, the sending exchange&#39;s ephemeral public key</li>
+<li><code>NONCE</code> - 24 bytes, randomly generated</li>
+<li><code>CIPHERTEXT</code> - the inner packet bytes encrypted using secretbox() using the <code>NONCE</code> as the nonce and the shared secret (derived from the recipients endpoint key and the included ephemeral key) as the key</li>
+<li><code>AUTH</code> - 16 bytes, the calculated onetimeauth(<code>KEY</code> + <code>NONCE</code> + <code>CIPHERTEXT</code>, SHA256(<code>NONCE</code> + secret)) using the shared secret derived from both endpoint keys, the hashing is to minimize the chance that the same key input is ever used twice</li>
+</ul>
+<h5>Channel Setup</h5>
+<p>Channel secret keys are generated by performing a SHA-256 hash of the shared secret (agreedKey) and the <code>TOKEN</code> values:</p>
+<ul>
+<li>channel encryption key: SHA256(secret, sent-KEY, received-KEY) / 2</li>
+<li>channel decryption key: SHA256(secret, received-KEY, sent-KEY) / 2</li>
+</ul>
+<h5>Channel BODY</h5>
+<p>The enclosing channel packet binary is defined as the following byte sections in sequential order:</p>
+<ul>
+<li><code>TOKEN</code> - 16 bytes, from the handshake, required for all channel packets</li>
+<li><code>NONCE</code> - 24 bytes, randomly generated</li>
+<li><code>CIPHERTEXT</code> - the secretbox() output representing the encrypted inner packet</li>
+</ul>
+<h5>Example Code For Discussion (handshake)</h5>
+<p>The following example illustrates the usage of cs3a for the sending and receiving handshakes for a new exchange.  </p>
+<blockquote>
+<p>Warning: pseudo code interspersed with real code.</p>
+</blockquote>
+<p>Message (handshake) Encryption:</p>
+<div id="highlighter_942075" class="syntaxhighlighter  "><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div><div class="line number11 index10 alt2">11</div><div class="line number12 index11 alt1">12</div><div class="line number13 index12 alt2">13</div><div class="line number14 index13 alt1">14</div><div class="line number15 index14 alt2">15</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="comments">// Generate Exchange Key Pair</code></div><div class="line number2 index1 alt1"><code class="keyword">var</code> <code class="plain">ephemeral = sodium.crypto_box_keypair();</code></div><div class="line number3 index2 alt2">&nbsp;</div><div class="line number4 index3 alt1"><code class="comments">// get the shared secret to create the iv+key for the open aes</code></div><div class="line number5 index4 alt2"><code class="keyword">var</code> <code class="plain">secret = sodium.crypto_box_beforenm(remote.publicKey, self.ephemeral.secretKey);</code></div><div class="line number6 index5 alt1"><code class="keyword">var</code> <code class="plain">nonce = crypto.randomBytes(24);</code></div><div class="line number7 index6 alt2">&nbsp;</div><div class="line number8 index7 alt1"><code class="comments">// encrypt the inner</code></div><div class="line number9 index8 alt2"><code class="keyword">var</code> <code class="plain">innerc = sodium.crypto_secretbox(inner, nonce, secret);</code></div><div class="line number10 index9 alt1"><code class="keyword">var</code> <code class="plain">body = Buffer.concat([ephemeral.publicKey,nonce,innerc]);</code></div><div class="line number11 index10 alt2">&nbsp;</div><div class="line number12 index11 alt1"><code class="comments">// hmac it with secret from the endpoint keys</code></div><div class="line number13 index12 alt2"><code class="keyword">var</code> <code class="plain">msecret = sodium.crypto_box_beforenm(remote.publicKey, self.secretKey);</code></div><div class="line number14 index13 alt1"><code class="keyword">var</code> <code class="plain">akey = crypto.createHash(</code><code class="string">'sha256'</code><code class="plain">).update(Buffer.concat([nonce,msecret])).digest();</code></div><div class="line number15 index14 alt2"><code class="keyword">var</code> <code class="plain">mac = sodium.crypto_onetimeauth(body,akey);</code></div></div></td></tr></tbody></table></div><p>Message Decryption:</p>
+<div id="highlighter_929037" class="syntaxhighlighter  "><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="keyword">var</code> <code class="plain">key = body.slice(0,32);</code></div><div class="line number2 index1 alt1"><code class="keyword">var</code> <code class="plain">nonce = body.slice(32,32+24);</code></div><div class="line number3 index2 alt2"><code class="keyword">var</code> <code class="plain">innerc = body.slice(32+24,body.length-16);</code></div><div class="line number4 index3 alt1">&nbsp;</div><div class="line number5 index4 alt2"><code class="keyword">var</code> <code class="plain">secret = sodium.crypto_box_beforenm(key, self.secretKey);</code></div><div class="line number6 index5 alt1">&nbsp;</div><div class="line number7 index6 alt2"><code class="comments">// decipher the inner</code></div><div class="line number8 index7 alt1"><code class="keyword">var</code> <code class="plain">inner = sodium.crypto_secretbox_open(innerc,nonce,secret);</code></div></div></td></tr></tbody></table></div><p>Sender Verification:</p>
+<pre><code>var mac1 = body.slice(body.length-16);
+var nonce = body.slice(32,32+24);
+
+var secret = sodium.crypto_box_beforenm(remote.publicKey, self.secretKey);
+var akey = crypto.createHash(&#39;sha256&#39;).update(Buffer.concat([nonce,secret])).digest();
+var mac2 = sodium.crypto_onetimeauth(body.slice(0,body.length-16),akey);
+
+if(mac2 != mac1) return false;
+</code></pre><p>Channel Key Setup:</p>
+<div id="highlighter_354446" class="syntaxhighlighter  "><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div><div class="line number11 index10 alt2">11</div><div class="line number12 index11 alt1">12</div><div class="line number13 index12 alt2">13</div><div class="line number14 index13 alt1">14</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="comments">// extract received ephemeral key</code></div><div class="line number2 index1 alt1"><code class="keyword">var</code> <code class="plain">key = body.slice(0,32);</code></div><div class="line number3 index2 alt2">&nbsp;</div><div class="line number4 index3 alt1"><code class="keyword">var</code> <code class="plain">secret = sodium.crypto_box_beforenm(key, remote.ephemeral.secretKey);</code></div><div class="line number5 index4 alt2"><code class="keyword">var</code> <code class="plain">encKey = crypto.createHash(</code><code class="string">"sha256"</code><code class="plain">)</code></div><div class="line number6 index5 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="plain">.update(secret)</code></div><div class="line number7 index6 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="plain">.update(remote.ephemeral.publicKey)</code></div><div class="line number8 index7 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="plain">.update(key)</code></div><div class="line number9 index8 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="plain">.digest();</code></div><div class="line number10 index9 alt1"><code class="keyword">var</code> <code class="plain">decKey = crypto.createHash(</code><code class="string">"sha256"</code><code class="plain">)</code></div><div class="line number11 index10 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="plain">.update(secret)</code></div><div class="line number12 index11 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="plain">.update(key)</code></div><div class="line number13 index12 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="plain">.update(remote.ephemeral.publicKey)</code></div><div class="line number14 index13 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="plain">.digest();</code></div></div></td></tr></tbody></table></div><p>Channel Encryption:</p>
+<div id="highlighter_553630" class="syntaxhighlighter  "><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="keyword">var</code> <code class="plain">nonce = crypto.randomBytes(24);</code></div><div class="line number2 index1 alt1"><code class="keyword">var</code> <code class="plain">cbody = sodium.crypto_secretbox(inner, nonce, encKey);</code></div><div class="line number3 index2 alt2"><code class="keyword">var</code> <code class="plain">outer = Buffer.concat([nonce,cbody]);</code></div></div></td></tr></tbody></table></div><p>Channel Decryption:</p>
+<div id="highlighter_397920" class="syntaxhighlighter  "><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="keyword">var</code> <code class="plain">nonce = outer.slice(0,24);</code></div><div class="line number2 index1 alt1"><code class="keyword">var</code> <code class="plain">cbody = outer.slice(24);</code></div><div class="line number3 index2 alt2"><code class="keyword">var</code> <code class="plain">body = sodium.crypto_secretbox_open(cbody,nonce,decKey);</code></div></div></td></tr></tbody></table></div></section></section><a id='e3x_messages' name='e3x_messages'></a><a id='section-5-2' name='section-5-2'></a><section data-type='section'><h3 id="e3x_messages">Messages - Asynchronous / Offline Content Transport with Forward Secrecy</h3>
+<p>Message packets are for encrypting small amounts of content to other entities without requiring a synchronous exchange, such that the recipient can process them at any point in the future.  They are used primarily for creating handshakes to establish synchronous <a class="xref" href="#e3x_channels">channel</a> encryption that has forward secrecy guarantees, as messages alone provide a lower level of privacy and should only be used for temporary or non-secret data and never stored at rest.</p>
+<p>Messages define how to encrypt the packets but have no required internal structure (unlike channels).  There is a larger overhead for encrypted message packets as they must always include the ephemeral public key information used and often require additional computation as well.</p>
+<p>An exchange may be created on demand just to generate/process one or more messages and not used for channels, but since messages are asynchronous they do not require the exchanges to be in sync to operate.</p>
+<p>All <a class="xref" href="#e3x_handshake">handshakes</a> are message packets.</p>
+<p>The size of an encrypted message is determined by the application and context in which it is used, handshakes are usually small (&lt;1400 bytes to maximize transport compatibility) and any messages intended to be sent over a transport with a low MTU may need to use <a class="xref" href="#e3x_chunking">chunked encoding</a> as the BODY of multiple messages.</p>
+<h4>Packet Encryption</h4>
+<p>All message packets are encrypted using a cipher as determined by the <a class="xref" href="#e3x_cs_">Cipher Set</a> in use for the exchange.  The encrypted (OUTER) packets must have a <code>HEAD</code> of length 1 to identify the CSID and the encrypted contents as the binary <code>BODY</code>.</p>
+<p>Once decrypted they result in an INNER packet with a structure that is determined entirely by the application.  It is common practice for applications to use a <code>&quot;type&quot;:&quot;value&quot;</code> on the INNER JSON similarly to channel packets, but not required.  All INNER packets should contain a mechanism for the recipient to determine recency to ensure that the ephemeral keys already used can be invalidated and not-reused if required for forward secrecy.</p>
+<p>The <a class="xref" href="#e3x_handshake">handshakes</a> messages have an INNER that contains the sending endpoint&#39;s public key for the CSID used so that the sender identity can be immediately validated.</p>
+<h4>Tokens</h4>
+<p>All message packets generated from one exchange will have at least the first 16 bytes remain fixed for the lifetime of that exchange to be used for network routing and validation caching.  These 16 bytes are SHA-256 hashed into a 32 byte digest in order to remove any CSID uniqueness, and then the first 16 bytes of the digest are used as the official <code>TOKEN</code> value to match future message or channel packets from that exchange.</p>
+</section><a id='e3x_handshake' name='e3x_handshake'></a><a id='section-5-2' name='section-5-2'></a><section data-type='section'><h3 id="e3x_handshake">Handshake - Mutual Exchange Creation</h3>
+<p>A handshake is one or more encrypted <a class="xref" href="#e3x_messages">messages</a> sent between two endpoints in order to validate their identity and establish a mutual session to use for <a class="xref" href="#e3x_channels">channels</a>.  At a minimum at least one handshake message must be both sent and received in order for the session to be created, with both endpoints verifying that it is always the most current one.</p>
+<p>Applications may send or expect more than one handshake message for additional authentication and authorization requirements beyond the basic endpoint key exchange. New handshakes are also triggered automatically for existing sessions as needed by the transport(s) in use to verify that the network paths are still valid and/or maintain any NAT mappings.</p>
+<p>The resulting size of encrypted handshake packets vary by which <a class="xref" href="#e3x_cs_">Cipher Sets</a> are used combined with the type of inner packet, typically it ranges from ~70 to ~1100 bytes.</p>
+<h4>Resend/Timeout</h4>
+<p>After a new handshake is generated and delivered it should be resent verbatim at 1 second, 3 seconds, 8 seconds, and again at 20 seconds unless there is a valid handshake response.  After 30 seconds with no response the exchange should be timed out, considered invalid and all related state removed.</p>
+<p>At any point the transport being used to deliver packets may generate a keepalive handshake request which will start this process.</p>
+<h4>Message Types</h4>
+<p>Any decrypted handshake message is identified with a <code>&quot;type&quot;:&quot;...&quot;</code> string value, that if not included in the header must be defaulted to the type of <code>&quot;key&quot;</code>.  Only one unique type may exist concurrently (same <code>at</code> value) with any handshake process.</p>
+<p>Known types include:</p>
+<ul>
+<li><strong><a class="xref" href="#e3x_link">link</a></strong> - to establish or keepalive a link</li>
+<li><strong><a class="xref" href="#e3x_link#jwt">jwt</a></strong> - message <code>BODY</code> is a JSON Web Token encoded packet</li>
+<li><strong><a class="xref" href="#e3x_uri">uri</a></strong> - a URI was used to generate this handshake and it is included as the <code>&quot;uri&quot;:&quot;...&quot;</code> value.</li>
+<li><strong><a class="xref" href="#e3x_guides_bitcoin">tx</a></strong> - message <code>BODY</code> is a raw bitcoin transaction</li>
+<li><strong>key</strong> - deprecated (early version of the link handshake)</li>
+</ul>
+<h4>Sequencing with <code>at</code></h4>
+<p>All decrypted handshake messages must contain an <code>&quot;at&quot;:123456</code> with a 64 bit positive unsigned integer value to determine the newest generated handshake from either endpoint.  There is no requirement for the <code>at</code> value to be the current time, in sync, or accurate, only that it increases on all subsequent handshakes in the future from the last highest known value.</p>
+<p>Multiple messages as part of one handshake must all have the same <code>at</code> value and different types, only one message per type with the highest <code>at</code> is used.</p>
+<p>The <code>at</code> value determines if an incoming handshake is the most current and if the recipient needs to respond.  The last bit in the <code>at</code> must always match the <a class="xref" href="#e3x_order">order</a> value of the sender, if they are <code>ODD</code> it must be a 1 (and 0 if they are <code>EVEN</code>) to guarantee that no two endpoints can choose the same <code>at</code> independently.</p>
+<p>When an <code>at</code> is received that is higher than one sent, new handshake message (or messages) must be returned with that matching highest <code>at</code> value in order to inform the sender that their handshake is confirmed.  Upon receiving and confirming a new <code>at</code>, any pending channel packets that may have been waiting to send may be flushed/delivered.</p>
+<p>When first creating a handshake, the sender should make every effort to always choose a higher <code>at</code> than any they may have sent in the past.  Most can just use local <a href="http://en.wikipedia.org/wiki/Unix_time">32-bit epoch</a> as this value, but when not available (embedded systems) they should locally store the last sent <code>at</code> and always increase it.</p>
+<p>If the maximum <code>at</code> value is ever reached/used the two hashnames cannot send any more subsequent handshakes and will no longer be able to communicate, either side must generate a new hashname to start over.</p>
+<h4>Routing Token</h4>
+<p>The handshake determines the exchange&#39;s <code>ROUTING TOKEN</code> value, generated by SHA-256 hashing the first 16 bytes of the encrypted outer message <code>BODY</code>, then using the first 16 bytes of the digest output.  The <code>ROUTING TOKEN</code> is not used cryptographically and is only a unique value to assist the two endpoints and any routing parties on mapping to a known exchange session.</p>
+<p>Each <a class="xref" href="#e3x_cs_">Cipher Set</a> must structure their messages such that the first 16 bytes of the <code>BODY</code> are unique and remain stable for the lifetime of the exchange, typically being the exchange&#39;s public key bytes.</p>
+<p>Any handshake with a different <code>ROUTING TOKEN</code> and a higher <code>at</code> of an existing exchange for the same endpoint must clear any cached handshake messages or state stored for that exchange.</p>
+<h4>Handling Multiple Messages</h4>
+<p>Immediately upon receiving a valid higher or equal <code>at</code> for any handshake message type, that message should be cached and replace any previous matching type with a <em>lower</em> <code>at</code> only (messages with matching <code>at</code> and <code>type</code> values must be discarded).  The message should also then be grouped with any other received messages with the same <code>at</code> and delivered to the application to process and validate.</p>
+<p>If an application requires multiple message types it simply waits until the sufficient types arrive and process/validate them.  Application-invalidated handshakes must never be responded to so that the endpoint does not advertise its existence except to explicitly trusted/validated endpoints.</p>
+<p>At any point the application may provide updated handshake message types to be sent in a new handshake process.  When the transport requests an updated handshake, the last known/provided message types are updated with a new <code>at</code> and re-sent.</p>
+</section><a id='e3x_channels' name='e3x_channels'></a><a id='section-5-2' name='section-5-2'></a><section data-type='section'><h3 id="e3x_channels">Channels - Streaming Content Transport</h3>
+<p>All streaming data sent between two endpoints in an exchange must be part of a <code>channel</code> packet. Every channel has an integer id included as the <code>c</code> parameter in the JSON. See <a class="xref" href="#e3x_#ids">Channel IDs</a> for details on how they are selected/handled.</p>
+<p>A channel may have only one outgoing initial packet, only one response to it, or it may be long-lived with many packets exchanged using the same &quot;c&quot; identifier (depending on the type of channel).  Channels are by default unreliable, they have no retransmit or ordering guarantees, and an <code>end</code> always signals the last <em>content</em> packet being sent (acknowledgements/retransmits may still occur after).  When required, an app can also create a <a class="xref" href="#e3x_reliable">reliable</a> channel that does provide ordering and retransmission functionality.</p>
+<h4>Packet Size Default</h4>
+<p>Channel packets should always be a maximum of 1400 bytes or less each, which allows enough space for added variable encryption, token, and transport overhead to fit within 1500 bytes total (one ethernet frame).  Larger data should use reliable channels to sequence and reassemble pieces of this size, and transports with a fixed lower MTU than 1400 should use <a class="xref" href="#e3x_chunking">chunked encoding</a> by default.</p>
+<p>A channel library should provide a <code>quota</code> method per packet for the app to determine how many bytes are available within the 1400 limit, and app-specific channel logic can use this to break larger data into packets.  In special cases (such as with a local high bandwidth transport) when the transport MTU is known, the app or custom channel logic may ignore this and send larger/smaller packets.</p>
+<h4>Packet Encryption</h4>
+<p>All channel packets are encrypted using a stream cipher as determined by the <a class="xref" href="#e3x_cs_">Cipher Set</a> in use for the exchange.  The encrypted (OUTER) packets must have a <code>HEAD</code> of length 0 and the encrypted contents as the binary <code>BODY</code>.</p>
+<p>Once decrypted they result in an INNER packet that must always contain valid JSON (have a <code>HEAD</code> of 7 or greater).</p>
+<h4>Decrypted Packets</h4>
+<p>Base parameters on channel packets:</p>
+<ul>
+<li><code>&quot;type&quot;:&quot;value&quot;</code> - A channel always opens with a <code>type</code> in the first outgoing packet to distinguish to the recipient what the name/category of the channel it is. This value must only be set on the first packet (called the <em>open packet</em>), not on any subsequent ones or any responses.</li>
+<li><code>&quot;end&quot;:true</code> - Upon sending any content packet with an <code>end</code> of true, the sender must not send any more content packets (reliability acks/resends may still be happening though). An <code>end</code> may be sent by either side and is required to be sent by <em>both</em> to cleanly close a channel, otherwise the channel will eventually close with a timeout.</li>
+<li><code>&quot;err&quot;:&quot;message&quot;</code> - As soon as any packet on a channel is received with an <code>err</code> it is immediately closed and no more packets can be sent or received at all, any/all buffered content in either direction must be dropped. Any <code>err</code> packets must contain no channel content other than additional error details. Any internal channel inactivity timeout is the same as receiving an <code>&quot;err&quot;:&quot;timeout&quot;</code>.</li>
+<li><code>&quot;seq&quot;:1</code> - A positive integer sequence number that is only used for and defined by <a class="xref" href="#e3x_reliable">reliable</a> channels and must be sent in the first open packet along with the <code>type</code>, it is an error to send/receive this without using reliability on both sides.</li>
+</ul>
+<p>An example unreliable channel start packet JSON for a built-in channel:</p>
+<div id="highlighter_375778" class="syntaxhighlighter  "><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="plain">{</code></div><div class="line number2 index1 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"c"</code><code class="plain">:1,</code></div><div class="line number3 index2 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"type"</code><code class="plain">:</code><code class="string">"path"</code><code class="plain">,</code></div><div class="line number4 index3 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"paths"</code><code class="plain">:[...]</code></div><div class="line number5 index4 alt2"><code class="plain">}</code></div></div></td></tr></tbody></table></div><p>An example initial reliable channel open request:</p>
+<div id="highlighter_340677" class="syntaxhighlighter  "><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="plain">{</code></div><div class="line number2 index1 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"c"</code><code class="plain">:2,</code></div><div class="line number3 index2 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"seq"</code><code class="plain">:1,</code></div><div class="line number4 index3 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"type"</code><code class="plain">:</code><code class="string">"hello"</code><code class="plain">,</code></div><div class="line number5 index4 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"hello"</code><code class="plain">:{</code><code class="string">"custom"</code><code class="plain">:</code><code class="string">"values"</code><code class="plain">}</code></div><div class="line number6 index5 alt1"><code class="plain">}</code></div></div></td></tr></tbody></table></div><p><a name="states" /></p>
+<h5>Channel States</h5>
+<p>A channel may only be in one of the following states:</p>
+<ul>
+<li><code>OPENING</code> - the initial channel open packet containing the <code>type</code> has been sent or received, but not confirmed or responded to yet and will time out in this state</li>
+<li><code>OPEN</code> - the channel open packets have been both sent and received and it will not timeout unless the exchange does or reliability fails</li>
+<li><code>ENDED</code> - a packet containing an <code>&quot;end&quot;:true</code> has been received and no further content will be delivered for this channel, it will be timed out</li>
+</ul>
+<p>These are the states that e3x manages, if an application requires additional states (such as when one party ended but the other hasn&#39;t) it must track them itself.  Any channel having received or sent an <code>err</code> is immediately removed after processing that packet and no more state is tracked, so e3x has no error state.  </p>
+<p>Any channel in the <code>ENDED</code> state and has also sent an <code>end</code> is no longer available for any sending/receiving, but internal state will be tracked until the channel timeout for any necessary reliability retransmits/acknowledgements.</p>
+<p><a name="ids" /></p>
+<h5>Channel IDs</h5>
+<p>A Channel ID is a <em>positive</em> integer (uint32_t) from 1 to 4,294,967,295 and is determined by the sender and then used by both sides to send/receive packets on that channel.  In order to prevent two endpoints from picking the same <code>c</code> value they choose them based on their <a class="xref" href="#e3x_order">order</a>: the <code>ODD</code> endpoint uses odd numbers starting with 1, and the <code>EVEN</code> endpoint uses even numbers starting with 2. 0 is never a valid ID.</p>
+<p>When a new channel is created, the ID must be higher than the last one the initiator used, they must always increment. Upon receiving a new channel request, the recipient must validate that it is higher than the last active channel (note: switches must still allow for two new channel requests to arrive out of order).</p>
+<p>When a new exchange is established, it errors any <code>OPEN</code> channels and sets the minimum required incoming channel IDs back to 1.</p>
+<p>If the maximum ID is reached the exchange must be regenerated, resetting it back to 1.</p>
+<p><a name="timeouts" /></p>
+<h5>Timeouts</h5>
+<p>Every channel is responsible for it&#39;s own timeout and may have a different value than others.  A timeout occurs whenever the channel is in <code>OPENING</code> or <code>ENDED</code> state or when any packet has not been ack&#39;d for reliable channels.</p>
+<p>Any channel that is in <code>OPEN</code> state will not trigger a timeout individually since the exchange as a whole will timeout if the connection is lost based on the network transports in use.  Those timeouts independently occur at a higher level for the overall exchange when the handshake process fails and do not use any channel timeout values.</p>
+</section><a id='e3x_cloaking' name='e3x_cloaking'></a><a id='section-5-2' name='section-5-2'></a><section data-type='section'><h3 id="e3x_cloaking">Cloaking - Network Obfuscation</h3>
+<p>In situations where the network may be performing any packet filtering or inspection it is important to add as much random noise as possible to all bytes sent across an untrusted/unencrypted transport. Cloaking is a simple and efficient technique that can be used on any transport and is the default for all unencrypted ones by default (such as TCP and UDP).</p>
+<p>The cloaking technique simply requires an extra processing step that adds a random number of 8 byte nonces to every packet and randomizes 100% of the bytes on the wire.  It makes large-scale pattern identification techniques significantly more difficult, but is not a guarantee that individual packets cannot be targetted.  Future designs will continually increase this difficulty.</p>
+<h4>Per-Packet</h4>
+<p>Due to all encrypted packets beginning with single zero byte (0x00) when sent on the wire (since they have no JSON encoded), cloaking uses a first byte that is any non-zero value (0x01 to 0xff).</p>
+<p>Cloaking is performed using the <a href="http://cr.yp.to/chacha.html">ChaCha20 cipher</a> and choosing a random nonce of 8 bytes that does not begin with 0x00. The key is a fixed well-known 32 byte value of <code>d7f0e555546241b2a944ecd6d0de66856ac50b0baba76a6f5a4782956ca9459a</code> (shown as hex encoded), which is the SHA-256 of the string <code>telehash</code>.</p>
+<p>The resulting cloaked packet is the concatenation of the 8-byte nonce and the ChaCha20 ciphertext output.  Once decloaked, the ciphertext should be processed as another packet, which may be a raw encrypted packet (0x00) or may be another cloaked one. A random number of multiple cloakings should always be used to obfuscate the original packet&#39;s size.</p>
+<h4>Accept both</h4>
+<p>All implementations must support receiving both cloaked and uncloaked packets, and the default for any un-encrypted transport should always be cloaking enabled.  The initial sender determines when to send un-cloaked packets on any transport, but when receiving a cloaked packet any sender should always respond with cloaked packets as that may be the only way to ensure they are transmitted.</p>
+</section><a id='e3x_compression' name='e3x_compression'></a><a id='section-5-2' name='section-5-2'></a><section data-type='section'><h3 id="e3x_compression">Channel Payload Compression</h3>
+<p>Since channel packets are the most frequent and have a set of fixed well-known key/values in their JSON headers, both endpoints may support optional channel compression encoding to minimize the resources required.</p>
+<p>This is important in embedded/device networks where the MTU is small (BLE and 6lowpan), and may improve performance in other edge cases with frequent small packets.</p>
+<h4><code>z</code> Handshake Signalling</h4>
+<p>To indicate support of a channel payload compression any endpoint may include a <code>z</code> key with an unsigned integer value in the handshake.  The value <code>0</code> is the default and signals no support.</p>
+<p>The <code>z</code> value indicates how to decode/interpret the channel payload bytes immediately after decryption.  After any alternative processing the resulting value must still always be identical to a LOB packet with a JSON header and binary BODY, it is only to minimize encoding and not for use to include additional data in a payload.</p>
+<p>Both endpoints must include identical <code>z</code> in a confirmed handshake in order for it to be enabled on any channel packets using the resulting keys, and only that type of channel payload is supported when enabled. There is no negotiation or signalling of support for multiple values, future <code>z</code> values will be defined that combine multiple techniques when necessary.</p>
+<h4><code>0</code> LOB encoded (default)</h4>
+<p>All channel payload bytes are <a class="xref" href="#e3x_lob">LOB encoded</a>.</p>
+<h4><code>1</code> CBOR encoded</h4>
+<p>The value <code>1</code> signals support of <a href="http://cbor.io">CBOR based</a> payloads, the bytes are interpreted as a stream of CBOR values instead of LOB encoding.</p>
+<ul>
+<li>first value is always channel id (&quot;c&quot;, unsigned int)</li>
+<li>[optional] byte string of a payload LOB packet</li>
+<li>[optional] map of additional key/value pairs</li>
+<li>[optional] text value is the &quot;type&quot; string value</li>
+<li>[optional] unsigned int is a &quot;seq&quot; value</li>
+<li>[optional] array is the &quot;ack&quot; and &quot;miss&quot; unsigned int values, ack is always the first value in the CBOR array</li>
+</ul>
+<h5>Decoding</h5>
+<p>When processing CBOR the result is always a regular LOB packet with a JSON header.</p>
+<ol>
+<li>decode the channel id</li>
+<li>if a byte string follows it is processed as the source LOB, if not then generate a blank/empty LOB packet</li>
+<li>set the <code>&quot;c&quot;:id</code> in the packet JSON to the channel id from 1.</li>
+<li>if a map follows, it&#39;s key/value pairs must be processed and only text keys and text or number values are used, each one being set in the packet JSON</li>
+<li>if a text value follows, it is set as the <code>&quot;type&quot;:value</code> in the JSON</li>
+<li>if an unsigned int follows, it is set as the <code>&quot;seq&quot;:value</code> in the JSON</li>
+<li>if an array follows, it must be processed and only unsigned int values are used, the first one is always set as the <code>&quot;ack&quot;:value</code> and all other entries in the array are the <code>&quot;miss&quot;:[1,2,3]</code> in the JSON.</li>
+</ol>
+<h5>Examples</h5>
+<p>JSON <code>{&quot;c&quot;:1,&quot;type&quot;:&quot;open&quot;}</code> (21) <a href="http://cbor.me/?diag=[1,%22open%22]">CBOR</a> (6):</p>
+<pre><code>01          # unsigned(1) // c
+64          # text(4)     // type
+   6f70656e # &quot;open&quot;
+</code></pre><p>JSON <code>{&quot;c&quot;:2,&quot;seq&quot;:22,&quot;ack&quot;:20,&quot;miss&quot;:[1,2,20]}</code> (41) <a href="http://cbor.me/?diag=[2,22,[20,1,2,20]]">CBOR</a> (7):</p>
+<pre><code>02    # unsigned(2)  // c
+16    # unsigned(22) // seq
+84    # array(4)
+   14 # unsigned(20) // ack
+   01 # unsigned(1)
+   02 # unsigned(2)
+   14 # unsigned(20)
+</code></pre><h4><code>2</code> DEFLATE encoded</h4>
+<p>All channel payload bytes are encoded/decoded with <a href="http://tools.ietf.org/html/rfc1951">DEFLATE</a> before/after encryption.  The uncompressed bytes are always a normal LOB packet.</p>
+</section><a id='e3x_order' name='e3x_order'></a><a id='section-5-2' name='section-5-2'></a><section data-type='section'><h3 id="e3x_order">Endpoint Order</h3>
+<p>In order to prevent conflicts between any two endpoints, uniqueness is guaranteed by comparing the public keys of their agreed upon <a class="xref" href="#e3x_">cipher set</a>.</p>
+<p>The binary value of each endpoint&#39;s public key is compared and they are placed in high-to-low sorted order.
+To achieve this the two public keys can be visited bit by bit, the first key that at a given position has a <code>1</code> (<em>higher</em>) where the other has a <code>0</code> (<em>lower</em>) is the one that has <em>higher</em> order.</p>
+<p>Based on this comparison the two are labeled as <code>ODD</code> (<em>high</em>) endpoint and an <code>EVEN</code> (<em>low</em>) endpoint.</p>
+<p>This mechanism ensures that that both endpoints will mutually agree on their label consistently and without communication.</p>
+</section><a id='e3x_reliable' name='e3x_reliable'></a><a id='section-5-2' name='section-5-2'></a><section data-type='section'><h3 id="e3x_reliable">Reliable Channels</h3>
+<p>Channel packets are by default only as reliable as the underlying transport itself is, which often means they may be dropped or arrive out of order.  Most of the time applications want to transfer content in a durable way, so reliable channels replicate TCP features such as ordering, retransmission, and buffering/backpressure mechanisms. The primary method of any application interfacing with an e3x library is going to be through starting or receiving reliable channels.</p>
+<p>Reliability is requested on a channel with the very first packet (that contains the <code>type</code>) by including a <code>&quot;seq&quot;:1</code> with it, and a recipient must respond with an <code>err</code> if it cannot handle reliable channels.  Reliability must not be requested for channel types that are expected to be unreliable.</p>
+<p><a name="seq" /></p>
+<h4><code>seq</code> - Sequenced Data</h4>
+<p>The requirement for a reliable channel is always including a simple incrementing <code>&quot;seq&quot;:1</code> positive integer value on every packet that contains any content (including the <code>end</code>). All <code>seq</code> values start at 1 with the open and increment per packet sent when it contains any data to be processed, with a maximum value of 4,294,967,295 (a 32-bit unsigned integer)</p>
+<p>A buffer of these packets must be kept keyed by the seq value until the recipient has responded confirming them in an <a class="xref" href="#e3x_#ack"><code>ack</code></a>. When the buffer is nearing full or new packets are being dropped, a <a class="xref" href="#e3x_#miss"><code>miss</code></a> should be sent to indicate what is missing and the capacity left.</p>
+<p>The receiving app logic must only process sequenced packets and their contents in order, any packets received with a sequence value that is older than already processed ones must be dropped, and any of order must either be buffered or dropped depending on local resources available.  </p>
+<p><a name="ack" /></p>
+<h4><code>ack</code> - Acknowledgements</h4>
+<p>The <code>&quot;ack&quot;:1</code> integer is included on outgoing packets as the highest known <code>seq</code> value confirmed as <em>delivered to the app</em> (as much as is possible to confirm quickly). What this means is that any library must provide a way to send data/packets to the app using it in a serialized way, and be told when the app is done processing one packet so that it can both confirm that <code>seq</code> as well as give the app the next one in order. Any outgoing <code>ack</code> must be the last processed <code>seq</code> so that the sender can confirm that the data was completely received/handled by the recipient.</p>
+<p>If a received packet contains a <code>seq</code> but does not contain an <code>ack</code> then the recipient is not required to send one for the given <code>seq</code> while it&#39;s still processing packets for up to one second.  This allows senders to manage their outgoing buffer of packets and the rate of ack&#39;s being returned, and ensures that an <code>ack</code> will still be sent at a regular rate based on what is actually received.</p>
+<p>An <code>ack</code> may also be sent in it&#39;s own packet ad-hoc at any point without any content data, and these ad-hoc acks must not include a <code>seq</code> value as they are not part of the content stream and are out-of-band.</p>
+<p>When receiving an <code>ack</code> the recipient may then discard any buffered packets up to and including that matching <code>seq</code> id, and also confirm to the app that the included content data was received and processed by the other side.</p>
+<p><a name="miss" /></p>
+<h4><code>miss</code> - Missing Sequences</h4>
+<p>The <code>&quot;miss&quot;:[1,2,4]</code> is an array of positive delta integers and must be sent along with any <code>ack</code> if in the process of receiving packets there are missing sequences. The array entries each represent a <code>seq</code> value calculated as the delta from the previous entry, using the accompanying <code>ack</code> as the initial base to start calculating from.</p>
+<p>The last entry in the array always represents the <code>seq</code> id that the recipient will start dropping packets at, it is the maximum capacity of the incoming unprocessed packet buffer.  Whenever the buffer is over 50% full the recipient should send a <code>miss</code> to indicate the capacity left even if there are no other missing packets.  When the sender gets a <code>miss</code> it should always cache the total delta number as the maximum window size and never send packets with a higher <code>seq</code> than the last received <code>ack</code>+delta.</p>
+<p>Upon receiving a <code>miss</code> the recipient should resend those specific matching calculated <code>seq</code> id packets in it&#39;s buffer. If the missing <code>seq</code> is signaled in multiple incoming packets quickly (happens often), the matching packet should only be resent once until at least one second has passed.</p>
+<p>The <code>miss</code> recipient can make no assumptions about the sender&#39;s state of any <code>seq</code> ids higher than the <code>ack</code> and not included in the array, it can only use the values included as a signal that those sequences are missing.</p>
+<h5><code>miss</code> delta encoding example</h5>
+<p>Given the raw list of missing <code>seq</code> ids <code>[78236, 78235, 78245, 78238]</code> and <code>&quot;ack&quot;: 78231</code>.</p>
+<ol>
+<li>Sort the original list of missing seq ids:<br/>
+<code>[78235, 78236, 78238, 78245]</code></li>
+<li>Calculate the difference between all subsequent ids (including the <code>ack</code>).<br/>
+<code>[(78235 - 78231), (78236 - 78235), (78238 - 78236), (78245 - 78238)]</code><br/>
+<code>[4, 1, 2, 7]</code></li>
+<li>If the incoming max buffer size is 20 packets, append the highest acceptable seq (<code>78251</code>) as a final delta (<code>78251 - 78245</code>).<br/>
+<code>[4, 1, 2, 7, 6]</code></li>
+<li>Deliver the final delta encoded <code>miss</code> array.</li>
+</ol>
+</section></section><a id='link' name='link'></a><a id='chapter-6-1' name='chapter-6-1'></a><section data-type='chapter'><h2 id="link">Links</h2>
+<p>A <code>link</code> is the core connectivity mechanism between two endpoints.  An endpoint with one or more links is referred to as a <code>mesh</code>.</p>
+<h3>Terminology</h3>
+<ul>
+<li><strong>Link CSID</strong> - The highest matching <code>CSID</code> between two endpoints</li>
+<li><strong>Link Keys</strong> - The one or more <code>CSKs</code> of the other endpoint, at a minimum must include the <code>CSID</code> one</li>
+<li><strong>Link Paths</strong> - All known or potential path information for connecting a link</li>
+<li><strong>Link Handshake</strong> - A handshake that contains one <code>CSK</code> and the intermediate hashes for any others to validate the hashname and encrypt a response</li>
+</ul>
+<h3>Link State</h3>
+<p>Links can be in three states:</p>
+<ul>
+<li><strong>unresolved</strong> - at least the hashname is known, but either the Link Keys or Link Paths are incomplete</li>
+<li><strong>down</strong> - keys have been validated and at least one path is available (possibly through router), but the link is not connected</li>
+<li><strong>up</strong> - link has sent and received a handshake and is active</li>
+</ul>
+<p><a name="json" /></p>
+<h3>JSON</h3>
+<p>Many apps use JSON as an easy storage/exchange format for defining and sharing link data.  The only required standard for this is that each link is an object with two fields, a <code>keys</code> object and a <code>paths</code> array.  Apps may extend and customize the JSON as needed but should attempt to preserve those two fields to simplify what other tools and libraries can automatically detect and generate.</p>
+<p>It&#39;s common to have a <code>hashname</code> field as well for convenience or as the verified value if only one <code>CSK</code> is stored.</p>
+<div id="highlighter_666981" class="syntaxhighlighter  "><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div><div class="line number11 index10 alt2">11</div><div class="line number12 index11 alt1">12</div><div class="line number13 index12 alt2">13</div><div class="line number14 index13 alt1">14</div><div class="line number15 index14 alt2">15</div><div class="line number16 index15 alt1">16</div><div class="line number17 index16 alt2">17</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="plain">{</code></div><div class="line number2 index1 alt1"><code class="undefined spaces">&nbsp;&nbsp;</code><code class="string">"keys"</code><code class="plain">: {</code></div><div class="line number3 index2 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"1a"</code><code class="plain">: </code><code class="string">"aiw4cwmhicwp4lfbsecbdwyr6ymx6xqsli"</code></div><div class="line number4 index3 alt1"><code class="undefined spaces">&nbsp;&nbsp;</code><code class="plain">},</code></div><div class="line number5 index4 alt2"><code class="undefined spaces">&nbsp;&nbsp;</code><code class="string">"paths"</code><code class="plain">: [</code></div><div class="line number6 index5 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="plain">{</code></div><div class="line number7 index6 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"ip"</code><code class="plain">: </code><code class="string">"192.168.0.55"</code><code class="plain">,</code></div><div class="line number8 index7 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"port"</code><code class="plain">: 61407,</code></div><div class="line number9 index8 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"type"</code><code class="plain">: </code><code class="string">"udp4"</code></div><div class="line number10 index9 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="plain">},</code></div><div class="line number11 index10 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="plain">{</code></div><div class="line number12 index11 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"hn"</code><code class="plain">: </code><code class="string">"e5mwmtsvueumlqgo32j67kbyjjtk46demhj7b6iibnnq36fsylka"</code><code class="plain">,</code></div><div class="line number13 index12 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"type"</code><code class="plain">: </code><code class="string">"peer"</code></div><div class="line number14 index13 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="plain">}</code></div><div class="line number15 index14 alt2"><code class="undefined spaces">&nbsp;&nbsp;</code><code class="plain">],</code></div><div class="line number16 index15 alt1"><code class="undefined spaces">&nbsp;&nbsp;</code><code class="string">"hashname"</code><code class="plain">: </code><code class="string">"frnfke2szyna2vwkge6eubxtnkj46rtctqk7g7ewbvfiesycbjdq"</code></div><div class="line number17 index16 alt2"><code class="plain">}</code></div></div></td></tr></tbody></table></div><p>The <code>keys</code> object is always a dictionary of at least the single <code>CSID</code> for the link, with all string values being a <a class="xref" href="#base32">base 32</a> encoding of the binary <code>CSK</code> for that given <code>CSID</code>.</p>
+<p>The <code>paths</code> array is always the list of current or recent <a class="xref" href="#channels_path">path values</a> and should contain only external paths when shared or a mix of both internal and external when used locally.</p>
+<p><a name="jwk" /></p>
+<h3>JSON Web Key (JWK)</h3>
+<p>The Link Keys can also be represented in a standard <a href="https://tools.ietf.org/html/draft-ietf-jose-json-web-key-41">JWK</a> using a <code>kty</code> of <code>hashname</code>:</p>
+<div id="highlighter_125003" class="syntaxhighlighter  "><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="plain">{</code></div><div class="line number2 index1 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"kty"</code><code class="plain">: </code><code class="string">"hashname"</code><code class="plain">,</code></div><div class="line number3 index2 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"kid"</code><code class="plain">: </code><code class="string">"27ywx5e5ylzxfzxrhptowvwntqrd3jhksyxrfkzi6jfn64d3lwxa"</code><code class="plain">,</code></div><div class="line number4 index3 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"use"</code><code class="plain">: </code><code class="string">"link"</code><code class="plain">,</code></div><div class="line number5 index4 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"cs1a"</code><code class="plain">: </code><code class="string">"an7lbl5e6vk4ql6nblznjicn5rmf3lmzlm"</code><code class="plain">,</code></div><div class="line number6 index5 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"cs3a"</code><code class="plain">: </code><code class="string">"eg3fxjnjkz763cjfnhyabeftyf75m2s4gll3gvmuacegax5h6nia"</code></div><div class="line number7 index6 alt2"><code class="plain">}</code></div></div></td></tr></tbody></table></div><p>The <code>kid</code> must always be the matching/correct hashname for the included keys.  The <code>use</code> value must always be <code>link</code> as it can only be used to create links.</p>
+<p>The JWK may also contain a <code>&quot;paths&quot;:[...]</code> array if required, often the JWK is only used as <a class="xref" href="#uri#discovery">authority validation</a> and does not require bundling of the current link connectivity information.</p>
+<h3>Resolution</h3>
+<p>Links can be resolved from any string:</p>
+<ol>
+<li><a class="xref" href="##json">JSON</a></li>
+<li><a class="xref" href="#uri">Direct URI</a> (no fragment)</li>
+<li><a class="xref" href="#uri#peer">Peer URI</a> (router assisted, with fragment)</li>
+<li>hashname - <a class="xref" href="#channels_peer">peer request</a> to default router(s)</li>
+</ol>
+<p>Once resolved, all paths should be preserved for future use.  If resolved via a router, also generate and preserve a <code>peer</code> path referencing that router.</p>
+<p><a name="handshake" /></p>
+<h3>Handshake</h3>
+<p>The handshake packet is of <code>&quot;type&quot;:&quot;link&quot;</code> and contains an optional <code>&quot;csid&quot;:&quot;1a&quot;</code> for use when not sent as a message (such as in a <a class="xref" href="#channels_peer">peer</a>).  The <code>BODY</code> of the handshake is another encoded packet that contains the sender&#39;s hashname details.</p>
+<p>The attached packet must include the correct <code>CSK</code> of the sender as the <code>BODY</code> and the JSON contains the intermediate hash values of any other <code>CSIDs</code> used to generate the hashname.</p>
+<p>Example:</p>
+<div id="highlighter_962456" class="syntaxhighlighter  "><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div><div class="line number11 index10 alt2">11</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="plain">{</code></div><div class="line number2 index1 alt1"><code class="undefined spaces">&nbsp;&nbsp;</code><code class="string">"type"</code><code class="plain">:</code><code class="string">"link"</code><code class="plain">,</code></div><div class="line number3 index2 alt2"><code class="undefined spaces">&nbsp;&nbsp;</code><code class="string">"at"</code><code class="plain">:123456789,</code></div><div class="line number4 index3 alt1"><code class="undefined spaces">&nbsp;&nbsp;</code><code class="string">"csid"</code><code class="plain">:</code><code class="string">"2a"</code></div><div class="line number5 index4 alt2"><code class="plain">}</code></div><div class="line number6 index5 alt1"><code class="plain">BODY:</code></div><div class="line number7 index6 alt2"><code class="undefined spaces">&nbsp;&nbsp;</code><code class="plain">{</code></div><div class="line number8 index7 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"3a"</code><code class="plain">: </code><code class="string">"eg3fxjnjkz763cjfnhyabeftyf75m2s4gll3gvmuacegax5h6nia"</code><code class="plain">,</code></div><div class="line number9 index8 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"1a"</code><code class="plain">: </code><code class="string">"ckczcg2fq5hhaksfqgnm44xzheku6t7c4zksbd3dr4wffdvvem6q"</code></div><div class="line number10 index9 alt1"><code class="undefined spaces">&nbsp;&nbsp;</code><code class="plain">}</code></div><div class="line number11 index10 alt2"><code class="undefined spaces">&nbsp;&nbsp;</code><code class="plain">BODY: [2a's CSK binary bytes]</code></div></div></td></tr></tbody></table></div><p><a name="jwt" /></p>
+<h3>Identity (JWT)</h3>
+<p>The endpoints connected over a link are always uniquely identified by their hashnames, which serves as a stable globally unique and verifiable address, but is not intended to be used as a higher level identity for an end-user or other entity beyond the single instance/device.  Once a hashname is generated in a new context, it should be registered and associated with other portable identities by the application.</p>
+<p><a href="http://openid.net/connect/">OpenID Connect</a> or any service that can generate a <a href="http://tools.ietf.org/html/draft-ietf-oauth-json-web-token">JSON Web Token</a> can be used as the primary user/entity identification process, enabling a strongly encrypted communication medium to be easily coupled with standard identity management tools.</p>
+<p>Just as a JWT is sent as a Bearer token over HTTP, it can be automatically included as part of the <a class="xref" href="#e3x_handshake">handshake process</a> between endpoints.  This enables applications to require additional context before deciding to establish a link or apply restrictions on to what can be performed over the link once connected.</p>
+<h4>Audience</h4>
+<p>When an <a href="http://openid.net/specs/openid-connect-basic-1_0.html#IDToken">ID Token</a> is generated specifically for one or more known hashnames, the hashname must be included in the <code>aud</code> as one of the items in the array value.</p>
+<h4>Scope</h4>
+<p>When a client is requesting to establish a new link to an identity, it must include the scope value <code>link</code> during authorization.</p>
+<h4>Claims</h4>
+<p>An identity may advertise its connectivity by including a <code>link</code> member in the <a href="http://openid.net/specs/openid-connect-basic-1_0.html#StandardClaims">Standard Claims</a>.  The value must be a valid <a class="xref" href="#uri">URI</a> that can be resolved to establish a link, and any resulting linked hashname must be included in the token&#39;s <code>aud</code> audience values.</p>
+</section><a id='mesh' name='mesh'></a><a id='chapter-7-1' name='chapter-7-1'></a><section data-type='chapter'><h2 id="mesh">Mesh Network</h2>
+<p>A mesh network consists of one or more <a class="xref" href="#link">links</a>, which are active <a class="xref" href="#e3x_">encrypted sessions</a> between two endpoints over any <a class="xref" href="#transports_">transport</a>.  Each endpoint is identified with a unique <a class="xref" href="#hashname">hashname</a>, the fingerprint of it&#39;s public key(s).  A mesh is private to each endpoint, which has complete control over what links it accepts, there is no automatic sharing of any link state to any other link.</p>
+<p>Once a link is up, <a class="xref" href="#channels_">channels</a> are used to run common services over it:</p>
+<ul>
+<li>peer: request connection to an endpoint from a router</li>
+<li>connect: incoming connection request relayed</li>
+<li>path: sync network transport info to try any direct/alternative paths</li>
+<li>sock: tcp/udp socket tunneling </li>
+<li>stream: binary streams</li>
+<li>thtp: mapping/proxying of http requests/responses</li>
+<li>chat: personal messaging</li>
+<li>box: async/offline messaging</li>
+</ul>
+<h3>Mesh Structure</h3>
+<ul>
+<li>a mesh is a local hashname and links to one or more other hashnames (full mesh)</li>
+<li>any link may be flagged as a <code>router</code> when it will provide relaying/bridging to other links</li>
+<li>individual hashnames may have their own router defined</li>
+<li>a router must have a way to validate hashnames before providing routing assistance to them</li>
+<li>any hashname may advertise it&#39;s router as a path (and must provide routing to it for the first handshake)</li>
+<li>a hashname my use a base <a class="xref" href="#uri">URI</a> from a router as an out-of-band mechanism to establish new links</li>
+</ul>
+<h3>API</h3>
+<p>A simple API is documented here to help provide a consistent foundation for all implementations by using similar methods/names and interaction patterns:</p>
+<h4><code>mesh = create(keypairs)</code></h4>
+<p>Create a new mesh using the given keypairs (or generate new ones).  This should enable all transports and start handling incoming channels.</p>
+<h4><code>mesh.onDiscover = function (from) {...}</code></h4>
+<p>When a new unknown hashname is discovered at any point (from transports or a connect channel), all of the details (keys, hashname, paths) are given to a callback or discovery event to be processed by the app.</p>
+<h4><code>link = mesh.link(to)</code></h4>
+<p>Establish a link to the given hashname.  The <code>to</code> may be a <a class="xref" href="#uri">URI</a>, <a class="xref" href="#link#json">JSON link</a>, or just a plain hashname.</p>
+<h4><code>link.onLink = function (state) {...}</code></h4>
+<p>When the link state changes to up or down the app must be able to receive these events, as well as check the current state at any point.</p>
+<h4><code>link.router(bool)</code></h4>
+<p>Set this link to be a default (trusted) router, which will automatically ask it to assist in connections to any other link and provide assistance in connecting to the local endpoint.</p>
+<h4><code>mesh.discover(bool)</code></h4>
+<p>Set the local endpoint discovery mode to on or off, when on this will tell any available transport to announce the endpoint&#39;s presence on local networks and newly discovered endpoints will generate <code>onDiscover</code> events.</p>
+<h4>Built-in and Custom Channels</h4>
+<p>All implementations should strive to support as many <a class="xref" href="#channels_">channels</a> as possible directly off of <code>mesh</code> and <code>link</code> objects using the language and patterns described in each channel definition.  For example, the <a class="xref" href="#channels_stream">stream</a> channel should be supported with a simple <code>mesh.onStream</code> event to handle incoming requests and <code>link.stream()</code> to connect new streams (using a language-native streaming interface if possible).</p>
+<p>Custom channels should be avoided whenever possible by using one of the built-in channels, and the API to create and handle custom channels is implementation specific.</p>
+<h3>Discovery</h3>
+<p>By default a local endpoint will never respond to any request unless it comes from another endpoint it already knows and trusts.  A <code>discover</code> mode can be enabled that changes this behavior and broadcasts the endpoint&#39;s hashname and keys to any local <a class="xref" href="#transports_">network transport</a> that supports discovery.</p>
+<p>This mode should be used sparingly so that local networks cannot record what endpoints are available, typically only enabled based on a user behavior (&quot;add a friend&quot; or &quot;pair device&quot;, etc) and only for a short period of time.  Permanent local services/servers that support dynamic association may have it always enabled.</p>
+<p>All transports that support discovery will always be listening for incoming discover announcements regardless of the discovery state and pass those to the application to evaluate.  Discovery does not need to be enabled to receive announcements and see other endpoints, only to announce the local endpoint.</p>
+</section><a id='uri' name='uri'></a><a id='chapter-8-1' name='chapter-8-1'></a><section data-type='chapter'><h2 id="uri">URI Handling</h2>
+<p>URIs are a convenient method for endpoints to convey connectivity information in any out-of-band medium. This defines a process for handling any URI to automatically detect associated keys and paths, as well as standard practices for embedding that information in any generated URIs.</p>
+<p>Once a URI is successfully resolved and a link is established to an endpoint the key and path information should be stored and used in place of the URI, a successful resolution only needs to be performed once.</p>
+<h3>Generation</h3>
+<p>New URIs that are generated by applications for the sole purpose of establishing a new link take the minimal form of: <code>link://host:port/?csid=base32</code></p>
+<ul>
+<li><code>link://</code> - defaults to <code>link</code> but may be any app-specific name for registering custom URL handlers</li>
+<li><code>host:port</code> - the <code>host</code> is often an IP address, and the port defaults to <code>42424</code> if not included</li>
+<li><code>csid=base32</code> - (optional) a key/value pair for each of the sender&#39;s public keys in <a class="xref" href="#base32">base 32</a></li>
+</ul>
+<p>A generated URI will often include additional pathname or query string values as needed by the application.</p>
+<p>Examples:</p>
+<pre><code>chat://127.0.0.1:55772/?cs1a=aof7baqdudm3mmjgexy5yqxj3m23pcsupy
+</code></pre><p><a name="peer" /></p>
+<h4>Router / Peer URI</h4>
+<p>A common architecture includes a designated router that facilitates the connection process with peers.  The router can generate an authorative base URI for peers to re-use and advertises it to them in a <a class="xref" href="#channels_path">path</a> request.  This allows a peer to be reachable via a URI but still remain private and not share any of its identity information (hashname, keys, or paths).</p>
+<p>The router may include its own keys in the query string but may not attach a <code>#fragment</code> so that a peer can use the fragment part to include additional data before distributing the URI.  The router must always include a value in the base URI to validate the request and internally map it to the peer it was generated for, it should never embed or expose the hashname or other specific details about the peer in the base URI.</p>
+<p>The peer endpoint must generate a fragment value that it can use to validate incoming requests and the recipient can use to verify the peer&#39;s hashname.  This fragment has two parts separated by a <code>.</code>, both are base32 encoded byte strings and only the first one is required.  The first part is always an 8 byte <a href="http://en.wikipedia.org/wiki/SipHash">SipHash</a> digest of all of the second part, using the first 16 bytes of the peer&#39;s hashname as the key input to the digest (identical to the <a class="xref" href="#channels_chat">chat channel</a>).  The variable bytes remaining in the fragment must be generated by the peer such that they are unique for every URI it shares.</p>
+<p>The connecting party may not have a complete fragment, it only requires the first check digest.  When the URI is resolved the peer must always respond with the full fragment in URI handshake and the connecting party must verify that the hashname is the correct key to generate the digest in the fragment of the complete second part.  This ensures that only that peer can correctly link from a specific URI and that the router cannot redirect to another party.</p>
+<p>Example URI that uses a router as the base and includes the peer fragment:</p>
+<pre><code>link://127.0.0.1/?sid=1zm3hv7g&amp;cs1a=aof7baqdudm3mmjgexy5yqxj3m23pcsupy#jpnzr4n33kwqb.gpw3mduf7takvczpx2gafzjc2ppfc4yrxkltzsa
+</code></pre><p>When a URI is processed that contains a fragment it generates a new <a class="xref" href="#channels_peer">peer</a> request to the router that includes the <code>&quot;uri&quot;:&quot;...&quot;</code> (without the fragment) for the router to validate and resolve to the right peer.  The peer request must still also include a full URI handshake to be forwarded directly to the peer for its own validation.</p>
+<h3>Processing:</h3>
+<ol>
+<li>detect included keys in the query string and derive hashname<ul>
+<li>[optional] fallback to discover keys via WebFinger</li>
+<li>fallback to resolve the canonical hostname to discover keys via DNS SRV</li>
+<li>fallback to discover keys via OpenID Connect Discovery</li>
+</ul>
+</li>
+<li>generate paths for all supported transports with any resolved IP and port</li>
+<li>create a link with the keys and path(s) including a URI handshake</li>
+<li>if there&#39;s a fragment hashname, issue a <code>peer</code> request over the link to it including a URI handshake<ul>
+<li>process any response URI handshake with a validating fragment as the final resolution</li>
+</ul>
+</li>
+</ol>
+<h3>Embedded Keys</h3>
+<p>The Cipher Set keys for an endpoint may be included in the query string of any existing URI.</p>
+<p>Each <code>CSID</code> is included as an individual key/value pair where the key is the format <code>cs??</code> (<code>cs1a</code>, <code>cs2a</code>, etc) and the value is always the base32 encoded key bytes.</p>
+<h3>Embedded Paths</h3>
+<p>The current paths may also be included in the query string of any existing URI.  Each available path has its JSON object base32 encoded as the value and is included with a common <code>paths</code> key, multiple paths have the same key.</p>
+<p>When the paths are able to be generated from the hostname in the URI it is not necessary to include them in the query string.</p>
+<p>Example paths:</p>
+<div id="highlighter_890270" class="syntaxhighlighter  "><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div><div class="line number11 index10 alt2">11</div><div class="line number12 index11 alt1">12</div><div class="line number13 index12 alt2">13</div><div class="line number14 index13 alt1">14</div><div class="line number15 index14 alt2">15</div><div class="line number16 index15 alt1">16</div><div class="line number17 index16 alt2">17</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="plain">[</code></div><div class="line number2 index1 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="plain">{</code></div><div class="line number3 index2 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"url"</code><code class="plain">: </code><code class="string">"<a href="http://192.168.0.36:42424">http://192.168.0.36:42424</a>"</code><code class="plain">,</code></div><div class="line number4 index3 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"type"</code><code class="plain">: </code><code class="string">"http"</code></div><div class="line number5 index4 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="plain">},</code></div><div class="line number6 index5 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="plain">{</code></div><div class="line number7 index6 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"ip"</code><code class="plain">: </code><code class="string">"192.168.0.36"</code><code class="plain">,</code></div><div class="line number8 index7 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"port"</code><code class="plain">: 42424,</code></div><div class="line number9 index8 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"type"</code><code class="plain">: </code><code class="string">"udp4"</code></div><div class="line number10 index9 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="plain">},</code></div><div class="line number11 index10 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="plain">{</code></div><div class="line number12 index11 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"ip"</code><code class="plain">: </code><code class="string">"fe80::bae8:56ff:fe43:3de4"</code><code class="plain">,</code></div><div class="line number13 index12 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"port"</code><code class="plain">: 42424,</code></div><div class="line number14 index13 alt1"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="string">"type"</code><code class="plain">: </code><code class="string">"tcp6"</code></div><div class="line number15 index14 alt2"><code class="undefined spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="plain">}</code></div><div class="line number16 index15 alt1"><code class="plain">]</code></div><div class="line number17 index16 alt2"><code class="plain">URL: proto:</code><code class="comments">//host/path?key=value&paths=pmrhk4tmei5ce2duorydulzpge4telrrgy4c4mbogm3dunbsgqzdiirmej2hs4dfei5ce2duoryce7i&paths=pmrgs4bchirdcojsfyytmobogaxdgnrcfqrha33soqrdunbsgqzdilbcor4xazjchirhkzdqgqrh2&paths=pmrgs4bchirgmzjyga5duytbmu4dunjwmztduztfgqztum3emu2celbcobxxe5bchi2denbsgqwce5dzobsseorcorrxanrcpu</code></div></div></td></tr></tbody></table></div><h3>Generated Paths</h3>
+<p>The <code>canonical</code> hostname (or IP and port) of a URI or the resolved SRV <code>port</code> and <code>IP</code> should be treated as a potential <code>path</code> for all available transports for an endpoint.  Handshakes should be sent to the given address in every transport supported that can use an IP and port, including UDP, TCP, TLS, and HTTP(S).</p>
+<h3>Link Discovery</h3>
+<p>When an endpoint&#39;s keys cannot be included directly in the URI they may be discovered via automated techniques from other parts of the URI.</p>
+<h4>DNS Links</h4>
+<p>SRV records always resolve to a hashname-prefixed host, with TXT records returning all of the keys.</p>
+<ul>
+<li><code>_link._udp.example.com. 86400 IN SRV 0 5 42424 uvabrvfqacyvgcu8kbrrmk9apjbvgvn2wjechqr3vf9c1zm3hv7g.example.com.</code></li>
+<li><code>uvabrvfqacyvgcu8kbrrmk9apjbvgvn2wjechqr3vf9c1zm3hv7g IN A 1.2.3.4</code></li>
+<li><code>uvabrvfqacyvgcu8kbrrmk9apjbvgvn2wjechqr3vf9c1zm3hv7g IN TXT &quot;1a=base32&quot;</code></li>
+<li><code>uvabrvfqacyvgcu8kbrrmk9apjbvgvn2wjechqr3vf9c1zm3hv7g IN TXT &quot;2a=base32&quot;</code></li>
+<li><code>uvabrvfqacyvgcu8kbrrmk9apjbvgvn2wjechqr3vf9c1zm3hv7g IN TXT &quot;2a2=base32&quot;</code></li>
+<li><code>uvabrvfqacyvgcu8kbrrmk9apjbvgvn2wjechqr3vf9c1zm3hv7g IN TXT &quot;3a=base32&quot;</code></li>
+</ul>
+<p>If a key&#39;s base32 encoding is larger than 250 characters (TXT limit), it is broken into multiple TXT records with the <code>CSID</code> being numerically increased so that it can be consistently reassembled.</p>
+<p>No other DNS record type is supported, only SRV records resulting in one or more A and TXT records.</p>
+<h4>WebFinger Links</h4>
+<p>Use <a href="https://tools.ietf.org/html/rfc7033">WebFinger</a> against the canonical hostname, passing the given URI in as the <code>resource</code> and a <code>rel</code> value of <code>http://telehash.org/link</code>.  If successful, it will result in a valid <code>href</code> that must return the standard <a class="xref" href="#link#json">JSON link</a> description format.</p>
+<pre><code>GET https://example.com/.well-known/webfinger?resource=http://example.com/~user1&amp;ref=http://telehash.org/link
+{
+  &quot;subject&quot;: &quot;http://example.com/~user1&quot;,
+  &quot;links&quot; : [
+    {
+      &quot;rel&quot; : &quot;http://telehash.org/link&quot;,
+      &quot;href&quot; : &quot;https://www.example.com/~user1/link.json&quot;
+    }
+  ]
+}
+
+GET https://example.com/~user1/link.json
+{
+  &quot;keys&quot;:{...},
+  &quot;paths&quot;:[...]
+}
+</code></pre><p><a name="discovery" /></p>
+<h3>OpenID Connect Discovery</h3>
+<p>One or more hashnames may be advertised as part of <a href="http://openid.net/specs/openid-connect-discovery-1_0.html">OpenID Connect Discovery</a> by simply including their <a class="xref" href="#hashname#jwk">JWK</a> in the <code>jwks_uri</code> response.  If there are multiple keys in the response only the first one in the array should be used to resolve the URI.</p>
+<p>The discovery endpoint may also be used as a default authority to validate against for incoming unknown hashnames before responding to them.</p>
+<p><a name="handshake" /></p>
+<h3>URI Handshake</h3>
+<p>When a URI is the source of a new link, a <code>&quot;type&quot;:&quot;uri&quot;</code> <a class="xref" href="#e3x_handshake#uri">handshake</a> should be sent including the original URI.</p>
+<p>Example:</p>
+<div id="highlighter_450463" class="syntaxhighlighter  "><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="plain">{</code></div><div class="line number2 index1 alt1"><code class="undefined spaces">&nbsp;&nbsp;</code><code class="string">"type"</code><code class="plain">:</code><code class="string">"uri"</code><code class="plain">,</code></div><div class="line number3 index2 alt2"><code class="undefined spaces">&nbsp;&nbsp;</code><code class="string">"uri"</code><code class="plain">:</code><code class="string">"<a href="https://example.com/link?ref=42#u8kbrrmk9apjbvgvn2wjechqr3vf9c1">https://example.com/link?ref=42#u8kbrrmk9apjbvgvn2wjechqr3vf9c1</a>"</code></div><div class="line number4 index3 alt1"><code class="plain">}</code></div></div></td></tr></tbody></table></div></section><a id='transports_' name='transports_'></a><a id='chapter-9-1' name='chapter-9-1'></a><section data-type='chapter'><h2 id="transports_">Transport Bindings</h2>
+<p>Since a mesh is designed to work over multiple network transports, there are bindings defined in this folder for how to send and receive the wire packets on different ones.</p>
+</section><a id='' name=''></a><a id='chapter-10-1' name='chapter-10-1'></a><section data-type='chapter'><p>This &quot;mesh&quot; logo was designed and <a href="https://github.com/telehash/telehash.org/pull/72">contributed</a> by <a href="https://github.com/jingman">Jake Ingman</a>.</p>
+</section></body></html>
