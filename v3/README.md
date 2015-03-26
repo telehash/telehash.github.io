@@ -3,7 +3,7 @@ telehash secure mesh protocol (v3)
 
 > this is a draft (issues and pull requests welcome), planning for release version in 03/2015
 
-![logo](../logo/mesh-logo-128.png)
+![logo](logo/mesh-logo-128.png)
 
 Telehash is a project to create interoperable private mesh networking:
 
