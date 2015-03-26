@@ -13,7 +13,7 @@ var options = {
 
 var dirPrefix = "v3";
 
-var bookOrg = JSON.parse(fs.readFileSync("book.json"));
+var bookOrg = JSON.parse(fs.readFileSync("v3/spec/book.json"));
 //console.log(bookOrg);
 
 var data = fs.readFileSync("README.md");
