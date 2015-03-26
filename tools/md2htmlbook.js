@@ -122,7 +122,7 @@ renderer.code = function(code, language) {
         return prevCodeRenderer.call(this, code, language);
     }
     //console.log("language is " + language + " on " + code);
-    return nsh.highlight(code, nsh.getLanguage(language));
+    return nsh.highlight(code, nsh.getLanguage(language)).replace(/highlighter_\d+/,'code');
 }
 
 
