@@ -33,9 +33,9 @@ To calculate the `hashname` the `intermediate` digests are sequentially hashed i
 
 ```js
 hash = sha256(0x1a)
-hash = sha256(hash + 0x21b65ba5a9567fed892569f00090b3c17fd66a5c32d7b355940088605fa7f350)
+hash = sha256(hash + 0x21b6...f350)
 hash = sha256(hash + 0x3a)
-hash = sha256(hash + 0x97d83d1af8919874a449769145b7b3cb46359b2c12169ee53e683477bec47101)
+hash = sha256(hash + 0x97d8...7101)
 final = hash
 ```
 
@@ -43,19 +43,32 @@ Here is a working example in node.js to do the calculation, results in `27ywx5e5
 
 ```js
 var crypto = require("crypto");
-var base32 = require("rfc-3548-b32"); // https://github.com/sehrope/node-rfc-3548-b32
+var base32 = require("rfc-3548-b32");
 var keys = {
-  "3a":"eg3fxjnjkz763cjfnhyabeftyf75m2s4gll3gvmuacegax5h6nia",
+  "3a": "eg3fxjnjkz763cjfnhyabeftyf75m2s4gll3gvmuacegax5h6nia",
   "1a": "an7lbl5e6vk4ql6nblznjicn5rmf3lmzlm"
 };
+
 var rollup = new Buffer(0);
-Object.keys(keys).sort().forEach(function(id){
-  rollup = crypto.createHash("sha256").update(Buffer.concat([rollup,new Buffer(id,"hex")])).digest();
-  var intermediate = crypto.createHash("sha256").update(new Buffer(base32.decode(keys[id]),"binary")).digest();
-  rollup = crypto.createHash("sha256").update(Buffer.concat([rollup,intermediate])).digest();
+Object.keys(keys).sort().forEach(function(id) {
+  rollup = crypto.createHash("sha256")
+    .update(Buffer.concat([rollup, new Buffer(id, "hex")]))
+    .digest();
+  var intermediate = crypto.createHash("sha256")
+    .update(new Buffer(base32.decode(keys[id]), "binary"))
+    .digest();
+  rollup = crypto.createHash("sha256")
+    .update(Buffer.concat([rollup, intermediate]))
+    .digest();
 });
-var hashname = base32.encode(rollup).toLowerCase().split("=").join(""); // normalize to lower case and remove padding
-console.log(hashname); // prints 27ywx5e5ylzxfzxrhptowvwntqrd3jhksyxrfkzi6jfn64d3lwxa
+
+// normalize to lower case and remove padding
+var hashname = base32.encode(rollup)
+  .toLowerCase()
+  .split("=").join("");
+
+// prints 27ywx5e5ylzxfzxrhptowvwntqrd3jhksyxrfkzi6jfn64d3lwxa
+console.log(hashname);
 ```
 
 
