@@ -1,7 +1,7 @@
-# Introduction
+> tele·hash
+> n. *Internet*, from **tele**graph and **hash**table
 
-tele·hash
-n. *Internet*, from **tele**graph and **hash**table
+# Introduction
 
 ![logo](logo/mesh-logo-128.png)
 
