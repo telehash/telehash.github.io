@@ -1,4 +1,4 @@
-> tele·hash
+tele·hash
 > n. *Internet*, from **tele**graph and **hash**table
 
 # Introduction
