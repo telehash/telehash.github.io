@@ -14,14 +14,13 @@
 <ul>
 <li>each endpoint has verifiable unique fingerprint (a <a class="xref" href="#hashname">hashname</a>), a secure global MAC address</li>
 <li>a consistent high level <a class="xref" href="#mesh">mesh</a> interface that maintains one or more <a class="xref" href="#link">links</a> to other endpoints</li>
+<li>supports an automatic peer discovery mode when available on local transports</li>
 <li>provides native tunneling of TCP/UDP sockets, HTTP, object streams, and more</li>
 <li>facilitates asynchronous and synchronous messaging and eventing</li>
-<li>supports bridging and routing privately by default and optionally via a <a href="https://github.com/telehash/blockname">public DHT</a></li>
-<li>supports an automatic discovery mode on local transports when available</li>
-<li>integrates native support for <a href="https://datatracker.ietf.org/wg/jose/charter/">JSON
-Object Signing and Encryption (JOSE)</a> and <a href="http://openid.net/connect/">OpenID Connect</a></li>
+<li>supports bridging and routing privately by default and optionally via a <a href="https://github.com/telehash/blockname">public DHT (draft)</a></li>
+<li>integrates native support for <a href="https://datatracker.ietf.org/wg/jose/charter/">JSON Object Signing and Encryption (JOSE)</a> and <a href="http://openid.net/connect/">OpenID Connect</a></li>
 </ul>
-<p>The protocol stack is separated into two main areas, a lower level <a class="xref" href="#e3x_">end-to-end encrypted exchange (e3x)</a> that handles all of the security primitives, and higher application-level definitions for managing a <a class="xref" href="#mesh">mesh</a> of <a class="xref" href="#link">links</a> that support standard <a class="xref" href="#channels_">channels</a>, <a class="xref" href="#transports_">transports</a>, and <a class="xref" href="#uri">URIs</a>.</p>
+<p>The protocol stack is separated into two main areas, a lower level <a class="xref" href="#e3x_">end-to-end encrypted exchange (E3X)</a> that handles all of the security primitives, and higher application-level definitions for managing a <a class="xref" href="#mesh">mesh</a> of <a class="xref" href="#link">links</a> that support standard <a class="xref" href="#channels_">channels</a>, <a class="xref" href="#transports_">transports</a>, and <a class="xref" href="#uri">URIs</a>.</p>
 <h2>Background</h2>
 <p>The principle idea that drove the creation and development of telehash
 is the belief that any application instance should be able to easily and
@@ -60,27 +59,88 @@ applications in any networking environment.</p>
 <p>In <a href="https://github.com/telehash/telehash.org/tree/master/v3">2014 (v3)</a> the protocol was refactored into <a href="https://github.com/telehash/telehash.org/tree/master/v3/e3x">e3x</a>, <a href="https://github.com/telehash/telehash.org/blob/master/v3/mesh.md">mesh</a>, and <a href="https://github.com/telehash/blockname">blockname</a>, to focus on being a set of easy to use end-to-end encrypted mesh communication tools.</p>
 <p>See this <a href="http://quartzjer.tumblr.com/post/71784515314/telehash-history">blog post</a> for some more history on its development.</p>
 </section><a id='glossary' name='glossary'></a><a id='chapter-2-1' name='chapter-2-1'></a><section data-type='chapter'><h1 id="glossary">Glossary</h1>
-<ul>
-<li><em>channel</em> : a virtual socket that allows two <em>endpoints</em> to exchange data reliably (like <a href="http://en.wikipedia.org/wiki/Transmission_Control_Protocol">TCP</a>) or unreliably (like <a href="http://en.wikipedia.org/wiki/User_Datagram_Protocol">UDP</a>)</li>
-<li><em>cloaking</em> : method used to hides telehash traffic on the wire by randomizing all data sent</li>
-<li><em>Cipher Set (CS)</em> : a collection of crypto algorithms with a given <em>cipher set id (CSID)</em></li>
-<li><em>Cipher Set ID (CSID)</em> : predefined hex number identifying a <em>cipher set (CS)</em></li>
-<li><em>endpoint</em> : a participant in the telehash network identified by a single <em>hashname</em></li>
-<li><em>EVEN</em> : the <em>endpoint</em> with the numerically lower public key</li>
-<li><em>e3x</em> : End-to-End Encrypted eXchange is a flexible encrypted exchange protocol</li>
-<li><em>exchange</em> : <strong>TODO: find good description for exchange</strong></li>
-<li><em>handshake</em> : <em>message</em> type used to establish an encrypted <em>session</em> for <em>channels</em></li>
-<li><em>hashname</em> : an identifier for a participant of telehash, it is calculated from all public keys of the participants <em>cipher set (CS)</em></li>
-<li><em>LOB</em> : Lenght-Oobject-Binary encoding format that allows combining JSON and binary data</li>
-<li><em>link</em> : connection between two <em>endpoints</em> either directly or via a <em>router</em></li>
-<li><em>mesh</em> : a number of <em>links</em> with active encrypted <em>sessions</em> over any <em>transport</em>, participants in the mesh are called <em>endpoints</em></li>
-<li><em>message</em> : an asynchronous encrypted packet between two endpoints</li>
-<li><em>ODD</em> : the <em>endpoint</em> with the numerically higher public key</li>
-<li><em>packet</em> : an encapsulation format for JSON and binary data using <em>length object binary (LOB)</em> encoding</li>
-<li><em>router</em> : <strong>TODO: find good description for router</strong></li>
-<li><em>transport</em> : underlying layer responsible for <em>packet</em> transfer</li>
-<li><em>URI</em> : is a special <a href="http://en.wikipedia.org/wiki/Uniform_resource_identifier">Uniform rescource identifier</a> format that enables endpoints to share enough information (<em>hashname</em>, <em>transport</em>) for out-of-band connection setup and references</li>
-</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xref" href="#channels_">channel</a></td>
+<td>a virtual socket that allows two <em>endpoints</em> to exchange data reliably (like TCP or unreliably UDP)</td>
+</tr>
+<tr>
+<td><a class="xref" href="#cloaking">cloaking</a></td>
+<td>method used to hides telehash traffic on the wire by randomizing all data sent</td>
+</tr>
+<tr>
+<td><a class="xref" href="#e3x_cs_">CS</a></td>
+<td>(Cipher Set) a collection of crypto algorithms with a given <em>CSID</em></td>
+</tr>
+<tr>
+<td><a class="xref" href="#e3x_cs_">CSID</a></td>
+<td>(Cipher Set ID) predefined hex number identifying a <em>CS</em></td>
+</tr>
+<tr>
+<td><a class="xref" href="#e3x_cs_">CSK</a></td>
+<td>(Cipher Set Key) the public key bytes for a given <em>CSID</em></td>
+</tr>
+<tr>
+<td><a class="xref" href="#link">endpoint</a></td>
+<td>a participant in the telehash network identified by a single <em>hashname</em></td>
+</tr>
+<tr>
+<td><a class="xref" href="#e3x_">E3X</a></td>
+<td>End-to-End Encrypted eXchange is a flexible encrypted exchange protocol</td>
+</tr>
+<tr>
+<td><a class="xref" href="#e3x_">exchange</a></td>
+<td>the current encrypted session state between two endpoints</td>
+</tr>
+<tr>
+<td><a class="xref" href="#e3x_handshake">handshake</a></td>
+<td><em>message</em> type used to establish an encrypted <em>session</em> for <em>channels</em></td>
+</tr>
+<tr>
+<td><a class="xref" href="#hashname">hashname</a></td>
+<td>an identifier for a participant of telehash, it is calculated from all public keys of the participants <em>cipher set (CS)</em></td>
+</tr>
+<tr>
+<td><a class="xref" href="#lob">LOB</a></td>
+<td>Lenght-Oobject-Binary encoding format that allows combining JSON and binary data</td>
+</tr>
+<tr>
+<td><a class="xref" href="#link">link</a></td>
+<td>connection between two <em>endpoints</em> either directly or via a <em>router</em></td>
+</tr>
+<tr>
+<td><a class="xref" href="#mesh">mesh</a></td>
+<td>a number of <em>links</em> with active encrypted <em>sessions</em> over any <em>transport</em>, participants in the mesh are called <em>endpoints</em></td>
+</tr>
+<tr>
+<td><a class="xref" href="#e3x_messages">message</a></td>
+<td>an asynchronous encrypted packet between two endpoints</td>
+</tr>
+<tr>
+<td><a class="xref" href="#lob">packet</a></td>
+<td>an encapsulation format for JSON and binary data using <em>length object binary (LOB)</em> encoding</td>
+</tr>
+<tr>
+<td><a class="xref" href="#link">router</a></td>
+<td>an endpoint that will facilitate connection setup between two other endpoints</td>
+</tr>
+<tr>
+<td><a class="xref" href="#transports_">transport</a></td>
+<td>underlying layer responsible for <em>packet</em> transfer</td>
+</tr>
+<tr>
+<td><a class="xref" href="#uri">URI</a></td>
+<td>using a <a href="http://en.wikipedia.org/wiki/Uniform_resource_identifier">Uniform rescource identifier</a> to enable endpoints to share enough information (<em>hashname</em>, <em>transport</em>) for out-of-band connection setup and references</td>
+</tr>
+</tbody>
+</table>
 </section><a id='base32' name='base32'></a><a id='chapter-3-1' name='chapter-3-1'></a><section data-type='chapter'><h1 id="base32">Base 32</h1>
 <p>All base 32 encoding is defined by <a href="http://tools.ietf.org/html/rfc4648">RFC 4648</a> with <a href="http://tools.ietf.org/html/rfc4648#section-3.2">no padding</a> and always using the lower case alphabet of <code>abcdefghijklmnopqrstuvwxyz234567</code>.</p>
 <p>It is used frequently to encode binary 32 byte <a href="http://en.wikipedia.org/wiki/SHA-2">SHA-256</a> digests safely for use in JSON and URIs, resulting in a 52 character string, for example: <code>kw3akwcypoedvfdquuppofpujbu7rplhj3vjvmvbkvf7z3do7kkq</code>.  It is sometimes also used to encode public key material, small JSON objects, and print binary values for debugging.</p>
@@ -183,19 +243,12 @@ applications in any networking environment.</p>
 BODY: {&quot;aad&quot;:&quot;&quot;,&quot;iv&quot;:&quot;&quot;,&quot;tag&quot;:&quot;&quot;,&quot;encrypted_key&quot;:&quot;&quot;}
   BODY: (no header)
     BODY: ciphertext
-</code></pre></section><a id='e3x_' name='e3x_'></a><a id='chapter-6-1' name='chapter-6-1'></a><section data-type='chapter'><h1 id="e3x_">e3x - End-to-End Encrypted eXchange</h1>
+</code></pre></section><a id='e3x_intro' name='e3x_intro'></a><a id='chapter-6-1' name='chapter-6-1'></a><section data-type='chapter'><h1 id="e3x_intro">E3X - End-to-End Encrypted eXchange</h1>
 <p>This is the definition of a flexible end-to-end encrypted exchange wire protocol, specifying a compatible way for applications to route packetized content over any transport while protecting the privacy of those communications from any network monitoring.</p>
 <p>It is designed to be used as a low-level software library that can be embedded in any app.  It exposes <em>all</em> trust decisions to app layer, zero information or metadata is revealed to any network or endpoint without explicit instructions from the app.</p>
-<h2>Index</h2>
-<ul>
-<li><a class="xref" href="#lob">packet</a> - all binary and JSON data encoding/encapsulation</li>
-<li><a class="xref" href="#e3x_cs_">Cipher Sets</a> - asynchronous and streaming encryption, multiple keys</li>
-<li><a class="xref" href="#e3x_messages">message</a> - an asynchronous encrypted packet between two endpoints</li>
-<li><a class="xref" href="#e3x_handshake">handshake</a> - a type of message used to establish a streaming encryption session for channels</li>
-<li><a class="xref" href="#e3x_channels">channel</a> - small (max 1400 bytes) synchronous encrypted packets, proxies larger reliable and unreliable data streams</li>
-<li><a class="xref" href="#e3x_cloaking">cloaking</a> - randomize all bytes on the wire</li>
-</ul>
-<p>An <code>endpoint</code> generates local keys to uniquely identify itself (one or more keys, depending on what Cipher Sets it supports), and requires another endpoint&#39;s public key(s) to create an <code>exchange</code> to it. The exchange can then be used to create encrypted <code>messages</code> and generate <code>handshakes</code> in both directions.  Once the handshakes have been received and verified, encrypted <code>channels</code> can stream reliable or unreliable data between the two connected endpoints.  All data is encoded as <code>packets</code> both before (app layer) and after encryption (wire transport layer).</p>
+<p>All of the cryptographic primitives used in E3X are defined as a <a class="xref" href="#e3x_cs_">Cipher Set</a>, allowing for applications to select for different resource or security requirements as needed.</p>
+<p>E3X defines asynchronous <a class="xref" href="#e3x_">messages</a> and synchronous <a class="xref" href="#e3x_">channels</a> managed using an <code>exchange</code> that has session state exchanged through explicit <a class="xref" href="#e3x_">handshakes</a>.  An <code>exchange</code> is created by an endpoint with local keys to uniquely identify itself (one or more keys, depending on what Cipher Sets it supports) and has another endpoint&#39;s public key(s), the <code>exchange</code> can then be used to create encrypted <code>messages</code> and generate <code>handshakes</code> in both directions.</p>
+<p>Once the handshakes have been received and verified, encrypted <code>channels</code> can stream reliable or unreliable data between the two connected endpoints.  All data is encoded as <a class="xref" href="#lob">packets</a> both before (application layer) and after encryption (wire transport layer).</p>
 <h2>Comparisons</h2>
 <p>These are similar low-level encrypted wire protocols:</p>
 <ul>
@@ -205,104 +258,8 @@ BODY: {&quot;aad&quot;:&quot;&quot;,&quot;iv&quot;:&quot;&quot;,&quot;tag&quot;:
 <li><a href="http://en.wikipedia.org/wiki/Secure_Real-time_Transport_Protocol">SRTP</a> (<a href="http://tools.ietf.org/html/rfc3711">spec</a>)</li>
 <li><a href="https://www.ethos-os.org/~solworth/minimalt-20131031.pdf">MinimaLT</a></li>
 </ul>
-<h2>Implementations</h2>
-<ul>
-<li><a href="https://github.com/telehash/e3x-js">JavaScript</a></li>
-<li><a href="https://github.com/telehash/telehash-c/blob/master/src/e3x.h">C</a></li>
-<li><a href="https://github.com/telehash/gogotelehash/tree/master/e3x">Go</a></li>
-<li><a href="https://github.com/telehash/telehash.net/tree/master/Telehash.Net/E3X">C#</a></li>
-</ul>
-<table>
-<thead>
-<tr>
-<th style="text-align:center"></th>
-<th style="text-align:center">base</th>
-<th style="text-align:center">reliable</th>
-<th style="text-align:center">cloaking</th>
-<th style="text-align:center">1a</th>
-<th style="text-align:center">1b</th>
-<th style="text-align:center">1c</th>
-<th style="text-align:center">2a</th>
-<th style="text-align:center">2b</th>
-<th style="text-align:center">3a</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">node.js</td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">✓</td>
-</tr>
-<tr>
-<td style="text-align:center">browser js</td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-</tr>
-<tr>
-<td style="text-align:center">c - unix</td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">✓</td>
-</tr>
-<tr>
-<td style="text-align:center">c - embedded</td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-</tr>
-<tr>
-<td style="text-align:center">go</td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-</tr>
-<tr>
-<td style="text-align:center">c#</td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center">✓</td>
-<td style="text-align:center"></td>
-</tr>
-</tbody>
-</table>
 <h2>API</h2>
-<p>The interface to use e3x is designed to minimize any accidential leakage of information by having a small explicit API.</p>
+<p>The interface to use E3X is designed to minimize any accidential leakage of information by having a small explicit API.</p>
 <p>Implementations may vary depending on their platform/language but should strive for a similar common pattern of interaction and method/data language as documented here at a high level.</p>
 <p>All implementations will require a strong/secure random number generator to properly support all aspects of this API and the underlying ciphers/algorithms.</p>
 <h3><code>generate</code></h3>
@@ -331,7 +288,7 @@ BODY: {&quot;aad&quot;:&quot;&quot;,&quot;iv&quot;:&quot;&quot;,&quot;tag&quot;:
 <li><code>send(packet)</code> - return encrypted channel packet</li>
 </ul>
 <a id='e3x_cs_' name='e3x_cs_'></a><a id='section-6-2' name='section-6-2'></a><section data-type='section'><h3 id="e3x_cs_">Cipher Sets</h3>
-<p>A Cipher Set (<code>CS</code>) is a group of crypto algrithms that are used to implement the core security functions as required by e3x.  Multiple sets exist to allow an evolution of supporting newer techniques as well as adapting to different system and deployment requirements.</p>
+<p>A Cipher Set (<code>CS</code>) is a group of crypto algrithms that are used to implement the core security functions as required by E3X.  Multiple sets exist to allow an evolution of supporting newer techniques as well as adapting to different system and deployment requirements.</p>
 <p>A set always contains an endpoint public key cipher, an ephemeral public key cipher (for forward secrecy), and an authenticated streaming cipher.  Often a set uses the same public key algorithm for both the endpoint and epehemeral ciphers with different keys for each.</p>
 <p><a name="csk" /></p>
 <h4>Cipher Set Key (CSK)</h4>
@@ -613,7 +570,7 @@ if(mac2 != mac1) return false;
 <li><code>OPEN</code> - the channel open packets have been both sent and received and it will not timeout unless the exchange does or reliability fails</li>
 <li><code>ENDED</code> - a packet containing an <code>&quot;end&quot;:true</code> has been received and no further content will be delivered for this channel, it will be timed out</li>
 </ul>
-<p>These are the states that e3x manages, if an application requires additional states (such as when one party ended but the other hasn&#39;t) it must track them itself.  Any channel having received or sent an <code>err</code> is immediately removed after processing that packet and no more state is tracked, so e3x has no error state.  </p>
+<p>These are the states that E3X manages, if an application requires additional states (such as when one party ended but the other hasn&#39;t) it must track them itself.  Any channel having received or sent an <code>err</code> is immediately removed after processing that packet and no more state is tracked, so E3X has no error state.  </p>
 <p>Any channel in the <code>ENDED</code> state and has also sent an <code>end</code> is no longer available for any sending/receiving, but internal state will be tracked until the channel timeout for any necessary reliability retransmits/acknowledgements.</p>
 <p><a name="ids" /></p>
 <h5>Channel IDs</h5>
@@ -686,7 +643,7 @@ To achieve this the two public keys can be visited bit by bit, the first key tha
 <p>Based on this comparison the two are labeled as <code>ODD</code> (<em>high</em>) endpoint and an <code>EVEN</code> (<em>low</em>) endpoint.</p>
 <p>This mechanism ensures that that both endpoints will mutually agree on their label consistently and without communication.</p>
 </section><a id='e3x_reliable' name='e3x_reliable'></a><a id='section-6-2' name='section-6-2'></a><section data-type='section'><h3 id="e3x_reliable">Reliable Channels</h3>
-<p>Channel packets are by default only as reliable as the underlying transport itself is, which often means they may be dropped or arrive out of order.  Most of the time applications want to transfer content in a durable way, so reliable channels replicate TCP features such as ordering, retransmission, and buffering/backpressure mechanisms. The primary method of any application interfacing with an e3x library is going to be through starting or receiving reliable channels.</p>
+<p>Channel packets are by default only as reliable as the underlying transport itself is, which often means they may be dropped or arrive out of order.  Most of the time applications want to transfer content in a durable way, so reliable channels replicate TCP features such as ordering, retransmission, and buffering/backpressure mechanisms. The primary method of any application interfacing with an E3X library is going to be through starting or receiving reliable channels.</p>
 <p>Reliability is requested on a channel with the very first packet (that contains the <code>type</code>) by including a <code>&quot;seq&quot;:1</code> with it, and a recipient must respond with an <code>err</code> if it cannot handle reliable channels.  Reliability must not be requested for channel types that are expected to be unreliable.</p>
 <p><a name="seq" /></p>
 <h4><code>seq</code> - Sequenced Data</h4>
