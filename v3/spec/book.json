@@ -69,10 +69,61 @@
             "content":"v3/uri.md"
         },
         {
-            "content":"v3/transports/README.md"
+            "content":"v3/channels/README.md",
+            "prefix":"channels",
+            "sections":[
+                {
+                    "content":"v3/channels/path.md"
+                },
+                {
+                    "content":"v3/channels/peer.md"
+                },
+                {
+                    "content":"v3/channels/connect.md"
+                },
+                {
+                    "content":"v3/channels/stream.md"
+                },
+                {
+                    "content":"v3/channels/sock.md"
+                },
+                {
+                    "content":"v3/channels/thtp.md"
+                },
+                {
+                    "content":"v3/channels/box.md"
+                },
+                {
+                    "content":"v3/channels/block.md"
+                },
+                {
+                    "content":"v3/channels/chat.md"
+                }
+            ]
         },
         {
-            "content":"logo/README.md"
+            "content":"v3/chunking.md"
+        },
+        {
+            "content":"v3/transports/README.md",
+            "prefix":"transports",
+            "sections":[
+                {
+                    "content":"v3/transports/udp.md"
+                },
+                {
+                    "content":"v3/transports/tcp.md"
+                },
+                {
+                    "content":"v3/transports/tls.md"
+                },
+                {
+                    "content":"v3/transports/http.md"
+                },
+                {
+                    "content":"v3/transports/webrtc.md"
+                }
+            ]
         }
     ]
 }

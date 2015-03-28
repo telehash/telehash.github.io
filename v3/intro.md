@@ -65,6 +65,13 @@ The name is a simple combination of **tele** from telegraph, and **hash** from h
 
 It is usually used in all lower-case to re-affirm the long term vision of it being used as a modern version of the word "telephone", both as a generic private communication system that is federated and compatible, and the act of two application instances communicating privately and directly.
 
+<a name="logo" />
+## Logo
+
+The telehash "mesh" [logo](https://github.com/telehash/telehash.org/tree/master/logo) was designed and contributed by [Jake Ingman](https://github.com/jingman) and is openly available for apps to use in representing support and current mesh connectivity status.
+
+The official color is [#2a7e60](http://www.color-hex.com/color/2a7e60).
+
 ## History
 
 The name and first version of the protocol was established in [2009](https://github.com/quartzjer/Telehash) by [Jeremie Miller](http://en.wikipedia.org/wiki/Jeremie_Miller) and was a research project until [2013 (v2)](https://github.com/telehash/telehash.org/tree/master/v2) when it was significantly updated with a privacy focus.
