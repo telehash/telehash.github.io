@@ -31,12 +31,12 @@ All `CSIDs` with the mask of `11111000` (`0x18` through `0x1f`, `0x28` through `
 
 | CSID          | Status | Crypto                        | Uses                  |
 |---------------|--------|-------------------------------|-----------------------|
-| [CS1a](1a.md) | Active | ECC-160, AES-128              | Embedded, Browser     |
-| [CS1b](1b.md) | Draft  | ECC-256, AES-128              | Hardware-Accelerated  |
-| [CS1c](1c.md) | Draft  | ECC-256k, AES-256             | Bitcoin-based Apps    |
-| [CS2a](2a.md) | Active | RSA-2048, ECC-256, AES-256    | Server, Apps          |
-| [CS2b](2b.md) | Draft  | RSA-4096, ECC-521, AES-256    | High-Security         |
-| [CS3a](3a.md) | Active | [NaCl](http://nacl.cr.yp.to/) | Server, Apps          |
+| [CS1a][]      | Active | ECC-160, AES-128              | Embedded, Browser     |
+| [CS1b][]      | Draft  | ECC-256, AES-128              | Hardware-Accelerated  |
+| [CS1c][]      | Draft  | ECC-256k, AES-256             | Bitcoin-based Apps    |
+| [CS2a][]      | Active | RSA-2048, ECC-256, AES-256    | Server, Apps          |
+| [CS2b][]      | Draft  | RSA-4096, ECC-521, AES-256    | High-Security         |
+| [CS3a][]      | Active | [NaCl](http://nacl.cr.yp.to/) | Server, Apps          |
 
 
 <a name="custom" />
@@ -44,18 +44,11 @@ All `CSIDs` with the mask of `11111000` (`0x18` through `0x1f`, `0x28` through `
 
 Any `CSID` with the mask of `11110111` (`0x10` through `0x17`, `0x20` through `0x27`, etc) are for custom application usage, these Cipher Sets definitions are entirely app-specific.  Implementations are responsible for ensuring that the ordering matches their security preferences.
 
-<a name="jose" />
-## JOSE Based
+See the [JOSE-based](https://github.com/telehash/telehash.org/blob/master/v3/e3x/cs/jose.md) mapping draft for example custom `CSIDs`.
 
-> [DRAFT](https://github.com/telehash/telehash.org/labels/draft)
-
-The [JOSE standards](https://datatracker.ietf.org/wg/jose/charter/) can be used to implement an entire [Cipher Set](../e3x/cs/) dynamically, where [JWE and JWS encoding](../../lob.md#jwe) is used directly as the wire format for the encrypted message and channel packets.
-
-Since the `CSID` is a simple ordering preference indicator and a JWE can internally signal its encryption algorithms, the [custom](#custom) range can be used by applications to map the chosen JWE `alg` value(s) to.
-
-Applications using JOSE-based `CSIDs` should be careful to not use the features of JWE such as unprotected headers or multiple recipients that expose significantly more metadata to the network and untrusted entities, reducing the level of expected privacy.
-
-* The `CSK` is a serialized JWK
-* The message BODY is a JWE that contains a  requires both encryption and signing, so it is always a JWE of a JWS, and the JWS payload is the inner message packet (binary HEAD)
-* If the handshake used ephemeral key agreement (ECDH) then channel JWEs can reference that agreement and contain the channel packet as the payload instead of a JWS
-
+[CS1a]: 1a.md
+[CS1b]: https://github.com/telehash/telehash.org/blob/master/v3/e3x/cs/1b.md
+[CS1c]: https://github.com/telehash/telehash.org/blob/master/v3/e3x/cs/1c.md
+[CS2a]: 2a.md
+[CS2b]: https://github.com/telehash/telehash.org/blob/master/v3/e3x/cs/2b.md
+[CS3a]: 3a.md

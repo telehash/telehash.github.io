@@ -2,15 +2,6 @@
 
 This is a simple encoding scheme to combine any JSON object with any binary data (both are optional) into one byte array, often referred to as a single `packet`.  This encoding does not include any total packet size or checksums, and expects the context where it's used to provide those when necessary (see [chunking](chunking.md)).
 
-## Implementations
-
-* [javascript](https://github.com/quartzjer/lob-enc) (node and browserify)
-* [c](https://github.com/telehash/telehash-c/blob/master/src/lib/lob.h)
-
-It is common to also support [cloaking](e3x/cloaking.md) within a LOB library as a convenience.
-
-For easier debugging and testing, libraries should also support [base 32](base32.md) encoding and decoding for easy visual identification/separation and to allow simple cutting/pasting of packets.
-
 ## Definition
 
 The wire-format byte array (a packet) is created by combining three distinct parts, the `LENGTH`, an optional `HEAD`, and an optional `BODY`.
