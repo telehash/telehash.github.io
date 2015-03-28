@@ -10,8 +10,8 @@ Telehash is a project to create interoperable private mesh networking, see the [
 The full protocol suite is a composite of multiple individual specifications:
 
 * [hashname](hashname.md) - endpoint address format (public key fingerprint)
-* [lob](lob.md) - length-object-binary, json+binary serialization (packetization)
-* [e3x](e3x/) - end-to-end encrypted exchange (wire encoding, crypto libraries)
+* [packets](lob.md) - length-object-binary formatted packets, json+binary serialization
+* [E3X](e3x/) - end-to-end encrypted exchange (wire encoding, crypto libraries)
 * [link](link.md) - establishing and maintaining connections between two endpoints
 * [mesh](mesh.md) - higher level tools to manage multiple links and do local discovery
 * [uri](uri.md) - how to encode/decode endpoint info via URIs for out-of-band bootstrapping
@@ -23,7 +23,7 @@ The primary discussion area is currently via Slack, anyone can join by getting a
 <a name="implementations" />
 ### Implementations
 
-Each implementation provides a library API adapted to its platform or language but they all strive to offer similar functionality including handling hashnames, URIs, and packets (lob), higher level interfaces to create a mesh and links within it, and lower level tools for e3x, transports/pipes, managing keys, etc.  Refer to the [implementers guide](guides/implementers.md) for an overview of the typical methods and patterns.
+Each implementation provides a library API adapted to its platform or language but they all strive to offer similar functionality including handling hashnames, URIs, and packets (lob), higher level interfaces to create a mesh and links within it, and lower level tools for E3X, transports/pipes, managing keys, etc.  Refer to the [implementers guide](guides/implementers.md) for an overview of the typical methods and patterns.
 
 Experimental implementations are being actively developed at:
 

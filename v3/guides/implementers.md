@@ -119,7 +119,7 @@ link_t link_handle(link_t link, channel3_t c3, void (*handle)(link_t link, chann
 link_t link_flush(link_t link, channel3_t c3, lob_t inner);
 ```
 
-## e3x
+## E3X
 
 ### `self`
 

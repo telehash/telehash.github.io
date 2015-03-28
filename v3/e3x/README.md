@@ -1,4 +1,4 @@
-e3x - End-to-End Encrypted eXchange
+E3X - End-to-End Encrypted eXchange
 ===================================
 
 This is the definition of a flexible end-to-end encrypted exchange wire protocol, specifying a compatible way for applications to route packetized content over any transport while protecting the privacy of those communications from any network monitoring.
@@ -45,7 +45,7 @@ These are similar low-level encrypted wire protocols:
 
 ## API 
 
-The interface to use e3x is designed to minimize any accidential leakage of information by having a small explicit API.
+The interface to use E3X is designed to minimize any accidential leakage of information by having a small explicit API.
 
 Implementations may vary depending on their platform/language but should strive for a similar common pattern of interaction and method/data language as documented here at a high level.
 

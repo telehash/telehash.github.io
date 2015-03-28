@@ -1,6 +1,6 @@
 # Cipher Sets
 
-A Cipher Set (`CS`) is a group of crypto algrithms that are used to implement the core security functions as required by e3x.  Multiple sets exist to allow an evolution of supporting newer techniques as well as adapting to different system and deployment requirements.
+A Cipher Set (`CS`) is a group of crypto algrithms that are used to implement the core security functions as required by E3X.  Multiple sets exist to allow an evolution of supporting newer techniques as well as adapting to different system and deployment requirements.
 
 A set always contains an endpoint public key cipher, an ephemeral public key cipher (for forward secrecy), and an authenticated streaming cipher.  Often a set uses the same public key algorithm for both the endpoint and epehemeral ciphers with different keys for each.
 
