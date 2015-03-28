@@ -16,12 +16,11 @@ The current v3 has these properties:
 
 * each endpoint has verifiable unique fingerprint (a [hashname](hashname.md)), a secure global MAC address
 * a consistent high level [mesh](mesh.md) interface that maintains one or more [links](link.md) to other endpoints
+* supports an automatic peer discovery mode when available on local transports
 * provides native tunneling of TCP/UDP sockets, HTTP, object streams, and more
 * facilitates asynchronous and synchronous messaging and eventing
-* supports bridging and routing privately by default and optionally via a [public DHT](https://github.com/telehash/blockname)
-* supports an automatic discovery mode on local transports when available
-* integrates native support for [JSON
-Object Signing and Encryption (JOSE)](https://datatracker.ietf.org/wg/jose/charter/) and [OpenID Connect](http://openid.net/connect/)
+* supports bridging and routing privately by default and optionally via a [public DHT (draft)](https://github.com/telehash/blockname)
+* integrates native support for [JSON Object Signing and Encryption (JOSE)](https://datatracker.ietf.org/wg/jose/charter/) and [OpenID Connect](http://openid.net/connect/)
 
 The protocol stack is separated into two main areas, a lower level [end-to-end encrypted exchange (e3x)](e3x/) that handles all of the security primitives, and higher application-level definitions for managing a [mesh](mesh.md) of [links](link.md) that support standard [channels](channels/), [transports](transports/), and [URIs](uri.md).
 

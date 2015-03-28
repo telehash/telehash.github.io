@@ -3,10 +3,13 @@
     "sections":[
         {
             "type":"introduction",
-            "content":"v3/README.md"
+            "content":"v3/intro.md"
         },
         {
-            "content":"v3/background.md"
+            "content":"v3/glossary.md"
+        },
+        {
+            "content":"v3/base32.md"
         },
         {
             "content":"v3/hashname.md"
