@@ -281,3 +281,85 @@ enum channel3_states channel3_state(channel3_t c);
 A `pipe` is an active delivery state as managed by a transport, that can be used by one or more transports to send packets to, and as the source of all packets.  A pipe can only signal back to the exchanges using it that a keepalive needs to be sent and when it is closed/invalid.  A transport only knows pipes and does not know about the exchanges or links on the other side, one pipe may be used by multiple exchanges (such as when routing).
 
 
+<a name="cs3a" />
+## CS3a Example Code (handshake)
+
+The following example illustrates the usage of cs3a for the sending and receiving handshakes for a new exchange.  
+
+> Warning: pseudo code interspersed with real code.
+
+Message (handshake) Encryption:
+```js
+// Generate Exchange Key Pair
+var ephemeral = sodium.crypto_box_keypair();
+
+// get the shared secret to create the iv+key for the open aes
+var secret = sodium.crypto_box_beforenm(remote.publicKey, self.ephemeral.secretKey);
+var nonce = crypto.randomBytes(24);
+
+// encrypt the inner
+var innerc = sodium.crypto_secretbox(inner, nonce, secret);
+var body = Buffer.concat([ephemeral.publicKey,nonce,innerc]);
+
+// hmac it with secret from the endpoint keys
+var msecret = sodium.crypto_box_beforenm(remote.publicKey, self.secretKey);
+var akey = crypto.createHash('sha256').update(Buffer.concat([nonce,msecret])).digest();
+var mac = sodium.crypto_onetimeauth(body,akey);
+```
+
+Message Decryption:
+```js
+var key = body.slice(0,32);
+var nonce = body.slice(32,32+24);
+var innerc = body.slice(32+24,body.length-16);
+
+var secret = sodium.crypto_box_beforenm(key, self.secretKey);
+
+// decipher the inner
+var inner = sodium.crypto_secretbox_open(innerc,nonce,secret);
+```
+
+Sender Verification:
+```
+var mac1 = body.slice(body.length-16);
+var nonce = body.slice(32,32+24);
+
+var secret = sodium.crypto_box_beforenm(remote.publicKey, self.secretKey);
+var akey = crypto.createHash('sha256').update(Buffer.concat([nonce,secret])).digest();
+var mac2 = sodium.crypto_onetimeauth(body.slice(0,body.length-16),akey);
+
+if(mac2 != mac1) return false;
+```
+
+Channel Key Setup:
+```js
+// extract received ephemeral key
+var key = body.slice(0,32);
+
+var secret = sodium.crypto_box_beforenm(key, remote.ephemeral.secretKey);
+var encKey = crypto.createHash("sha256")
+      .update(secret)
+      .update(remote.ephemeral.publicKey)
+      .update(key)
+      .digest();
+var decKey = crypto.createHash("sha256")
+      .update(secret)
+      .update(key)
+      .update(remote.ephemeral.publicKey)
+      .digest();
+```
+
+Channel Encryption:
+```js
+var nonce = crypto.randomBytes(24);
+var cbody = sodium.crypto_secretbox(inner, nonce, encKey);
+var outer = Buffer.concat([nonce,cbody]);
+```
+
+Channel Decryption:
+```js
+var nonce = outer.slice(0,24);
+var cbody = outer.slice(24);
+var body = sodium.crypto_secretbox_open(cbody,nonce,decKey);
+```
+
