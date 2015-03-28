@@ -6,13 +6,6 @@ In many ways, a `hashname` can be viewed as a portable secure [MAC address](http
 
 The value of a `hashname` is always a [base 32](base32.md) encoded string that is 52 characters long.  When decoded it is always a 32 byte binary value, the result of a [SHA-256](http://en.wikipedia.org/wiki/SHA-2) hash digest.  An example hashname is `kw3akwcypoedvfdquuppofpujbu7rplhj3vjvmvbkvf7z3do7kkq`.
 
-## Implementations
-
-* [javascript](https://github.com/telehash/hashname) (node and browserify)
-* [c](https://github.com/telehash/telehash-c/blob/master/src/lib/hashname.c)
-* [c#](https://github.com/telehash/telehash.net/blob/master/Telehash.Net/Hashname.cs)
-* [go](https://github.com/telehash/gogotelehash/tree/master/hashname)
-
 ## Hashname Generation
 
 A hashname is calculated by combining one or more Cipher Set Keys ([CSK](e3x/cs/)) through multiple rounds of [SHA-256](http://en.wikipedia.org/wiki/SHA-2) hashing.

@@ -56,7 +56,7 @@ A channel may only be in one of the following states:
 * `OPEN` - the channel open packets have been both sent and received and it will not timeout unless the exchange does or reliability fails
 * `ENDED` - a packet containing an `"end":true` has been received and no further content will be delivered for this channel, it will be timed out
 
-These are the states that e3x manages, if an application requires additional states (such as when one party ended but the other hasn't) it must track them itself.  Any channel having received or sent an `err` is immediately removed after processing that packet and no more state is tracked, so e3x has no error state.  
+These are the states that E3X manages, if an application requires additional states (such as when one party ended but the other hasn't) it must track them itself.  Any channel having received or sent an `err` is immediately removed after processing that packet and no more state is tracked, so E3X has no error state.  
 
 Any channel in the `ENDED` state and has also sent an `end` is no longer available for any sending/receiving, but internal state will be tracked until the channel timeout for any necessary reliability retransmits/acknowledgements.
 

@@ -7,6 +7,68 @@ Most active implementations are in the [telehash org](https://github.com/telehas
 
 Anyone implementing or interested in contributing should join the [telehash slack](http://6.telehash.org:3000).
 
+<a name="base32" />
+## Base 32
+
+Implementations:
+
+* [javascript](https://github.com/telehash/hashname/blob/master/index.js#L16) (node and browserify)
+* [c](https://github.com/telehash/telehash-c/blob/master/src/lib/base32.c)
+* [c#](https://github.com/telehash/telehash.net/blob/master/Telehash.Net/Base32.cs)
+* [go](https://github.com/telehash/gogotelehash/tree/master/internal/util/base32util)
+
+Test Fixtures (hex <=> base32):
+
+```json
+{
+    "": "",
+    "66": "my",
+    "666f": "mzxq",
+    "666f6f": "mzxw6",
+    "666f6f62": "mzxw6yq",
+    "666f6f6261": "mzxw6ytb",
+    "666f6f626172": "mzxw6ytboi",
+    "666f6f62617262": "mzxw6ytbojra",
+    "666f6f6261726261": "mzxw6ytbojrgc",
+    "666f6f626172626178": "mzxw6ytbojrgc6a",
+    "9f": "t4",
+    "9fa9": "t6uq",
+    "9fa9e0": "t6u6a",
+    "9fa9e037": "t6u6any",
+    "9fa9e03792": "t6u6an4s",
+    "9fa9e0379247": "t6u6an4si4",
+    "9fa9e0379247ca": "t6u6an4si7fa",
+    "9fa9e0379247cad2": "t6u6an4si7fne",
+    "9fa9e0379247cad2d3": "t6u6an4si7fnfuy",
+    "9fa9e0379247cad2d395": "t6u6an4si7fnfu4v",
+    "9fa9e0379247cad2d395ad": "t6u6an4si7fnfu4vvu",
+    "9fa9e0379247cad2d395ad7e": "t6u6an4si7fnfu4vvv7a",
+    "9fa9e0379247cad2d395ad7e61": "t6u6an4si7fnfu4vvv7gc",
+    "9fa9e0379247cad2d395ad7e61c2": "t6u6an4si7fnfu4vvv7gdqq",
+    "9fa9e0379247cad2d395ad7e61c215": "t6u6an4si7fnfu4vvv7gdqqv",
+    "9fa9e0379247cad2d395ad7e61c215ad": "t6u6an4si7fnfu4vvv7gdqqvvu",
+    "9fa9e0379247cad2d395ad7e61c215ad32": "t6u6an4si7fnfu4vvv7gdqqvvuza",
+    "9fa9e0379247cad2d395ad7e61c215ad32f7": "t6u6an4si7fnfu4vvv7gdqqvvuzpo",
+    "9fa9e0379247cad2d395ad7e61c215ad32f768": "t6u6an4si7fnfu4vvv7gdqqvvuzpo2a",
+    "9fa9e0379247cad2d395ad7e61c215ad32f76838": "t6u6an4si7fnfu4vvv7gdqqvvuzpo2by",
+    "9fa9e0379247cad2d395ad7e61c215ad32f768382c": "t6u6an4si7fnfu4vvv7gdqqvvuzpo2byfq",
+    "9fa9e0379247cad2d395ad7e61c215ad32f768382cd4": "t6u6an4si7fnfu4vvv7gdqqvvuzpo2byftka",
+    "9fa9e0379247cad2d395ad7e61c215ad32f768382cd44c": "t6u6an4si7fnfu4vvv7gdqqvvuzpo2byftkey",
+    "9fa9e0379247cad2d395ad7e61c215ad32f768382cd44cf0": "t6u6an4si7fnfu4vvv7gdqqvvuzpo2byftkez4a",
+    "9fa9e0379247cad2d395ad7e61c215ad32f768382cd44cf03f": "t6u6an4si7fnfu4vvv7gdqqvvuzpo2byftkez4b7",
+    "9fa9e0379247cad2d395ad7e61c215ad32f768382cd44cf03f5f": "t6u6an4si7fnfu4vvv7gdqqvvuzpo2byftkez4b7l4",
+    "9fa9e0379247cad2d395ad7e61c215ad32f768382cd44cf03f5f5a": "t6u6an4si7fnfu4vvv7gdqqvvuzpo2byftkez4b7l5na",
+    "9fa9e0379247cad2d395ad7e61c215ad32f768382cd44cf03f5f5ae7": "t6u6an4si7fnfu4vvv7gdqqvvuzpo2byftkez4b7l5noo",
+    "9fa9e0379247cad2d395ad7e61c215ad32f768382cd44cf03f5f5ae780": "t6u6an4si7fnfu4vvv7gdqqvvuzpo2byftkez4b7l5nopaa",
+    "9fa9e0379247cad2d395ad7e61c215ad32f768382cd44cf03f5f5ae78088": "t6u6an4si7fnfu4vvv7gdqqvvuzpo2byftkez4b7l5nopaei",
+    "9fa9e0379247cad2d395ad7e61c215ad32f768382cd44cf03f5f5ae780884a": "t6u6an4si7fnfu4vvv7gdqqvvuzpo2byftkez4b7l5nopaeiji",
+    "9fa9e0379247cad2d395ad7e61c215ad32f768382cd44cf03f5f5ae780884a98": "t6u6an4si7fnfu4vvv7gdqqvvuzpo2byftkez4b7l5nopaeijkma"
+}
+
+```
+
+
+<a name="hashname" />
 ## Hashname
 
 ```c
@@ -21,7 +83,21 @@ uint8_t hashname_id(lob_t a, lob_t b); // best matching id (single byte)
 lob_t hashname_im(lob_t keys, uint8_t id); // intermediate hashes in the json, optional id to set that as body
 ```
 
-## Packets
+## Implementations
+
+* [javascript](https://github.com/telehash/hashname) (node and browserify)
+* [c](https://github.com/telehash/telehash-c/blob/master/src/lib/hashname.c)
+* [c#](https://github.com/telehash/telehash.net/blob/master/Telehash.Net/Hashname.cs)
+* [go](https://github.com/telehash/gogotelehash/tree/master/hashname)
+
+## Packets (LOB encoding)
+
+* [javascript](https://github.com/quartzjer/lob-enc) (node and browserify)
+* [c](https://github.com/telehash/telehash-c/blob/master/src/lib/lob.h)
+
+It is common to also support [cloaking](e3x/cloaking.md) within a LOB library as a convenience.
+
+For easier debugging and testing, libraries should also support [base 32](base32.md) encoding and decoding for easy visual identification/separation and to allow simple cutting/pasting of packets.
 
 ```js
 var lob = require('lob-enc');
@@ -119,7 +195,7 @@ link_t link_handle(link_t link, channel3_t c3, void (*handle)(link_t link, chann
 link_t link_flush(link_t link, channel3_t c3, lob_t inner);
 ```
 
-## e3x
+## E3X
 
 ### `self`
 
@@ -204,4 +280,86 @@ enum channel3_states channel3_state(channel3_t c);
 
 A `pipe` is an active delivery state as managed by a transport, that can be used by one or more transports to send packets to, and as the source of all packets.  A pipe can only signal back to the exchanges using it that a keepalive needs to be sent and when it is closed/invalid.  A transport only knows pipes and does not know about the exchanges or links on the other side, one pipe may be used by multiple exchanges (such as when routing).
 
+
+<a name="cs3a" />
+## CS3a Example Code (handshake)
+
+The following example illustrates the usage of cs3a for the sending and receiving handshakes for a new exchange.  
+
+> Warning: pseudo code interspersed with real code.
+
+Message (handshake) Encryption:
+```js
+// Generate Exchange Key Pair
+var ephemeral = sodium.crypto_box_keypair();
+
+// get the shared secret to create the iv+key for the open aes
+var secret = sodium.crypto_box_beforenm(remote.publicKey, self.ephemeral.secretKey);
+var nonce = crypto.randomBytes(24);
+
+// encrypt the inner
+var innerc = sodium.crypto_secretbox(inner, nonce, secret);
+var body = Buffer.concat([ephemeral.publicKey,nonce,innerc]);
+
+// hmac it with secret from the endpoint keys
+var msecret = sodium.crypto_box_beforenm(remote.publicKey, self.secretKey);
+var akey = crypto.createHash('sha256').update(Buffer.concat([nonce,msecret])).digest();
+var mac = sodium.crypto_onetimeauth(body,akey);
+```
+
+Message Decryption:
+```js
+var key = body.slice(0,32);
+var nonce = body.slice(32,32+24);
+var innerc = body.slice(32+24,body.length-16);
+
+var secret = sodium.crypto_box_beforenm(key, self.secretKey);
+
+// decipher the inner
+var inner = sodium.crypto_secretbox_open(innerc,nonce,secret);
+```
+
+Sender Verification:
+```
+var mac1 = body.slice(body.length-16);
+var nonce = body.slice(32,32+24);
+
+var secret = sodium.crypto_box_beforenm(remote.publicKey, self.secretKey);
+var akey = crypto.createHash('sha256').update(Buffer.concat([nonce,secret])).digest();
+var mac2 = sodium.crypto_onetimeauth(body.slice(0,body.length-16),akey);
+
+if(mac2 != mac1) return false;
+```
+
+Channel Key Setup:
+```js
+// extract received ephemeral key
+var key = body.slice(0,32);
+
+var secret = sodium.crypto_box_beforenm(key, remote.ephemeral.secretKey);
+var encKey = crypto.createHash("sha256")
+      .update(secret)
+      .update(remote.ephemeral.publicKey)
+      .update(key)
+      .digest();
+var decKey = crypto.createHash("sha256")
+      .update(secret)
+      .update(key)
+      .update(remote.ephemeral.publicKey)
+      .digest();
+```
+
+Channel Encryption:
+```js
+var nonce = crypto.randomBytes(24);
+var cbody = sodium.crypto_secretbox(inner, nonce, encKey);
+var outer = Buffer.concat([nonce,cbody]);
+```
+
+Channel Decryption:
+```js
+var nonce = outer.slice(0,24);
+var cbody = outer.slice(24);
+var body = sodium.crypto_secretbox_open(cbody,nonce,decKey);
+```
 

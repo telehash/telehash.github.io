@@ -1,7 +1,7 @@
 Reliable Channels
 =================
 
-Channel packets are by default only as reliable as the underlying transport itself is, which often means they may be dropped or arrive out of order.  Most of the time applications want to transfer content in a durable way, so reliable channels replicate TCP features such as ordering, retransmission, and buffering/backpressure mechanisms. The primary method of any application interfacing with an e3x library is going to be through starting or receiving reliable channels.
+Channel packets are by default only as reliable as the underlying transport itself is, which often means they may be dropped or arrive out of order.  Most of the time applications want to transfer content in a durable way, so reliable channels replicate TCP features such as ordering, retransmission, and buffering/backpressure mechanisms. The primary method of any application interfacing with an E3X library is going to be through starting or receiving reliable channels.
 
 Reliability is requested on a channel with the very first packet (that contains the `type`) by including a `"seq":1` with it, and a recipient must respond with an `err` if it cannot handle reliable channels.  Reliability must not be requested for channel types that are expected to be unreliable.
 

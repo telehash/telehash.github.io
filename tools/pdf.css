@@ -53,7 +53,14 @@ nav[data-type="toc"] { page: toc }
   @bottom-left-corner { content: counter(page, lower-roman) }
 }
 
-nav[data-type="toc"] ol { list-style-type: none }
+nav[data-type="toc"] ol { 
+  list-style-type: none;
+  margin-left:0.25in;
+}
+
+nav[data-type="toc"] a::after {
+  content: leader('.') target-counter(attr(href), page);
+}
 
 /* (((((((((((((( FOREWORD )))))))))))))) */
 
@@ -168,4 +175,8 @@ code {
     font-family: monospace;
     white-space: pre-wrap;       /* css-3 */
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+a {
+  text-decoration: none;
 }
