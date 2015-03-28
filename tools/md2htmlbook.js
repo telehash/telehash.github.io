@@ -12,6 +12,7 @@ var options = {
 };
 
 var dirPrefix = "v3";
+var ToCMaxDepth = 2;
 
 var bookOrg = JSON.parse(fs.readFileSync("v3/spec/book.json"));
 //console.log(bookOrg);
@@ -56,6 +57,8 @@ function fileToAnchor(section) {
 }
 
 function processSection(count, depth, type, section) {
+    var finalHTML = "";
+
     var prevSection = renderer.curSection;
     renderer.curSection = section;
     var prevPrefix = curAnchorPrefix;
@@ -66,18 +69,19 @@ function processSection(count, depth, type, section) {
     if (section.content) {
         renderer.nameTag = fileToAnchor(section);
         
-        outHTML += "<a id='" + fileToAnchor(section) + "' name='" + fileToAnchor(section) + "'></a>";
+        finalHTML += "<a id='" + fileToAnchor(section) + "' name='" + fileToAnchor(section) + "'></a>";
     }
-    outHTML += "<a id='" + type + "-" + count + "-" + depth + "' name='" + type + "-" + count + "-" + depth + "'></a><section data-type='" + type + "'>";
+    finalHTML += "<a id='" + type + "-" + count + "-" + depth + "' name='" + type + "-" + count + "-" + depth + "'></a><section data-type='" + type + "'>";
+    section.tocLink = renderer.nameTag || (type + "-" + count + "-" + depth);
     if (section.content) {
         var data = fs.readFileSync(section.content);
-        outHTML += marked(data.toString("utf8"));
+        finalHTML += marked(data.toString("utf8"));
     }
     if (section.sections) {
         section.sections.forEach(function(sectionInfo) {
             sectionInfo.parent = section;
             renderer.sectionLevel = depth + 1;
-            processSection(count, depth + 1, "section", sectionInfo);
+            finalHTML += processSection(count, depth + 1, "section", sectionInfo);
             renderer.sectionLevel = depth;
         });
     }
@@ -85,11 +89,16 @@ function processSection(count, depth, type, section) {
     curAnchorPrefix = prevPrefix;
     renderer.curSection = prevSection;
 
-    outHTML += "</section>";
+    finalHTML += "</section>";
+
+    return finalHTML;
 }
 
 var prevHeaderRenderer = renderer.heading;
 renderer.heading = function(text, level, raw) {
+    if (renderer.curSection && !renderer.curSection.title) {
+        renderer.curSection.title = text;
+    }
     var out =  '<h' + (level + renderer.sectionLevel);
     if (renderer.nameTag) {
         out += ' id="' + renderer.nameTag + '"';
@@ -133,10 +142,33 @@ nsh.copyStyle("default", "tools/code-style", function(err) {
 });
 
 outHTML = "<html><head><title>" + bookOrg.title + "</title><link href='tools/pdf.css' type='text/css'></link><link href='tools/code-style/default.css' type='text/css'></link></head><body data-type='book'>";
+var sectionHTML = "";
 var cnt = 1;
 bookOrg.sections.forEach(function(section) {
-    processSection(cnt, 1, "chapter", section);
+    sectionHTML += processSection(cnt, 1, "chapter", section);
     cnt += 1;
 });
+// Build our ToC
+outHTML += "<nav data-type='toc'><h1>Table of Contents</h1><ol>";
+function genToC(sections, depth) {
+    if (depth === undefined) depth = 1;
+    var resultHTML = "";
+    sections.forEach(function(section) {
+        if (!section || !section.tocLink || ! section.title) return;
+        resultHTML += "<li><a href='#" + section.tocLink + "'>" + section.title + "</a>";
+        if (section.sections && ToCMaxDepth >= depth + 1) {
+            resultHTML += "<ol>";
+            resultHTML += genToC(section.sections, depth + 1);
+            resultHTML += "</ol>";
+        }
+        resultHTML += "</li>";
+    });
+
+    return resultHTML;
+}
+outHTML += genToC(bookOrg.sections);
+
+outHTML += "</ol></nav>";
+outHTML += sectionHTML;
 outHTML += "</body></html>";
 console.log(outHTML);
