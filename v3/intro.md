@@ -1,3 +1,6 @@
+tele·hash
+> n. *Internet*, from **tele**graph and **hash**table
+
 # Introduction
 
 ![logo](logo/mesh-logo-128.png)
@@ -24,7 +27,7 @@ The current v3 has these properties:
 
 The protocol stack is separated into two main areas, a lower level [end-to-end encrypted exchange (E3X)](e3x/) that handles all of the security primitives, and higher application-level definitions for managing a [mesh](mesh.md) of [links](link.md) that support standard [channels](channels/), [transports](transports/), and [URIs](uri.md).
 
-## Background
+## Design Philosophy
 
 The principle idea that drove the creation and development of telehash
 is the belief that any application instance should be able to easily and
@@ -58,12 +61,12 @@ publish-subscribe, or message passing... any can be used, as telehash
 simply facilitates secure reliable connectivity between any two or more
 applications in any networking environment.
 
-<a name="name" />
-## The Name
+<a name="usage" />
+## Usage
 
-The name is a simple combination of **tele** from telegraph, and **hash** from hashtable, and pronounced as the parts of those words normally would be.
+The word telehash should be pronounced as the root terms would normally be pronounced in the speaker's native dialect.
 
-It is usually used in all lower-case to re-affirm the long term vision of it being used as a modern version of the word "telephone", both as a generic private communication system that is federated and compatible, and the act of two application instances communicating privately and directly.
+It is usually written in all lower-case in the sense of a modern version of the word "telephone"—both as a generic private communication system that is federated and compatible, and the act of two application instances communicating privately and directly.
 
 <a name="logo" />
 ## Logo
