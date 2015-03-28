@@ -21,7 +21,7 @@
 | [transport][]            | underlying layer responsible for _packet_ transfer
 | [URI][]                  | using a [Uniform rescource identifier](http://en.wikipedia.org/wiki/Uniform_resource_identifier) to enable endpoints to share enough information (_hashname_, _transport_) for out-of-band connection setup and references
 
-[channel]: channels/
+[channel]: channels/README.md
 [cloaking]: cloaking.md
 [CS]: e3x/cs/
 [CSID]: e3x/cs/
