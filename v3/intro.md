@@ -1,4 +1,31 @@
-# Background
+# Introduction
+
+![logo](logo/mesh-logo-128.png)
+
+Telehash is a completely open secure mesh networking standard with the following principles:
+
+* 100% end-to-end encrypted at all times
+* strict privacy, no content, identity, or metadata is ever revealed to 3rd parties
+* capable of using different transport protocols, app or network layer
+* designed to complement and add to existing transport security
+* easy to use for developers to encourage wider adoption of privacy
+* native implementations to each language/platform
+* designed for compatibility between embedded device, mobile, and web usage
+
+The current v3 has these properties:
+
+* each endpoint has verifiable unique fingerprint (a [hashname](hashname.md)), a secure global MAC address
+* a consistent high level [mesh](mesh.md) interface that maintains one or more [links](link.md) to other endpoints
+* provides native tunneling of TCP/UDP sockets, HTTP, object streams, and more
+* facilitates asynchronous and synchronous messaging and eventing
+* supports bridging and routing privately by default and optionally via a [public DHT](https://github.com/telehash/blockname)
+* supports an automatic discovery mode on local transports when available
+* integrates native support for [JSON
+Object Signing and Encryption (JOSE)](https://datatracker.ietf.org/wg/jose/charter/) and [OpenID Connect](http://openid.net/connect/)
+
+The protocol stack is separated into two main areas, a lower level [end-to-end encrypted exchange (e3x)](e3x/) that handles all of the security primitives, and higher application-level definitions for managing a [mesh](mesh.md) of [links](link.md) that support standard [channels](channels/), [transports](transports/), and [URIs](uri.md).
+
+## Background
 
 The principle idea that drove the creation and development of telehash
 is the belief that any application instance should be able to easily and
@@ -33,13 +60,13 @@ simply facilitates secure reliable connectivity between any two or more
 applications in any networking environment.
 
 <a name="name" />
-# The Name
+## The Name
 
 The name is a simple combination of **tele** from telegraph, and **hash** from hashtable, and pronounced as the parts of those words normally would be.
 
 It is usually used in all lower-case to re-affirm the long term vision of it being used as a modern version of the word "telephone", both as a generic private communication system that is federated and compatible, and the act of two application instances communicating privately and directly.
 
-# History
+## History
 
 The name and first version of the protocol was established in [2009](https://github.com/quartzjer/Telehash) by [Jeremie Miller](http://en.wikipedia.org/wiki/Jeremie_Miller) and was a research project until [2013 (v2)](https://github.com/telehash/telehash.org/tree/master/v2) when it was significantly updated with a privacy focus.
 
