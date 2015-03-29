@@ -14,7 +14,7 @@ var options = {
 var dirPrefix = "v3";
 var ToCMaxDepth = 2;
 
-var bookOrg = JSON.parse(fs.readFileSync("v3/spec/book.json"));
+var bookOrg = JSON.parse(fs.readFileSync("v3/spec/spec.json"));
 //console.log(bookOrg);
 
 var data = fs.readFileSync("README.md");
