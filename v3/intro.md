@@ -66,7 +66,7 @@ applications in any networking environment.
 
 The word telehash should be pronounced as the root terms would normally be pronounced in the speaker's native dialect.
 
-It is usually written in all lower-case in the sense of a modern version of the word "telephone"—both as a generic private communication system that is federated and compatible, and the act of two application instances communicating privately and directly.
+It is usually written in all lower-case in the sense of a modern version of the word "telephone", both as a generic private communication system that is federated and compatible, and the act of two application instances communicating privately and directly.
 
 <a name="logo" />
 ## Logo
