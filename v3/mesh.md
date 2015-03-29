@@ -5,7 +5,7 @@ A mesh network consists of one or more [links](link.md), which are active [encry
 
 Once a link is up, [channels](channels/) are used to run common services over it:
 
-  * peer: request connection to an endpoint from a router
+  * peer: request connection to an endpoint from a [router](routing.md)
   * connect: incoming connection request relayed
   * path: sync network transport info to try any direct/alternative paths
   * sock: tcp/udp socket tunneling 
@@ -17,11 +17,11 @@ Once a link is up, [channels](channels/) are used to run common services over it
 ## Mesh Structure
 
 * a mesh is a local hashname and links to one or more other hashnames (full mesh)
-* any link may be flagged as a `router` when it will provide relaying/bridging to other links
-* individual hashnames may have their own router defined
-* a router must have a way to validate hashnames before providing routing assistance to them
-* any hashname may advertise it's router as a path (and must provide routing to it for the first handshake)
-* a hashname my use a base [URI](uri.md) from a router as an out-of-band mechanism to establish new links
+* any link may be flagged as a [router](routing.md) when it will provide relaying/bridging to other links
+* individual hashnames may have their own [router](routing.md) defined
+* a [router](routing.md) must have a way to validate hashnames before providing routing assistance to them
+* any hashname may advertise it's [router](routing.md) as a path (and must provide routing to it for the first handshake)
+* a hashname my use a base [URI](uri.md) from a [router](routing.md) as an out-of-band mechanism to establish new links
 
 ## API
 
@@ -46,7 +46,7 @@ When the link state changes to up or down the app must be able to receive these 
 
 ### `link.router(bool)`
 
-Set this link to be a default (trusted) router, which will automatically ask it to assist in connections to any other link and provide assistance in connecting to the local endpoint.
+Set this link to be a default (trusted) [router](routing.md), which will automatically ask it to assist in connections to any other link and provide assistance in connecting to the local endpoint.
 
 ### `mesh.discover(bool)`
 

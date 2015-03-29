@@ -14,7 +14,7 @@ A `link` is the core connectivity mechanism between two endpoints.  An endpoint 
 Links can be in three states:
 
 * **unresolved** - at least the hashname is known, but either the Link Keys or Link Paths are incomplete
-* **down** - keys have been validated and at least one path is available (possibly through router), but the link is not connected
+* **down** - keys have been validated and at least one path is available (possibly through [router](routing.md)), but the link is not connected
 * **up** - link has sent and received a handshake and is active
 
 <a name="json" />
@@ -73,10 +73,10 @@ Links can be resolved from any string:
 
 1. [JSON](#json)
 2. [Direct URI](uri.md) (no fragment)
-3. [Peer URI](uri.md#peer) (router assisted, with fragment)
-3. hashname - [peer request](channels/peer.md) to default router(s)
+3. [Peer URI](uri.md#peer) ([router](routing.md) assisted, with fragment)
+3. hashname - [peer request](channels/peer.md) to default [router(s)](routing.md)
 
-Once resolved, all paths should be preserved for future use.  If resolved via a router, also generate and preserve a `peer` path referencing that router.
+Once resolved, all paths should be preserved for future use.  If resolved via a [router](routing.md), also generate and preserve a `peer` path referencing that [router](routing.md).
 
 <a name="handshake" />
 ## Handshake

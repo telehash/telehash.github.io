@@ -14,6 +14,7 @@ The full protocol suite is a composite of multiple individual specifications:
 * [E3X](e3x/) - end-to-end encrypted exchange (wire encoding, crypto libraries)
 * [link](link.md) - establishing and maintaining connections between two endpoints
 * [mesh](mesh.md) - higher level tools to manage multiple links and do local discovery
+* [routing](routing.md) - when one endpoint assists two others to establish/maintain a link
 * [uri](uri.md) - how to encode/decode endpoint info via URIs for out-of-band bootstrapping
 * [transports](transports/) - details (encoding, timeouts, discovery, etc) for mapping/supporting different network transports
 * [logo](logo/) - for use to represent telehash support in apps 

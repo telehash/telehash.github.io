@@ -36,6 +36,6 @@
 [mesh]: mesh.md
 [message]: e3x/messages.md
 [packet]: lob.md
-[router]: link.md
+[router]: routing.md
 [transport]: transports/
 [URI]: uri.md
