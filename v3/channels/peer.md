@@ -23,7 +23,7 @@ BODY: ...packet...
 
 ## First Introductions
 
-The first time an endpoint is attempting a link with a new peer it may not have any information other than it's hashname, so it cannot send encrypted handshakes.  Instead, it must attach the handshakes unencrypted, with at least one of them including the sender's [key](../e3x/cs/#packet).  If the sender doesn't know the correct `CSID` it should open multiple peer channels, one with each key handshake it supports.
+The first time an endpoint is attempting a link with a new peer it may not have any information other than it's hashname, so it cannot send encrypted handshakes.  Instead, it must attach the handshakes unencrypted, with at least one of them including the sender's [key](../e3x/cs/README.md#csk).  If the sender doesn't know the correct `CSID` it should open multiple peer channels, one with each key handshake it supports.
 
 The router is not required to parse the attached handshakes, but may detect and ignore attached keys that it knows to be an invalid `CSID` for the peer.
 
