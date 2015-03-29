@@ -1,10 +1,10 @@
 # Messages - Asynchronous / Offline Content Transport with Forward Secrecy
 
-Message packets are for encrypting small amounts of content to other entities without requiring a synchronous exchange, such that the recipient can process them at any point in the future.  They are used primarily for creating handshakes to establish synchronous [channel](channels.md) encryption that has forward secrecy guarantees, as messages alone provide a lower level of privacy and should only be used for temporary or non-secret data and never stored at rest.
+Message packets are for encrypting small amounts of content to other entities without requiring a synchronized [exchange](exchange.md), such that the recipient can process them at any point in the future.  They are used primarily for creating handshakes to establish synchronous [channel](channels.md) encryption that has forward secrecy guarantees, as messages alone provide a lower level of privacy and should only be used for temporary or non-secret data and never stored at rest.
 
 Messages define how to encrypt the packets but have no required internal structure (unlike channels).  There is a larger overhead for encrypted message packets as they must always include the ephemeral public key information used and often require additional computation as well.
 
-An exchange may be created on demand just to generate/process one or more messages and not used for channels, but since messages are asynchronous they do not require the exchanges to be in sync to operate.
+An [exchange](exchange.md) may be created on demand just to generate/process one or more messages and not used for channels, but since messages are asynchronous they do not require the exchanges to be in sync to operate.
 
 All [handshakes](handshake.md) are message packets.
 

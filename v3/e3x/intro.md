@@ -7,9 +7,9 @@ It is designed to be used as a low-level software library that can be embedded i
 
 All of the cryptographic primitives used in E3X are defined as a [Cipher Set](cs/), allowing for applications to select for different resource or security requirements as needed.
 
-E3X defines asynchronous [messages]() and synchronous [channels]() managed using an `exchange` that has session state exchanged through explicit [handshakes]().  An `exchange` is created by an endpoint with local keys to uniquely identify itself (one or more keys, depending on what Cipher Sets it supports) and has another endpoint's public key(s), the `exchange` can then be used to create encrypted `messages` and generate `handshakes` in both directions.
+E3X defines asynchronous [messages][] and synchronous [channels][] managed using an [exchange][] that has session state exchanged through explicit [handshakes][].  An [exchange][] is created by an endpoint with local keys to uniquely identify itself (one or more keys, depending on what Cipher Sets it supports) and has another endpoint's public key(s), the [exchange][] can then be used to create encrypted [messages][] and generate [handshakes][] in both directions.
 
-Once the handshakes have been received and verified, encrypted `channels` can stream reliable or unreliable data between the two connected endpoints.  All data is encoded as [packets](../lob.md) both before (application layer) and after encryption (wire transport layer).
+Once the [handshakes][] have been received and verified, encrypted [channels][] can stream reliable or unreliable data between the two connected endpoints.  All data is encoded as [packets](../lob.md) both before (application layer) and after encryption (wire transport layer).
 
 ## Comparisons
 
@@ -59,3 +59,9 @@ Requires an exchange that has sent/received a handshake and is in sync.
 * `state` - current state of the channel (`ENDED`, `OPENING`, `OPEN`)
 * `timeout` - get/set the current timeout value of this channel
 * `send(packet)` - return encrypted channel packet
+
+[messages]: messages.md
+[handshakes]: handshake.md
+[channels]: channels.md
+[exchange]: exchange.md
+

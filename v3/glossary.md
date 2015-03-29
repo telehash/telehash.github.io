@@ -28,7 +28,7 @@
 [CSK]: e3x/cs/
 [endpoint]: link.md
 [E3X]: e3x/intro.md
-[exchange]: e3x/intro.md
+[exchange]: e3x/exchange.md
 [handshake]: e3x/handshake.md
 [hashname]: hashname.md
 [LOB]: lob.md

@@ -1,6 +1,6 @@
 # Channels - Streaming Content Transport
 
-All streaming data sent between two endpoints in an exchange must be part of a `channel` packet. Every channel has an integer id included as the `c` parameter in the JSON. See [Channel IDs](#ids) for details on how they are selected/handled.
+All streaming data sent between two endpoints in an exchange must be part of a `channel` packet. Every channel has an integer id included as the `c` parameter in the JSON and managed by the current [exchange](exchange.md). See [Channel IDs](#ids) for details on how they are selected/handled.
 
 A channel may have only one outgoing initial packet, only one response to it, or it may be long-lived with many packets exchanged using the same "c" identifier (depending on the type of channel).  Channels are by default unreliable, they have no retransmit or ordering guarantees, and an `end` always signals the last *content* packet being sent (acknowledgements/retransmits may still occur after).  When required, an app can also create a [reliable](reliable.md) channel that does provide ordering and retransmission functionality.
 
@@ -12,7 +12,7 @@ A channel library should provide a `quota` method per packet for the app to dete
 
 ## Packet Encryption
 
-All channel packets are encrypted using a stream cipher as determined by the [Cipher Set](cs/) in use for the exchange.  The encrypted (OUTER) packets must have a `HEAD` of length 0 and the encrypted contents as the binary `BODY`.
+All channel packets are encrypted using a stream cipher as determined by the [Cipher Set](cs/) in use for the [exchange](exchange.md).  The encrypted (OUTER) packets must have a `HEAD` of length 0 and the encrypted contents as the binary `BODY`.
 
 Once decrypted they result in an INNER packet that must always contain valid JSON (have a `HEAD` of 7 or greater).
 
