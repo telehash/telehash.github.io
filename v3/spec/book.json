@@ -89,15 +89,6 @@
                 },
                 {
                     "content":"v3/channels/thtp.md"
-                },
-                {
-                    "content":"v3/channels/box.md"
-                },
-                {
-                    "content":"v3/channels/block.md"
-                },
-                {
-                    "content":"v3/channels/chat.md"
                 }
             ]
         },
@@ -116,12 +107,6 @@
                 },
                 {
                     "content":"v3/transports/tls.md"
-                },
-                {
-                    "content":"v3/transports/http.md"
-                },
-                {
-                    "content":"v3/transports/webrtc.md"
                 }
             ]
 

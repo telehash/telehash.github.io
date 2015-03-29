@@ -1,4 +1,4 @@
-HTTP <> Telehash Bindings - thtp
+# `thtp` - HTTP Mapping
 ================================
 
 This is a channel mapping HTTP to telehash for the common browser user-agent and web-app patterns.  Most HTTP requests can be translated directly into a `thtp` channel and back.
