@@ -1,4 +1,4 @@
-# Length-Object-Binary Encoding (Packet Format)
+# Packet Format
 
 This is a simple encoding scheme to combine any JSON object with any binary data (both are optional) into one byte array, often referred to as a single `packet`.  This encoding does not include any total packet size or checksums, and expects the context where it's used to provide those when necessary (see [chunking](chunking.md)).
 

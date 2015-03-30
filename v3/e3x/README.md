@@ -1,5 +1,4 @@
-E3X - End-to-End Encrypted eXchange
-===================================
+# E3X - End-to-End Encrypted eXchange
 
 See the [intro](intro.md) for more background and an overview.
 

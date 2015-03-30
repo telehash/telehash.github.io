@@ -180,3 +180,14 @@ code {
 a {
   text-decoration: none;
 }
+
+h1 {
+    background-color:#2a7e60;
+    color:white;
+    width:100%;
+    padding:0.2em;
+}
+
+h2 {
+    border-bottom:1px solid #2a7e60;
+}

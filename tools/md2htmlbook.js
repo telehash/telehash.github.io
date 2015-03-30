@@ -96,6 +96,7 @@ function processSection(count, depth, type, section) {
 
 var prevHeaderRenderer = renderer.heading;
 renderer.heading = function(text, level, raw) {
+    //console.log("Level is " + level + " section level " + renderer.sectionLevel + " for " + text)
     if (renderer.curSection && !renderer.curSection.title) {
         renderer.curSection.title = text;
     }
@@ -145,7 +146,8 @@ outHTML = "<html><head><title>" + bookOrg.title + "</title><link href='tools/pdf
 var sectionHTML = "";
 var cnt = 1;
 bookOrg.sections.forEach(function(section) {
-    sectionHTML += processSection(cnt, 1, "chapter", section);
+    renderer.sectionLevel = 0;
+    sectionHTML += processSection(cnt, 0, "chapter", section);
     cnt += 1;
 });
 // Build our ToC
