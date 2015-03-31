@@ -171,10 +171,17 @@ img { max-width: 100% }
 
 /* (((((((((((((( INLINES )))))))))))))) */
 
+div.syntaxhighlighter {
+  margin-left:0;
+  padding:0;
+  margin-right:0;
+}
+
 code { 
     font-family: monospace;
     white-space: pre-wrap;       /* css-3 */
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
+    margin-left:0;
 }
 
 a {
@@ -190,4 +197,23 @@ h1 {
 
 h2 {
     border-bottom:1px solid #2a7e60;
+}
+
+div.spec-title
+{
+  margin:0;
+  margin-top:1in;
+  padding:0;
+  font-size:72pt;
+  font-family:"Helvetica Neue";
+  letter-spacing: -7.200719833374023px;
+  font-weight:bold;
+}
+
+section[data-type="titlepage"] > img {
+  padding:0;
+  width:80%;
+  margin-left:0.65in;
+  margin-bottom:-1in;
+  margin-top:0.5in;
 }

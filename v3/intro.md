@@ -3,8 +3,6 @@ tele·hash
 
 # Introduction
 
-![logo](logo/mesh-logo-128.png)
-
 Telehash is a completely open secure mesh networking standard with the following principles:
 
 * 100% end-to-end encrypted at all times

@@ -150,6 +150,11 @@ bookOrg.sections.forEach(function(section) {
     sectionHTML += processSection(cnt, 0, "chapter", section);
     cnt += 1;
 });
+// Cover page
+outHTML += "<section data-type='titlepage'>";
+outHTML += "<img src='v3/spec/logo/mesh-logo.svg' />"
+outHTML += "<div class='spec-title'>telehash</div>"
+outHTML += "</section>"
 // Build our ToC
 outHTML += "<nav data-type='toc'><h1>Table of Contents</h1><ol>";
 function genToC(sections, depth) {
