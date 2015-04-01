@@ -3,7 +3,7 @@
 |                 |        |
 |-----------------|--------|
 | [channel][]              | a virtual socket that allows two _endpoints_ to exchange data reliably (like TCP or unreliably UDP)
-| [cloaking][]             | method used to hides telehash traffic on the wire by randomizing all data sent
+| [cloaking][]             | method used to hide telehash traffic on the wire by randomizing all data sent
 | [CS][]                   | (Cipher Set) a collection of crypto algorithms with a given _CSID_
 | [CSID][]                 | (Cipher Set ID) predefined hex number identifying a _CS_
 | [CSK][]                  | (Cipher Set Key) the public key bytes for a given _CSID_
@@ -12,14 +12,14 @@
 | [exchange][]             | the current encrypted session state between two endpoints
 | [handshake][]            | _message_ type used to establish an encrypted _session_ for _channels_
 | [hashname][]             | an identifier for a participant of telehash, it is calculated from all public keys of the participants _cipher set (CS)_
-| [LOB][]                  | Lenght-Oobject-Binary encoding format that allows combining JSON and binary data
+| [LOB][]                  | Length-Object-Binary encoding format that allows combining JSON and binary data
 | [link][]                 | connection between two _endpoints_ either directly or via a _router_
 | [mesh][]                 | a number of _links_ with active encrypted _sessions_ over any _transport_, participants in the mesh are called _endpoints_
-| [message][]              | an asynchronous encrypted packet between two endpoints
+| [message][]              | an asynchronous encrypted packet between two _endpoints_
 | [packet][]               | an encapsulation format for JSON and binary data using _length object binary (LOB)_ encoding
-| [router][]               | an endpoint that will facilitate connection setup between two other endpoints
+| [router][]               | an _endpoint_ that will facilitate connection setup between two other endpoints
 | [transport][]            | underlying layer responsible for _packet_ transfer
-| [URI][]                  | using a [Uniform rescource identifier](http://en.wikipedia.org/wiki/Uniform_resource_identifier) to enable endpoints to share enough information (_hashname_, _transport_) for out-of-band connection setup and references
+| [URI][]                  | [Uniform rescource identifier](http://en.wikipedia.org/wiki/Uniform_resource_identifier) to enable endpoints to share enough information (_hashname_, _transport_) for out-of-band connection setup and references
 
 [channel]: channels/
 [cloaking]: e3x/cloaking.md
