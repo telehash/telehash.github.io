@@ -13,6 +13,8 @@ Telehash is a completely open secure mesh networking standard with the following
 * native implementations to each language/platform
 * designed for compatibility between embedded device, mobile, and web usage
 
+![Basic Network](v3/BasicNetwork.png)
+
 The current v3 has these properties:
 
 * each endpoint has verifiable unique fingerprint (a [hashname](hashname.md)), a secure global MAC address
