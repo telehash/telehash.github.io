@@ -76,7 +76,7 @@ Links can be resolved from any string:
 1. [JSON](#json)
 2. [Direct URI](uri.md) (no fragment)
 3. [Peer URI](uri.md#peer) ([router](routing.md) assisted, with fragment)
-3. hashname - [peer request](channels/peer.md) to default [router(s)](routing.md)
+4. hashname - [peer request](channels/peer.md) to default [router(s)](routing.md)
 
 Once resolved, all paths should be preserved for future use.  If resolved via a [router](routing.md), also generate and preserve a `peer` path referencing that [router](routing.md).
 

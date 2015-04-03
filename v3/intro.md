@@ -25,7 +25,7 @@ The current v3 has these properties:
 * supports bridging and routing privately by default and optionally via a [public DHT (draft)](https://github.com/telehash/blockname)
 * integrates native support for [JSON Object Signing and Encryption (JOSE)](https://datatracker.ietf.org/wg/jose/charter/) and [OpenID Connect](http://openid.net/connect/)
 
-The protocol stack is separated into two main areas, a lower level [end-to-end encrypted exchange (E3X)](e3x/) that handles all of the security primitives, and higher application-level definitions for managing a [mesh](mesh.md) of [links](link.md) that support standard [channels](channels/), [transports](transports/), and [URIs](uri.md).
+The protocol stack is separated into two main areas, a lower level [end-to-end encrypted exchange (E3X)](e3x/intro.md) that handles all of the security primitives, and higher application-level definitions for managing a [mesh](mesh.md) of [links](link.md) that support standard [channels](channels/), [transports](transports/), and [URIs](uri.md).
 
 ## Design Philosophy
 
@@ -64,7 +64,7 @@ applications in any networking environment.
 <a name="usage" />
 ## Usage
 
-The word telehash should be pronounced as the root terms would normally be pronounced in the speaker's native dialect.
+The word _telehash_ should be pronounced as the root terms would normally be pronounced in the speaker's native dialect.
 
 It is usually written in all lower-case in the sense of a modern version of the word "telephone", both as a generic private communication system that is federated and compatible, and the act of two application instances communicating privately and directly.
 
