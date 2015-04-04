@@ -12,6 +12,10 @@ Cloaking is performed using the [ChaCha20 cipher](http://cr.yp.to/chacha.html) a
 
 The resulting cloaked packet is the concatenation of the 8-byte nonce and the ChaCha20 ciphertext output.  Once decloaked, the ciphertext should be processed as another packet, which may be a raw encrypted packet (0x00) or may be another cloaked one. A random number of multiple cloakings should always be used to obfuscate the original packet's size.
 
+## Noise Floor
+
+Any endpoint may wish to obfuscate not only the individual packets but also the rate or timing of any transmission.  A noise floor can be established by generating random but valid cloaked packets of a minimum size and sending them continuously at a fixed rate to the recipient.  When real packets are waiting to be sent they are swapped out and sent instead of the next larger noise floor packet and cloaked multiple times to match the noise floor size.
+
 ## Accept both
 
 All implementations must support receiving both cloaked and uncloaked packets, and the default for any un-encrypted transport should always be cloaking enabled.  The initial sender determines when to send un-cloaked packets on any transport, but when receiving a cloaked packet any sender should always respond with cloaked packets as that may be the only way to ensure they are transmitted.

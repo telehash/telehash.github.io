@@ -4,13 +4,13 @@ Since channel packets are the most frequent and have a set of fixed well-known k
 
 This is important in embedded/device networks where the MTU is small (BLE and 6lowpan), and may improve performance in other edge cases with frequent small packets.
 
-## `z` Handshake Signalling
+## `z` Link Handshake Signalling
 
-To indicate support of a channel payload compression any endpoint may include a `z` key with an unsigned integer value in the handshake.  The value `0` is the default and signals no support.
+To indicate support of a channel payload compression any endpoint may include a `z` key with an unsigned integer value in the link handshake.  The value `0` is the default and signals no support.
 
 The `z` value indicates how to decode/interpret the channel payload bytes immediately after decryption.  After any alternative processing the resulting value must still always be identical to a LOB packet with a JSON header and binary BODY, it is only to minimize encoding and not for use to include additional data in a payload.
 
-Both endpoints must include identical `z` in a confirmed handshake in order for it to be enabled on any channel packets using the resulting keys, and only that type of channel payload is supported when enabled. There is no negotiation or signalling of support for multiple values, future `z` values will be defined that combine multiple techniques when necessary.
+Both endpoints must include identical `z` in a confirmed link handshake in order for it to be enabled on any channel packets using the resulting keys, and only that type of channel payload is supported when enabled. There is no negotiation or signalling of support for multiple values, future `z` values will be defined that combine multiple techniques when necessary.
 
 ## `0` LOB encoded (default)
 

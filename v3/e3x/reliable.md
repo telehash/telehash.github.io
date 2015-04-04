@@ -17,11 +17,11 @@ The receiving app logic must only process sequenced packets and their contents i
 <a name="ack" />
 ## `ack` - Acknowledgements
 
-The `"ack":1` integer is included on outgoing packets as the highest known `seq` value confirmed as *delivered to the app* (as much as is possible to confirm quickly). What this means is that any library must provide a way to send data/packets to the app using it in a serialized way, and be told when the app is done processing one packet so that it can both confirm that `seq` as well as give the app the next one in order. Any outgoing `ack` must be the last processed `seq` so that the sender can confirm that the data was completely received/handled by the recipient.
+The `"ack":1` integer is included on outgoing packets as the highest known `seq` value confirmed as *delivered to the app* (as much as is possible to confirm immediately). What this means is that any library must provide a way to send data/packets to the app using it in a serialized way, and be told when the app is done processing one packet so that it can both confirm that `seq` as well as give the app the next one in order. Any outgoing `ack` must be the last processed `seq` so that the sender can confirm that the data was completely received/handled by the recipient.
 
 If a received packet contains a `seq` but does not contain an `ack` then the recipient is not required to send one for the given `seq` while it's still processing packets for up to one second.  This allows senders to manage their outgoing buffer of packets and the rate of ack's being returned, and ensures that an `ack` will still be sent at a regular rate based on what is actually received.
 
-An `ack` may also be sent in it's own packet ad-hoc at any point without any content data, and these ad-hoc acks must not include a `seq` value as they are not part of the content stream and are out-of-band.
+An `ack` may also be sent in its own packet ad-hoc at any point without any content data, and these ad-hoc acks must not include a `seq` value as they are not part of the content stream and are out-of-band.
 
 When receiving an `ack` the recipient may then discard any buffered packets up to and including that matching `seq` id, and also confirm to the app that the included content data was received and processed by the other side.
 
