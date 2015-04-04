@@ -27,10 +27,10 @@ renderer.sectionLevel = 0;
 
 var curAnchorPrefix = "";
 function makeAnchor(baseName, section) {
-    
     var anchorName = baseName;
     anchorName = anchorName.replace("README", "");
     anchorName = anchorName.replace(/\//g, "_")
+    anchorName = anchorName.replace(/.*\#(.+)/g, "$1")
     anchorName = anchorName.replace(".md", "");
     if (/\.\._/.test(anchorName)) {
         var upPrefix = (section.parent && section.parent.prefix) || "";
