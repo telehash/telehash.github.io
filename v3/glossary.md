@@ -2,24 +2,24 @@
 
 |                 |        |
 |-----------------|--------|
-| [channel][]              | a virtual socket that allows two _endpoints_ to exchange data reliably (like TCP or unreliably UDP)
+| [channel][]              | a virtual stream that allows two _endpoints_ to exchange data reliably or unreliably
 | [cloaking][]             | method used to hide telehash traffic on the wire by randomizing all data sent
-| [CS][]                   | (Cipher Set) a collection of crypto algorithms with a given _CSID_
-| [CSID][]                 | (Cipher Set ID) predefined hex number identifying a _CS_
-| [CSK][]                  | (Cipher Set Key) the public key bytes for a given _CSID_
+| [CS][]                   | *Cipher Set*, a collection of crypto algorithms with a given _CSID_
+| [CSID][]                 | *Cipher Set ID*, predefined hex number identifying a _CS_
+| [CSK][]                  | *Cipher Set Key*, the public key bytes for a given _CSID_
 | [endpoint][]             | a participant in the telehash network identified by a single _hashname_
-| [E3X][]                  | End-to-End Encrypted eXchange is a flexible encrypted exchange protocol
+| [E3X][]                  | *End-to-End Encrypted eXchange*, a flexible encrypted exchange wire protocol
 | [exchange][]             | the current encrypted session state between two endpoints
 | [handshake][]            | _message_ type used to establish an encrypted _session_ for _channels_
-| [hashname][]             | an identifier for a participant of telehash, it is calculated from all public keys of the participants _cipher set (CS)_
-| [LOB][]                  | Length-Object-Binary encoding format that allows combining JSON and binary data
+| [hashname][]             | an _endpoint_ identifier, calculated from all of its _CSKs_
+| [LOB][]                  | *Length-Object-Binary*, encoding format that allows combining JSON and binary data
 | [link][]                 | connection between two _endpoints_ either directly or via a _router_
 | [mesh][]                 | a number of _links_ with active encrypted _sessions_ over any _transport_, participants in the mesh are called _endpoints_
 | [message][]              | an asynchronous encrypted packet between two _endpoints_
 | [packet][]               | an encapsulation format for JSON and binary data using _length object binary (LOB)_ encoding
-| [router][]               | an _endpoint_ that will facilitate connection setup between two other endpoints
-| [transport][]            | underlying layer responsible for _packet_ transfer
-| [URI][]                  | [Uniform rescource identifier](http://en.wikipedia.org/wiki/Uniform_resource_identifier) to enable endpoints to share enough information (_hashname_, _transport_) for out-of-band connection setup and references
+| [router][]               | an _endpoint_ that will facilitate link setup between two other endpoints
+| [transport][]            | underlying network responsible for _packet_ transfer
+| [URI][]                  | *Uniform Rescource Identifier*, to enable endpoints to share enough information (_hashname_, _transport_) for out-of-band connection setup and references
 
 [channel]: channels/
 [cloaking]: e3x/cloaking.md
