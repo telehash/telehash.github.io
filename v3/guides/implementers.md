@@ -195,6 +195,41 @@ link_t link_handle(link_t link, channel3_t c3, void (*handle)(link_t link, chann
 link_t link_flush(link_t link, channel3_t c3, lob_t inner);
 ```
 
+## Higher-level API
+
+A simple API is documented here to help provide a consistent foundation for all implementations by using similar methods/names and interaction patterns:
+
+
+### `mesh = create(keypairs)`
+
+Create a new mesh using the given keypairs (or generate new ones).  This should enable all transports and start handling incoming channels.
+
+### `mesh.onDiscover = function (from) {...}`
+
+When a new unknown hashname is discovered at any point (from transports or a connect channel), all of the details (keys, hashname, paths) are given to a callback or discovery event to be processed by the app.
+
+### `link = mesh.link(to)`
+
+Establish a link to the given hashname.  The `to` may be a [URI](uri.md), [JSON link](link.md#json), or just a plain hashname.
+
+### `link.onLink = function (state) {...}`
+
+When the link state changes to up or down the app must be able to receive these events, as well as check the current state at any point.
+
+### `link.router(bool)`
+
+Set this link to be a default (trusted) [router](routing.md), which will automatically ask it to assist in connections to any other link and provide assistance in connecting to the local endpoint.
+
+### `mesh.discover(bool)`
+
+Set the local endpoint discovery mode to on or off, when on this will tell any available transport to announce the endpoint's presence on local networks and newly discovered endpoints will generate `onDiscover` events.
+
+### Built-in and Custom Channels
+
+All implementations should strive to support as many [channels](channels/) as possible directly using the language and patterns described in each channel definition.  For example, the [stream](channels/stream.md) channel should be supported with a simple `mesh.onStream` event to handle incoming requests and `link.stream()` to connect new streams (using a language-native streaming interface if possible).
+
+Custom channels should be avoided whenever possible by using one of the built-in channels, and the API to create and handle custom channels is implementation specific.
+
 ## E3X
 
 ### `self`
