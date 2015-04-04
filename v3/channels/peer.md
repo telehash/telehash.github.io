@@ -2,7 +2,7 @@
 
 Any endpoint can request another to act as a [router](../routing.md) to an endpoint it is attempting to link with.  These routing requests are sent in a `"type":"peer"` unreliable channel.  A peer request is typically generated as the result of having a [peer path](path.md) for any endpoint.
 
-A peer open request contains a `"peer":"fvifxlr3bsaan2jajo5qqn4au5ldy2ypiweazmuwjtgtg43tirkq"` where the value is a the hashname the sender is trying to reach.  In some cases the hashname may not be known yet and the peer request was the result of a router-generated [URI](../uri.md), included as the `"uri":"..."` value.
+A peer open request contains a `"peer":"fvif...irkq"` where the value is a the hashname the sender is trying to reach.  In some cases the hashname may not be known yet and the peer request was the result of a router-generated [URI](../uri.md), included as the `"uri":"..."` value.
 
 The `BODY` of the open request must contain an attached packet with information for the specified peer to qualify the original sender.  The `BODY` will be relayed by the routing endpoint.
 
@@ -16,16 +16,14 @@ No response is ever given to the `peer` channel, it should not error based on an
 {
   "c":10,
   "type":"peer",
-  "peer":"fvifxlr3bsaan2jajo5qqn4au5ldy2ypiweazmuwjtgtg43tirkq"
+  "peer":"fvif...irkq"
 }
 BODY: ...packet...
 ```
 
 ## First Introductions
 
-The first time an endpoint is attempting a link with a new peer it may not have any information other than it's hashname, so it cannot send encrypted handshakes.  Instead, it must attach the handshakes unencrypted, with at least one of them including the sender's [key](../e3x/cs/README.md#csk).  If the sender doesn't know the correct `CSID` it should open multiple peer channels, one with each key handshake it supports.
-
-The [router](../routing.md) is not required to parse the attached handshakes, but may detect and ignore attached keys that it knows to be an invalid `CSID` for the peer.
+The first time an endpoint is attempting a link with a new peer it may not have any information other than it's hashname, so it cannot send encrypted handshakes.  Instead, it must attach the handshakes unencrypted, with at least one of them including the sender's `CSK`.  If the sender doesn't know the correct `CSID` it should open multiple peer channels, one with each key handshake it supports.
 
 ## Automatic Bridging
 

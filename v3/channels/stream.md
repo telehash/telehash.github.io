@@ -1,6 +1,6 @@
 # `stream` - Reliable Data Streams
 
-One of the most common needs between any two endpoints is creating streams of data.  The `"type":"stream"` reliable channel is a request from one endpoint to open a stream to another.
+One of the most common patterns between any two endpoints is creating streams of data.  The `"type":"stream"` reliable channel is a request from one endpoint to open a stream to another.
 
 The stream open request may contain a single additional packet attached as the `BODY` that is the options for this stream request, these options should contain anything the recipient app needs to determine what the stream is for and to create it.
 
