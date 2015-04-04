@@ -154,6 +154,6 @@ Example:
 ```json
 {
   "type":"uri",
-  "uri":"https://example.com/link?ref=42#u8kb...f9c1"
+  "uri":"https://example.com/link?ref=42#u8kb..."
 }
 ```

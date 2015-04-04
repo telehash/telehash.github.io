@@ -76,6 +76,6 @@ If the maximum ID is reached the exchange must be regenerated, resetting it back
 <a name="timeouts" />
 ### Timeouts
 
-Every channel is responsible for it's own timeout and may have a different value than others.  A timeout occurs whenever the channel is in `OPENING` or `ENDED` state or when any packet has not been ack'd for reliable channels.
+Every channel is responsible for its own timeout and may have a different value than others.  A timeout occurs whenever the channel is in `OPENING` or `ENDED` state or when any packet has not been ack'd for reliable channels.
 
 Any channel that is in `OPEN` state will not trigger a timeout individually since the exchange as a whole will timeout if the connection is lost based on the network transports in use.  Those timeouts independently occur at a higher level for the overall exchange when the handshake process fails and do not use any channel timeout values.

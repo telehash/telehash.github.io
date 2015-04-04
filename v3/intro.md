@@ -77,7 +77,9 @@ It is usually written in all lower-case in the sense of a modern version of the 
 <a name="logo" />
 ## Logo
 
-The telehash [logo](https://github.com/telehash/telehash.org/tree/master/v3/logo) was designed and contributed by [Jake Ingman](https://github.com/jingman) and is openly available for apps to use in representing support and current mesh connectivity status.
+![logo-128](logo/mesh-logo-128.png)
+
+The telehash [logo](https://github.com/telehash/telehash.org/tree/master/v3/logo) was designed and contributed by [Jake Ingman](https://github.com/jingman) and is freely available for apps to use in representing support and current mesh connectivity status.
 
 The official color is [#2a7e60](http://www.color-hex.com/color/2a7e60).
 
