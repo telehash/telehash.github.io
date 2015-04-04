@@ -1,11 +1,11 @@
 # Links
 
-A _link_ is the core connectivity mechanism between two endpoints. An endpoint with one or more links is referred to as a _mesh_.
+A _link_ is the core connectivity mechanism between two endpoints. An endpoint managing one or more links is referred to as a _mesh_.
 
 ## Terminology
 
-|                 |        |
-|-----------------|--------|
+|                            |        |
+|----------------------------|--------|
 | **Link CSID**              | The highest matching `CSID` between two endpoints
 | **Link Keys**              | The one or more `CSKs` of the other endpoint, at a minimum must include the `CSID` one
 | **Link Paths**             | All known or potential path information for connecting a link
@@ -38,11 +38,11 @@ It's common to have a `hashname` field as well for convenience or as the verifie
         "type": "udp4"
       },
       {
-        "peer": "e5mwmtsvueumlqgo32j67kbyjjtk46demhj7b6iibnnq36fsylka",
+        "peer": "e5mw...ylka",
         "type": "peer"
       }
     ],
-    "hashname": "frnfke2szyna2vwkge6eubxtnkj46rtctqk7g7ewbvfiesycbjdq"
+    "hashname": "frnf...bjdq"
   }
 ```
 
@@ -58,10 +58,10 @@ The Link Keys can also be represented in a standard [JWK](https://tools.ietf.org
 ```json
 {
     "kty": "hashname",
-    "kid": "27ywx5e5ylzxfzxrhptowvwntqrd3jhksyxrfkzi6jfn64d3lwxa",
+    "kid": "27yw...lwxa",
     "use": "link",
-    "cs1a": "an7lbl5e6vk4ql6nblznjicn5rmf3lmzlm",
-    "cs3a": "eg3fxjnjkz763cjfnhyabeftyf75m2s4gll3gvmuacegax5h6nia"
+    "cs1a": "an7l...mzlm",
+    "cs3a": "eg3fx...6nia"
 }
 ```
 
@@ -78,13 +78,13 @@ Links can be resolved from any string:
 3. [Peer URI](uri.md#peer) ([router](routing.md) assisted, with fragment)
 4. hashname - [peer request](channels/peer.md) to default [router(s)](routing.md)
 
-Once resolved, all paths should be preserved for future use.  If resolved via a [router](routing.md), also generate and preserve a `peer` path referencing that [router](routing.md).
+Once resolved, all paths should be preserved for future use.  If resolved via a [router](routing.md) a `peer` type path should be preserved referencing that [router](routing.md).
 
 <a name="handshake" />
 ## Handshake
 
-The [_handshake_](e3x/handshake.md) packet is of `"type":"link"` and contains an optional `"csid":"1a"` for use when not sent as a message (such as in a [peer](channels/peer.md)).  The `BODY` of the handshake is another encoded packet that contains the sender's hashname details.
-
+In order to establish a link both endpoints must first send and receive an encrypted [_handshake_](e3x/handshake.md). The minimum required handshake packet is of `"type":"link"` and the `BODY` is another encoded packet that contains the sender's hashname details.
+ 
 The attached packet must include the correct `CSK` of the sender as the `BODY` and the JSON contains the intermediate hash values of any other `CSIDs` used to generate the hashname.
 
 Example:
@@ -97,20 +97,22 @@ Example:
 }
 BODY:
   {
-    "3a": "eg3fxjnjkz763cjfnhyabeftyf75m2s4gll3gvmuacegax5h6nia",
-    "1a": "ckczcg2fq5hhaksfqgnm44xzheku6t7c4zksbd3dr4wffdvvem6q"
+    "3a": "eg3f...6nia",
+    "1a": "ckcz...em6q"
   }
   BODY: [2a's CSK binary bytes]
 ```
 
+The `"csid":"2a"` is optional when sent as an encrypted message, but required when sent in a [peer](channels/peer.md) channel.
+
 <a name="jwt" />
 ## Identity (JWT)
 
-The endpoints connected over a link are always uniquely identified by their hashnames, which serves as a stable globally unique and verifiable address, but is not intended to be used as a higher level identity for an end-user or other entity beyond the single instance/device.  Once a hashname is generated in a new context, it should be registered and associated with other portable identities by the application.
+The endpoints connected over a link are always uniquely identified by their hashnames which serve as a stable universally unique and verifiable address, but is not intended to be used as a higher level identity for an end-user or other entity beyond the single instance/device.  Once a hashname is generated in a new context, it should be registered and associated with other portable identities by the application.
 
-[OpenID Connect](http://openid.net/connect/) or any service that can generate a [JSON Web Token](http://tools.ietf.org/html/draft-ietf-oauth-json-web-token) can be used as the primary user/entity identification process, enabling a strongly encrypted communication medium to be easily coupled with standard identity management tools.
+[OpenID Connect](http://openid.net/connect/) or any service that is able to generate a [JSON Web Token](http://tools.ietf.org/html/draft-ietf-oauth-json-web-token) can be used for primary user/entity identification, enabling strongly encrypted communication to be easily coupled with standard identity management tools.
 
-Just as a JWT is sent as a Bearer token over HTTP, it can be automatically included as part of the [handshake process](e3x/handshake.md) between endpoints.  This enables applications to require additional context before deciding to establish a link or apply restrictions on to what can be performed over the link once connected.
+Just as a JWT is sent as a Bearer token over HTTP, it can be automatically included as part of the [handshake process](e3x/handshake.md) between endpoints with a `"type":"jwt"`.  This enables applications to require additional context before deciding to establish a link or apply restrictions on to what can be performed over the link once connected.
 
 ### Audience
 
