@@ -353,6 +353,10 @@ Requires an exchange that has sent/received a handshake and is in sync.
 
 A `pipe` is an active delivery state as managed by a transport, that can be used by one or more transports to send packets to, and as the source of all packets.  A pipe can only signal back to the exchanges using it that a keepalive needs to be sent and when it is closed/invalid.  A transport only knows pipes and does not know about the exchanges or links on the other side, one pipe may be used by multiple exchanges (such as when routing).
 
+## Chunking Implementations
+
+* [js](https://github.com/telehash/lob-enc/blob/master/index.js#L101)
+* [c](https://github.com/telehash/telehash-c/blob/master/src/lib/chunks.h)
 
 <a name="cs3a" />
 ## CS3a Example Code (handshake)

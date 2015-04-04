@@ -1,14 +1,14 @@
 # Packet Chunking
 
-Sending sequential [LOB](lob.md) packet byte arrays over streaming transports (such as TCP/TLS) requires additional framing to indicate the size of each one. Framing is also necessary to break packets into smaller pieces for low MTU transports (such as Bluetooth LE and 802.15.4 based ) and to signal flow control (Serial).
+Sending sequential [LOB](lob.md) packet byte arrays over streaming transports (such as TCP/TLS) requires additional framing to indicate the size of each one. Framing is also necessary to break packets into smaller pieces for low MTU transports (such as Bluetooth LE and 802.15.4 based) and to signal flow control (Serial).
 
-LOB chunking is a minimalist byte-encoding technique describing how to break any packet into multiple sequential chunks and re-assemble them into packets with minimum overhead. There is no CRC or other consistency checks as it is only designed to carry encrypted packets with their own internal validation and be implemented as a library utility for many transports with differing needs.
+Chunking is a minimalist byte-encoding technique describing how to break any packet into multiple sequential chunks and re-assemble them into packets with low overhead. There is no CRC or other consistency checks as it is only designed to carry encrypted packets with their own internal validation and be implemented as a library utility for many transports with differing needs.
 
 ## Format
 
 A packet is broken into fragments of size 1 to 255 bytes each, and each fragment is prefixed with a single byte representing its length, together this is called a `chunk`. The sequence of one or more chunks is terminated with a zero-length terminator chunk, a single null byte.
 
-Sequential chunks received that have any size should be appended to a buffer until the zero terminator chunk, at which point the buffer should be checked for a valid packet or discarded.  Any lone zero chunks with no buffer should just be ignored.
+Sequential chunks received that have any size should be appended to a buffer until the zero terminator chunk, at which point the buffer should be checked for a valid packet or discarded.  Any lone zero chunks with no buffer should be ignored.
 
 Chunk size of 5:
 ```
@@ -34,7 +34,3 @@ This ack mechanism should not be used to try and create a reliable transport at 
 * 802.15.4 based transports - default chunk size of 120 bytes, no acks necessary (use 802.15.4 framing acks)
 * Serial - use the hardware serial buffer size (64 bytes for many arduino devices) as the chunk size, and require writing an ack for every chunk read for flow control to not overflow the hardware buffer
 
-## Implementations
-
-* [js](https://github.com/telehash/lob-enc/blob/master/index.js#L101)
-* [c](https://github.com/telehash/telehash-c/blob/master/src/lib/chunks.h)
