@@ -29,20 +29,20 @@ Any `CSID` of `0x0*` (`0x01` through `0x0f`) is for experimental use when develo
 
 All `CSIDs` with the mask of `11111000` (`0x18` through `0x1f`, `0x28` through `0x2f`, etc) are reserved and their usage is specified in this table:
 
-| CSID          | Status | Crypto                        | Uses                  |
-|---------------|--------|-------------------------------|-----------------------|
-| [CS1a][]      | Active | ECC-160, AES-128              | Embedded, Browser     |
-| [CS1b][]      | Draft  | ECC-256, AES-128              | Hardware-Accelerated  |
-| [CS1c][]      | Draft  | ECC-256k, AES-256             | Bitcoin-based Apps    |
-| [CS2a][]      | Active | RSA-2048, ECC-256, AES-256    | Server, Apps          |
-| [CS2b][]      | Draft  | RSA-4096, ECC-521, AES-256    | High-Security         |
-| [CS3a][]      | Active | [NaCl](http://nacl.cr.yp.to/) | Server, Apps          |
+| CSID          | Status | Crypto                         | Uses                  |
+|---------------|--------|--------------------------------|-----------------------|
+| [CS1a][]      | Active | ECC-160, AES-128               | Embedded, Browser     |
+| [CS1b][]      | Draft  | ECC-256, AES-128               | Hardware-Accelerated  |
+| [CS1c][]      | Draft  | ECC-256k, AES-256              | Bitcoin-based Apps    |
+| [CS2a][]      | Active | RSA-2048, ECC-256, AES-256     | Server, Apps          |
+| [CS2b][]      | Draft  | RSA-4096, ECC-521, AES-256     | High-Security         |
+| [CS3a][]      | Active | Curve25519, XSalsa20, Poly1305 | Server, Apps          |
 
 
 <a name="custom" />
 ### Custom
 
-Any `CSID` with the mask of `11110111` (`0x10` through `0x17`, `0x20` through `0x27`, etc) are for custom application usage, these Cipher Sets definitions are entirely app-specific.  Implementations are responsible for ensuring that the ordering matches their security preferences.
+Any `CSID` with the mask of `11110111` (`0x10` through `0x17`, `0x20` through `0x27`, etc) are for custom application usage, these Cipher Sets definitions are entirely app-specific.  Implementations are responsible for ensuring that the custom `CSIDs` match their security preferences.
 
 See the [JOSE-based](https://github.com/telehash/telehash.org/blob/master/v3/e3x/cs/jose.md) mapping draft for example custom `CSIDs`.
 
