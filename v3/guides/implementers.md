@@ -311,6 +311,44 @@ enum channel3_states { ENDED, OPENING, OPEN };
 enum channel3_states channel3_state(channel3_t c);
 ```
 
+## E3X API 
+
+The interface to use E3X is designed to minimize any accidential leakage of information by having a small explicit API.
+
+Implementations may vary depending on their platform/language but should strive for a similar common pattern of interaction and method/data language as documented here at a high level.
+
+All implementations will require a strong/secure random number generator to properly support all aspects of this API and the underlying ciphers/algorithms.
+
+### `generate`
+
+Create a new set of public and private keys for all supported Cipher Sets.
+
+### `self(keypairs)`
+
+Load a given set of public/secret keys to create a local endpoint state.
+
+* `decrypt(message)` - take an enecrypted message received from a wire transport, return a decrypted [packet](../lob.md)
+
+### `exchange(self, public keys)`
+
+Load a given set of another endpoint's public keys to create an exchange state object between the `self` and that endpoint.
+
+* `token` - 16 byte ephemeral exchange identifier
+* `verify(message)` - validate that this message was sent from this exchange
+* `encrypt(packet)` - return encrypted message to this endpoint
+* `handshake(at)` - return a handshake with the given at value
+* `sync(handshake)` - process incoming handshake, returns current at value
+* `receive(channel)` - process/validate an incoming encrypted channel packet, return decrypted packet
+
+### `channel(exchange, open)`
+
+Requires an exchange that has sent/received a handshake and is in sync.
+
+* `id` - unique numeric id
+* `state` - current state of the channel (`ENDED`, `OPENING`, `OPEN`)
+* `timeout` - get/set the current timeout value of this channel
+* `send(packet)` - return encrypted channel packet
+
 ## Transports / Pipes
 
 A `pipe` is an active delivery state as managed by a transport, that can be used by one or more transports to send packets to, and as the source of all packets.  A pipe can only signal back to the exchanges using it that a keepalive needs to be sent and when it is closed/invalid.  A transport only knows pipes and does not know about the exchanges or links on the other side, one pipe may be used by multiple exchanges (such as when routing).
