@@ -12,7 +12,7 @@ Telehash is a 100% open, secure mesh networking standard with the following desi
 * making privacy an *easy* choice for developers
 * native implementations for the widest possible variety of languages/platforms
 
-The telehash team includes collaborators from around the world, many of whom were the principle architects of [XMPP](http://en.wikipedia.org/wiki/XMPP). It is intended as a next-generation protocol advancing the original goals of Jabber.
+The telehash team includes collaborators from around the world, many of whom were the principal architects of [XMPP](http://en.wikipedia.org/wiki/XMPP). It is intended as a next-generation protocol advancing the original goals of Jabber.
 
 ![Basic Network](v3/BasicNetwork.png)
 
