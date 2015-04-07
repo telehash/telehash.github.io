@@ -3,6 +3,7 @@
 |                 |        |
 |-----------------|--------|
 | [channel][]              | a virtual stream that allows two _endpoints_ to exchange data reliably or unreliably
+| [chunking][]             | a packet is _chunked_ into smaller pieces for low-MTU or streaming transports
 | [cloaking][]             | method used to hide telehash traffic on the wire by randomizing all data sent
 | [CS][]                   | *Cipher Set*, a collection of crypto algorithms with a given _CSID_
 | [CSID][]                 | *Cipher Set ID*, predefined hex number identifying a _CS_
@@ -22,6 +23,7 @@
 | [URI][]                  | *Uniform Rescource Identifier*, to enable endpoints to share enough information (_hashname_, _transport_) for out-of-band connection setup and references
 
 [channel]: channels/
+[chunking]: chunking.md
 [cloaking]: e3x/cloaking.md
 [CS]: e3x/cs/
 [CSID]: e3x/cs/
