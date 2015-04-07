@@ -3,7 +3,7 @@ tele·hash
 
 # Introduction
 
-Telehash is a 100% open, secure mesh networking standard with these design principles:
+Telehash is a 100% open, secure mesh networking technology with these design principles:
 
 * full end-to-end encryption, all the time
 * strict privacy: no content, identity, or metadata is ever revealed to third parties
@@ -18,7 +18,7 @@ The telehash team includes collaborators from around the world, many of whom wer
 
 The basic architecture contains application or device instances that each maintain a logical [mesh](mesh.md) which is just a collection of secure [links](link.md) to other instances.  Every endpoint has its own view of the mesh, a link between two instances is private only to them and not shared across the mesh.
 
-The current v3 has these high-level properties:
+The current v3 protocol has these high-level properties:
 
 * each endpoint has verifiable unique fingerprint (a [hashname](hashname.md)), a secure universal MAC address
 * provides native tunneling of TCP/UDP sockets, HTTP, object streams, and more
@@ -34,7 +34,7 @@ The protocol stack is separated into two main areas, a lower level [end-to-end e
 
 ## Design Philosophy
 
-The principle idea that drove the creation and development of telehash
+The primary idea that drove the creation and development of telehash
 is the belief that any application instance should be able to easily and
 securely talk to any other application instance or device, whether they are two
 instances of the same application, or completely different
@@ -48,17 +48,17 @@ them - that the user can connect, share, and communicate more easily
 and with control of their privacy.
 
 The challenges and complexity today in connecting applications via
-existing technologies such as APIs, OAuth, and REST is only increasing,
+existing technologies such as APIs, OAuth, and REST are only increasing,
 often forcing fundamentally insecure, centralized, and closed/gated
-communication platforms.  By adopting telehash in any application, that
-application immediately has a powerful set of open tools for not only
-its own needs, but can then also enable connectivity to and from
-applications created by others easily. These tools include the ability
+communication platforms.  By adopting telehash, an
+application immediately has a powerful set of open tools for 
+its own needs, but can also easily enable connectivity to and from
+applications created by others. These tools include the ability
 to have friends, sharing, feeds, tagging, search, notifications,
 discovery, transactions, and other social patterns.
 
 Telehash has a fundamental requirement to remain simple and
-light-weight in order to support applications running on networked
+lightweight in order to support applications running on networked
 devices and sensors. The design goals also include not forcing any
 specific architectural pattern such as client-server,
 centralized/federated/distributed, polling/push, REST, streaming,
@@ -94,6 +94,6 @@ In 2013 it was significantly updated with a privacy focus as [v2](https://github
 
 ### v3
 
-In 2014 the protocol refactored the wire encryption into [E3X](e3x/intro.md) and moved the DHT functionality into a separate project called [blockname](https://github.com/telehash/blockname).
+In 2014 the protocol was refactored and simplified: the wire encryption format was codified as [E3X](e3x/intro.md) and the DHT functionality was moved into a separate project called [blockname](https://github.com/telehash/blockname).
 
 * [v3.0.0-rc1](spec/v3.0.0-rc1.pdf) released on 2015-04-04

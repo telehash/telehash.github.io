@@ -1,8 +1,8 @@
 # Hashnames
 
-A _hashname_ is a unique fingerprint to represent the union of one or more public keys of different formats ([Cipher Sets](e3x/cs/)), providing consistent verifiable endpoint addresses when utilizing multiple different Public-key algorithms. This enables a compatibility layer for improving the algorithms used so that any application can increase security in newer versions while still being able to represent itself securely to older ones.
+A _hashname_ is a unique fingerprint to represent the union of one or more public keys of different formats ([Cipher Sets](e3x/cs/)), providing consistent verifiable endpoint addresses when utilizing multiple different public-key algorithms. This enables a compatibility layer for improving the algorithms used so that any application can increase security in newer versions while still being able to represent itself securely to older ones.
 
-A _hashname_ can be viewed as a portable secure [MAC address](http://en.wikipedia.org/wiki/MAC_address), it is a universally unique identifier for a network endpoint that is also self-generated and cryptographically verifiable.
+A _hashname_ can be viewed as a portable, secure, virtual equivalent of a [MAC address](http://en.wikipedia.org/wiki/MAC_address), since it is a universally unique identifier for a network endpoint that is also self-generated and cryptographically verifiable.
 
 The value is always a [base 32](base32.md) encoded string that is 52 characters long.  When decoded it is always a 32 byte binary value, which corresponds to the result of a [SHA-256](http://en.wikipedia.org/wiki/SHA-2) hash digest.  An example _hashname_ is `kw3akwcypoedvfdquuppofpujbu7rplhj3vjvmvbkvf7z3do7kkq`.
 

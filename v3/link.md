@@ -108,11 +108,11 @@ The `"csid":"2a"` is optional when sent as an encrypted message, but required wh
 <a name="jwt" />
 ## Identity (JWT)
 
-The endpoints connected over a link are always uniquely identified by their hashnames which serve as a stable universally unique and verifiable address, but is not intended to be used as a higher level identity for an end-user or other entity beyond the single instance/device.  Once a hashname is generated in a new context, it should be registered and associated with other portable identities by the application.
+The endpoints connected over a link are always uniquely identified by their hashnames. A hashname serves as stable, universally unique, verifiable address, but is not intended to be used as a higher-level identity for an end user or other entity beyond the single instance/device.  Once a hashname is generated in a new context, it should be registered and associated with other portable identities by the application.
 
 [OpenID Connect](http://openid.net/connect/) or any service that is able to generate a [JSON Web Token](http://tools.ietf.org/html/draft-ietf-oauth-json-web-token) can be used for primary user/entity identification, enabling strongly encrypted communication to be easily coupled with standard identity management tools.
 
-Just as a JWT is sent as a Bearer token over HTTP, it can be automatically included as part of the [handshake process](e3x/handshake.md) between endpoints with a `"type":"jwt"`.  This enables applications to require additional context before deciding to establish a link or apply restrictions on to what can be performed over the link once connected.
+Just as a JWT is sent as a Bearer token over HTTP, it can be automatically included as part of the [handshake process](e3x/handshake.md) between endpoints with a `"type":"jwt"`.  This enables applications to require additional context before deciding to establish a link or apply restrictions on what can be performed over the link once it is established.
 
 ### Audience
 
