@@ -3,17 +3,16 @@ tele·hash
 
 # Introduction
 
-Telehash is a completely open secure mesh networking standard with the following principles:
+Telehash is a 100% open, secure mesh networking standard with these design principles:
 
-* 100% end-to-end encrypted at all times
-* strict privacy, no content, identity, or metadata is ever revealed to 3rd parties
-* capable of using different transport protocols, app or network layer
-* designed to complement and add to existing transport security
-* easy to use for developers to encourage wider adoption of privacy
-* native implementations to each language/platform
-* designed for compatibility between embedded device, mobile, and web usage
+* full end-to-end encryption, all the time
+* strict privacy: no content, identity, or metadata is ever revealed to 3rd parties
+* maximum app/device compatibility: suitable for embedded, mobile, and web usage
+* making privacy the **easy** choice for developers
+* flexible transport protocols, for compatibility with existing layers
+* native implementations for the widest possible variety of languages/platforms
 
-The team of collaboators helping create and evolve telehash are distributed around the world, many of which were the principle architects of [XMPP](http://en.wikipedia.org/wiki/XMPP) and are working to establish this as a next-generation protocol advancing the original goals for Jabber.
+The telehash team includes collaborators from around the world, many of whom were the principal architects of [XMPP](http://en.wikipedia.org/wiki/XMPP). It is intended as a next-generation protocol advancing the original goals of Jabber.
 
 ![Basic Network](v3/BasicNetwork.png)
 
