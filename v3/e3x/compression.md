@@ -2,7 +2,7 @@
 
 Since channel packets are the most frequent and have a set of fixed well-known key/values in their JSON headers, both endpoints may support optional channel compression encoding to minimize the resources required.
 
-This is important in embedded/device networks where the MTU is small (BLE and 6lowpan), and may improve performance in other edge cases with frequent small packets.
+This is important in embedded/device networks where the MTU is small (e.g., BLE and 6lowpan), and may improve performance in other edge cases with frequent small packets.
 
 ## `z` Link Handshake Signalling
 
@@ -10,7 +10,7 @@ To indicate support of a channel payload compression any endpoint may include a 
 
 The `z` value indicates how to decode/interpret the channel payload bytes immediately after decryption.  After any alternative processing the resulting value must still always be identical to a LOB packet with a JSON header and binary BODY, it is only to minimize encoding and not for use to include additional data in a payload.
 
-Both endpoints must include identical `z` in a confirmed link handshake in order for it to be enabled on any channel packets using the resulting keys, and only that type of channel payload is supported when enabled. There is no negotiation or signalling of support for multiple values, future `z` values will be defined that combine multiple techniques when necessary.
+Both endpoints must include identical `z` in a confirmed link handshake in order for it to be enabled on any channel packets using the resulting keys, and only that type of channel payload is supported when enabled. Because there is no negotiation or signalling of support for multiple values, future `z` values will be defined that combine multiple techniques when necessary.
 
 ## `0` LOB encoded (default)
 
@@ -18,7 +18,7 @@ All channel payload bytes are [LOB encoded](../lob.md).
 
 ## `1` CBOR encoded
 
-The value `1` signals support of [CBOR based](http://cbor.io) payloads, the bytes are interpreted as a stream of CBOR values instead of LOB encoding.
+The value `1` signals support of [CBOR](http://cbor.io) payloads, the bytes are interpreted as a stream of CBOR values instead of LOB encoding.
 
 * first value is always channel id ("c", unsigned int)
 * [optional] byte string of a payload LOB packet
@@ -34,7 +34,7 @@ When processing CBOR the result is always a regular LOB packet with a JSON heade
 1. decode the channel id
 2. if a byte string follows it is processed as the source LOB, if not then generate a blank/empty LOB packet
 3. set the `"c":id` in the packet JSON to the channel id from 1.
-4. if a map follows, it's key/value pairs must be processed and only text keys and text or number values are used, each one being set in the packet JSON
+4. if a map follows, its key/value pairs must be processed and only text keys and text or number values are used, each one being set in the packet JSON
 5. if a text value follows, it is set as the `"type":value` in the JSON
 6. if an unsigned int follows, it is set as the `"seq":value` in the JSON
 7. if an array follows, it must be processed and only unsigned int values are used, the first one is always set as the `"ack":value` and all other entries in the array are the `"miss":[1,2,3]` in the JSON.
