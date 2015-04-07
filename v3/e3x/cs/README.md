@@ -9,7 +9,7 @@ A set always contains an endpoint public key cipher, an ephemeral public key cip
 
 Each set can generate a single public key byte array called the Cipher Set Key (`CSK`) that is shared to other entities in order to generate outgoing or validate incoming messages.
 
-The `CSK` is a consistent opaque value intended for use only by a given `CS`.  It must be tread as an arbitrary *binary octet string* when transferred, imported, or exported.
+The `CSK` is a consistent opaque value intended for use only by a given `CS`.  It must be treated as an arbitrary *binary octet string* when transferred, imported, or exported.
 
 <a name="csid" />
 ## Cipher Set ID (CSID)
