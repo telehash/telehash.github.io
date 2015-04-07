@@ -26,7 +26,7 @@ Base parameters on channel packets:
 * `"type":"value"` - A channel always opens with a `type` in the first outgoing packet to distinguish to the recipient what the name/category of the channel it is. This value must only be set on the first packet (called the *open packet*), not on any subsequent ones or any responses.
 * `"end":true` - Upon sending any content packet with an `end` of true, the sender must not send any more content packets (reliability acks/resends may still be happening though). An `end` may be sent by either side and is required to be sent by *both* to cleanly close a channel, otherwise the channel will eventually close with a timeout.
 * `"err":"message"` - As soon as any packet on a channel is received with an `err` it is immediately closed and no more packets can be sent or received at all, any/all buffered content in either direction must be dropped. Any `err` packets must contain no channel content other than additional error details. Any internal channel inactivity timeout is the same as receiving an `"err":"timeout"`.
-* `"seq":1` - A positive integer sequence number that is only used for and defined by [reliable](reliable.md) channels and must be sent in the first open packet along with the `type`, it is an error to send/receive this without using reliability on both sides.
+* `"seq":1` - A positive integer sequence number that is only used for and defined by [reliable](reliable.md) channels. It must be sent in the first open packet along with the `type`. It is an error to send/receive this without using reliability on both sides.
 
 An example unreliable channel start packet JSON for a built-in channel:
 
@@ -55,12 +55,12 @@ An example initial reliable channel open request:
 A channel may only be in one of the following states:
 
 * `OPENING` - the initial channel open packet containing the `type` has been sent or received, but not confirmed or responded to yet and will time out in this state
-* `OPEN` - the channel open packets have been both sent and received and it will not timeout unless the exchange does or reliability fails
+* `OPEN` - the channel open packets have been both sent and received and it will not timeout unless the exchange itself does or unless reliability fails
 * `ENDED` - a packet containing an `"end":true` has been received and no further content will be delivered for this channel, it will be timed out
 
-These are the states that E3X manages, if an application requires additional states (such as when one party ended but the other hasn't) it must track them itself.  Any channel having received or sent an `err` is immediately removed after processing that packet and no more state is tracked, there is no channel error state.
+These are the states that E3X manages, if an application requires additional states (such as when one party ended but the other hasn't) it must track them itself.  Any channel having received or sent an `err` is immediately removed after processing that packet and no more state is tracked (i.e., there is no channel error state).
 
-Any channel in the `ENDED` state and has also sent an `end` is no longer available for any sending/receiving, but internal state will be tracked until the channel timeout for any necessary reliability retransmits/acknowledgements.
+Any channel that is in the `ENDED` state and has also sent an `end` is no longer available for any sending/receiving, but internal state will be tracked until the channel timeout for any necessary reliability retransmits/acknowledgements.
 
 <a name="ids" />
 ### Channel IDs
