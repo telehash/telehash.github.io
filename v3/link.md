@@ -4,20 +4,18 @@ A _link_ is the core connectivity mechanism between two endpoints. An endpoint m
 
 ## Terminology
 
-|                            |        |
-|----------------------------|--------|
-| **Link CSID**              | The highest matching `CSID` between two endpoints
-| **Link Keys**              | The one or more `CSKs` of the other endpoint, at a minimum must include the `CSID` one
-| **Link Paths**             | All known or potential path information for connecting a link
-| **Link Handshake**         | A handshake that contains one `CSK` and the intermediate hashes for any others to validate the _hashname_ and encrypt a response
+* **Link CSID** - the highest matching `CSID` between two endpoints
+* **Link Keys** - the one or more `CSKs` of the other endpoint, at a minimum must include the `CSID` one
+* **Link Paths** - all known or potential path information for connecting a link
+* **Link Handshake** - a handshake that contains one `CSK` and the intermediate hashes for any others to validate the _hashname_ and encrypt a response
 
 ## Link State
 
 Links can be in three states:
 
-* **unresolved** - at least the hashname is known, but either the Link Keys or Link Paths are incomplete
-* **down** - keys have been validated and at least one path is available (possibly through [_router_](routing.md)), but the link is not connected
-* **up** - link has sent and received a handshake and is active
+* **Unresolved** - at least the hashname is known, but either the Link Keys or Link Paths are incomplete
+* **Down** - keys have been validated and at least one path is available (possibly through [_router_](routing.md)), but the link is not connected
+* **Up** - link has sent and received a handshake and is active
 
 <a name="json" />
 ## JSON
