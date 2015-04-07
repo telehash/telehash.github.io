@@ -16,7 +16,7 @@ The telehash team includes collaborators from around the world, many of whom wer
 
 ![Basic Network](v3/BasicNetwork.png)
 
-The primary architecture contains application or device instance endpoints that each maintain a [mesh](mesh.md) of secure [links](link.md) to other endpoints.  A mesh is private to each instance, one endpoint may have different links than another.
+The basic architecture contains application or device instances that each maintain a logical [mesh](mesh.md) which is just a collection of secure [links](link.md) to other instances.  Every endpoint has its own view of the mesh, a link between two instances is private only to them and not shared across the mesh.
 
 The current v3 has these high-level properties:
 
