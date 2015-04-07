@@ -96,4 +96,4 @@ In 2013 it was significantly updated with a privacy focus as [v2](https://github
 
 In 2014 the protocol was refactored and simplified: the wire encryption format was codified as [E3X](e3x/intro.md) and the DHT functionality was moved into a separate project called [blockname](https://github.com/telehash/blockname).
 
-* [v3.0.0-rc1](spec/v3.0.0-rc1.pdf) released on 2015-04-04
+* [v3.0.0-stable](https://github.com/telehash/telehash.org/releases/tag/v3.0.0-stable) released on 2015-04-07
