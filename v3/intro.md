@@ -6,7 +6,7 @@ tele·hash
 Telehash is a 100% open, secure mesh networking standard with these design principles:
 
 * full end-to-end encryption, all the time
-* strict privacy: no content, identity, or metadata is ever revealed to 3rd parties
+* strict privacy: no content, identity, or metadata is ever revealed to third parties
 * maximum app/device compatibility: suitable for embedded, mobile, and web usage
 * making privacy the **easy** choice for developers
 * flexible transport protocols, for compatibility with existing layers
