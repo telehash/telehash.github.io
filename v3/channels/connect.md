@@ -8,4 +8,4 @@ When accepted, a [peer path](path.md) should be implicitly added to the sender's
 
 ## Automatic Bridging
 
-When the incoming connect request has a `BODY` that is a validated handshake, the current network path it was received on should also be added as a network path to hashname of the handshake, since the [router](../routing.md) provides automatic bridging for encrypted channel packets.
+When the incoming connect request has a `BODY` that is a validated handshake, the current network path it was received on should also be added as a network path to the hashname of the handshake, since the [router](../routing.md) provides automatic bridging for encrypted channel packets.
