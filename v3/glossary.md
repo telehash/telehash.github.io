@@ -13,9 +13,9 @@
 | [exchange][]             | the current encrypted session state between two endpoints
 | [handshake][]            | _message_ type used to establish an encrypted _session_ for _channels_
 | [hashname][]             | an _endpoint_ identifier, calculated from all of its _CSKs_
-| [LOB][]                  | *Length-Object-Binary*, encoding format that allows combining JSON and binary data
-| [link][]                 | connection between two _endpoints_ either directly or via a _router_
-| [mesh][]                 | a number of _links_ with active encrypted _sessions_ over any _transport_, participants in the mesh are called _endpoints_
+| [LOB][]                  | *Length-Object-Binary*, an encoding format that allows combining JSON and binary data
+| [link][]                 | a connection between two _endpoints_ either directly or via a _router_
+| [mesh][]                 | a number of _links_ with active encrypted _sessions_ over any _transport_; participants in the mesh are called _endpoints_
 | [message][]              | an asynchronous encrypted packet between two _endpoints_
 | [packet][]               | an encapsulation format for JSON and binary data using _length object binary (LOB)_ encoding
 | [router][]               | an _endpoint_ that will facilitate link setup between two other endpoints
