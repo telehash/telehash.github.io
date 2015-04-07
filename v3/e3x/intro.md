@@ -2,13 +2,13 @@
 
 `E3X` is a flexible end-to-end encrypted wire protocol, a specification for applications to route interoperable packetized content over any transport while protecting the privacy of those communications from network monitoring.
 
-It is designed to be used as a low-level software library that can be embedded in any app.  It exposes *all* trust decisions to app layer, zero information or metadata is revealed to any network or endpoint without explicit instructions from the app.
+It is designed to be used as a low-level software library that can be embedded in any app.  It exposes *all* trust decisions to the app layer; zero information or metadata is revealed to any network or endpoint without explicit instructions from the app.
 
 All of the cryptographic primitives used in E3X are defined as a [Cipher Set](cs/), allowing for applications to select for different resource or security requirements as needed.
 
 `E3X` defines asynchronous [messages][] and synchronous [channels][] managed using an [exchange][]. Each [exchange][] has mutual session state established through explicit [handshakes][].
 
-An [exchange][] is created by combining keys for the local endpoint (one or more, depending on what Cipher Sets it supports) and has another endpoint's public key(s), the [exchange][] can then be used to create encrypted [messages][] and generate [handshakes][] in both directions.
+An [exchange][] is created by combining keys for the local endpoint (one or more, depending on what Cipher Sets it supports) and has another endpoint's public key(s). Once created, the [exchange][] can then be used to create encrypted [messages][] and generate [handshakes][] in both directions.
 
 Once the [handshakes][] have been received and verified, encrypted [channels][] can stream reliable or unreliable data between the two connected endpoints.  All data is encoded as [packets](../lob.md) both before (application layer) and after encryption (wire transport layer).
 

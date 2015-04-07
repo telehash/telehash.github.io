@@ -33,9 +33,9 @@ The `at` value determines if an incoming handshake is the most current and if th
 
 When an `at` is received that is higher than one sent, new handshake message (or messages) must be returned with that matching highest `at` value in order to inform the sender that their handshake is confirmed.  Upon receiving and confirming a new `at`, any pending channel packets that may have been waiting to send may be flushed/delivered.
 
-When first creating a handshake, the sender should make every effort to always choose a higher `at` than any they may have sent in the past.  Most can just use local [32-bit epoch](http://en.wikipedia.org/wiki/Unix_time) as this value, but when not available (embedded systems) they should locally store the last sent `at` and always increase it.
+When first creating a handshake, the sender should make every effort to always choose a higher `at` than any they may have sent in the past.  Most can just use local [32-bit epoch](http://en.wikipedia.org/wiki/Unix_time) as this value, but when not available (e.g., on embedded systems) they should locally store the last sent `at` and always increase it.
 
-If the maximum `at` value is ever reached/used the two hashnames cannot send any more subsequent handshakes and will no longer be able to communicate, either side must generate a new hashname to start over.
+If the maximum `at` value is ever reached/used the two hashnames cannot send any more subsequent handshakes and will no longer be able to communicate. In this case, either side must generate a new hashname to start over.
 
 <a name="token" />
 ## Routing Token
@@ -50,6 +50,6 @@ Any handshake with a different `ROUTING TOKEN` and a higher `at` of an existing 
 
 Immediately upon receiving a valid higher or equal `at` for any handshake message type, that message should be cached and replace any previous matching type with a _lower_ `at` only (messages with matching `at` and `type` values must be discarded).  The message should also then be grouped with any other received messages with the same `at` and delivered to the application to process and validate.
 
-If an application requires multiple message types it simply waits until the sufficient types arrive and process/validate them.  Application-invalidated handshakes must never be responded to so that the endpoint does not advertise its existence except to explicitly trusted/validated endpoints.
+If an application requires multiple message types it simply waits until the sufficient types arrive and then processes/validates them.  Application-invalidated handshakes must never be responded to so that the endpoint does not advertise its existence except to explicitly trusted/validated endpoints.
 
 At any point the application may provide updated handshake message types to be sent in a new handshake process.  When the transport requests an updated handshake, the last known/provided message types are updated with a new `at` and re-sent.

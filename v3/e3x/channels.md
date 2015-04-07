@@ -2,13 +2,13 @@
 
 All streaming data sent between two endpoints in an exchange must be part of a `channel` packet. Every channel has an integer id included as the `c` parameter in the JSON and managed by the current [exchange](exchange.md). See [Channel IDs](#ids) for details on how they are selected/handled.
 
-A channel may consist of only one outgoing initial packet, only one response to it, or it may be long-lived with many packets exchanged using the same "c" identifier (depending on the type of channel).  Channels are by default unreliable with no retransmit or ordering guarantees, and may optionally be created as [reliable](reliable.md) that does provide ordering and retransmission functionality.
+A channel may consist of only one outgoing initial packet and one response to it, or it may be long-lived with many packets exchanged using the same "c" identifier (depending on the type of channel).  Channels are by default unreliable with no retransmit or ordering guarantees, and may optionally be created as [reliable](reliable.md) to provide ordering and retransmission functionality.
 
-An `"end":true` always signals the last *content* packet being sent for any channel type, for reliable channels there may be subsequent acks/retransmits after the end.
+An `"end":true` always signals the last *content* packet being sent for any channel type; for reliable channels there may be subsequent acks/retransmits after the end.
 
 ## Packet Size Default
 
-Channel packets should always be a maximum of 1400 bytes or less each, which allows enough space for added variable encryption, token, and transport overhead to fit within 1500 bytes total (one ethernet frame).  Larger data blocks should use reliable channels for sequencing and reassembly, and transports with a fixed lower MTU than 1400 should use [chunked encoding](../chunking.md) by default.
+Channel packets should always be a maximum of 1400 bytes or less each, which allows enough space for added variable encryption, token, and transport overhead to fit within 1500 bytes total (one Ethernet frame).  Larger data blocks should use reliable channels for sequencing and reassembly, and transports with a fixed MTU lower than 1400 should use [chunked encoding](../chunking.md) by default.
 
 A channel library should provide a `quota` method per packet for the app to determine how many bytes are available within the 1400 limit, and app-specific channel logic can use this to break larger data into packets.  In special cases (such as with a local high bandwidth transport) when the transport MTU is known, the app or custom channel logic may ignore this and send larger/smaller packets.
 
