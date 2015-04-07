@@ -2,7 +2,7 @@
 
 Since channel packets are the most frequent and have a set of fixed well-known key/values in their JSON headers, both endpoints may support optional channel compression encoding to minimize the resources required.
 
-This is important in embedded/device networks where the MTU is small (e.g., BLE and 6lowpan), and may improve performance in other edge cases with frequent small packets.
+This is important in embedded/device networks where the MTU is small (e.g., Bluetooth LE and 6lowpan), and may improve performance in other edge cases with frequent small packets.
 
 ## `z` Link Handshake Signalling
 
