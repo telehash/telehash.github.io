@@ -1,8 +1,8 @@
 # Routing
 
-A `router` in telehash is simply any endpoint that is willing to forward packets between two other endpoints, at least one of which it must already have a [link](link.md) for.  These packets are encrypted such that the routing endpoint cannot decode the contents, but all usage of routing requires a trusted relationship as the routers are at least aware of which two endpoints are connecting to each other.
+A `router` in telehash is simply any endpoint that is willing to forward packets between two other endpoints, at least one of which it must already have a [link](link.md) for.  These packets are encrypted such that the routing endpoint cannot decode the contents, but all usage of routing requires a trusted relationship since the routers are at least aware of which two endpoints are connecting to each other.
 
-When a `router` is forwarding the initial handshakes for endpoints first connecting, typically those endpoints will be able to negotiate and establish direction connections immediately and not rely on the router to forward future packets for that session.  To support when there is no working direct network path between the two endpoints the router should continue forwarding packets but may rate-limit them to reduce the impact on its own network.
+When a `router` is forwarding the initial handshakes for endpoints first connecting, typically those endpoints will be able to negotiate and establish direct connections immediately and not rely on the router to forward future packets for that session.  To support situations in which there is no working direct network path between the two endpoints, the router should continue forwarding packets but may rate-limit them to reduce the impact on its own network.
 
 Any `router` role is an explicit choice by the application, either based on an administrative decision (specific default routers) or a trust relationship (offering to route for friends).  These may be through configuration values or automatically discovered by advertising support through a `peer` in the [path](channels/path.md) channel.
 

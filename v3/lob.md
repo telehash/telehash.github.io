@@ -4,9 +4,9 @@ This is a simple encoding scheme to combine any JSON object with any binary data
 
 ## Definition
 
-The wire-format byte array (a packet) is created by combining three distinct parts, the `LENGTH`, an optional `HEAD`, and an optional `BODY`.
+The wire-format byte array (a packet) is created by combining three distinct parts: the `LENGTH`, an optional `HEAD`, and an optional `BODY`.
 
-The `LENGTH` is always two bytes which are a network-order (Big-endian) short unsigned integer that represents the number of bytes for the `HEAD`.  When the `HEAD` is greather than 6 bytes then they are always parsed and represented as a UTF-8 JSON object.  Any bytes remaining after the `HEAD` are the `BODY` and always handled as binary.
+The `LENGTH` is always two bytes which are a network-order (big-endian) short unsigned integer that represents the number of bytes for the `HEAD`.  When the `HEAD` is greater than 6 bytes the data are always parsed and represented as a UTF-8 JSON object.  Any bytes remaining after the `HEAD` are the `BODY` and always handled as binary.
 
 The format is thus:
 
@@ -47,16 +47,16 @@ If the JSON object parsing fails, the parser must include an error but still ret
 
 ## BODY
 
-The optional `BODY` is always a raw binary of the remainder bytes between the packet's total length and that of the `HEAD`. 
+The optional `BODY` is always a raw binary of the remainder bytes between the end of the `HEAD` and the total length of the packet. 
 
-Often packets are attached inside other packets as the `BODY`, enabling simple packet wrapping/relaying usage patterns.
+Often packets are attached inside other packets as the `BODY`, enabling simple packet wrapping/relaying usage patterns (see below).
 
 <a name="jose" />
 ## JSON Web Encryption / Signing (JWE/JWS)
 
 LOB encoding can be used as an optimized serialization of the [JOSE](https://datatracker.ietf.org/wg/jose/charter/) based [JWE](https://tools.ietf.org/html/draft-ietf-jose-json-web-encryption-40)  and [JWS](https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41) standards.
 
-The LOB encoding is simply a consistent binary translation of the JWS/JWE compact serialization, there are no semantic changes to the contents in either direction.
+The LOB encoding is simply a consistent binary translation of the JWS/JWE compact serialization; there are no semantic changes to the contents in either direction.
 
 <a name="jws" />
 ### JWS
@@ -68,7 +68,7 @@ Any [JWS](https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41) can
   * HEAD: {JWS Payload (JWT Claims)}
   * BODY: JWS Signature (binary)
 
-The attached HEAD is treated as a binary octet string when translating, even though it is frequently JSON it must be preserved as the original bytes for signature validation and non-JSON use cases.
+The attached HEAD is treated as a binary octet string when translating. Even though it is frequently JSON it must be preserved as the original bytes for signature validation and non-JSON use cases.
 
 <a name="jwe" />
 ### JWE
