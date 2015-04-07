@@ -76,7 +76,7 @@ BODY:
 
 ## `thtp` channel
 
-A new request is initiated by creating a reliable channel of type `thtp`, multiples can be created simultaneously. These channels are always in one direction, the endpoint starting the channel can only send a request packet over it, and the receiving side can only send a response packet.  If the receiving needs to make requests, it can start a `thtp` channel in the other direction at any point.
+A new request is initiated by creating a reliable channel of type `thtp`, multiples can be created simultaneously. These channels are always in one direction, the endpoint starting the channel can only send a request packet over it, and the receiving side can only send a response packet.  If the receiving endpoint needs to make requests, it can start a `thtp` channel in the other direction at any point.
 
 The channel open packet includes all of or as much of the request packet as possible in the BODY, with subsequent packets if it needs to be fragmented and the last packet always including an `"end":true` to end the channel.
 
