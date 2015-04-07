@@ -4,9 +4,9 @@ Any endpoint can request another to act as a [router](../routing.md) to an endpo
 
 A peer open request contains a `"peer":"fvif...irkq"` where the value is a the hashname the sender is trying to reach.  In some cases the hashname may not be known yet and the peer request was the result of a router-generated [URI](../uri.md), included as the `"uri":"..."` value.
 
-The `BODY` of the open request must contain an attached packet with information for the specified peer to qualify the original sender.  The `BODY` will be relayed by the routing endpoint.
+The `BODY` of the open request must contain an attached packet with information for the specified peer.  The `BODY` will be relayed by the routing endpoint to that peer who must validate the attached packet before processing or responding to it.  The validation requires application trust similarly to processing handshakes.
 
-The recipient of the peer request is called the [router](../routing.md) and must qualify the specified `peer` value to make sure that it is able to establish a channel with it.  It must also ensure that either the sender or peer endpoints have an active link and are trusted to provide routing for.
+The recipient of the peer request is called the [router](../routing.md) and must first qualify the specified `peer` value to make sure that it is able to establish a channel with it.  It must also ensure that either the sender or peer endpoints have an active link and are trusted to provide routing for.
 
 Once validated, the [router](../routing.md) relay's the original `BODY` in a [connect](connect.md) request to the peer.
 
