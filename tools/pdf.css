@@ -12,6 +12,7 @@
 body[data-type="book"] {
   color: cmyk(0%,0%,0%,100%);
   hyphens: auto;
+  font-family:"Times New Roman";
 }
 
 /* page counters are tricky */
