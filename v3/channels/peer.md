@@ -27,7 +27,7 @@ The first time an endpoint is attempting a link with a new peer it may not have 
 
 ## Automatic Bridging
 
-When the `BODY` contains an encrypted [handshake](../e3x/handshake.md) packet the [router](../routing.md) should determine the `routing token` value of the handshake and create a mapping of that token to the network path that the peer request arrived via.  Any subsequent encrypted channel packets received with this token should be re-delivered to that network path, providing automatic bridging.
+When the `BODY` contains an encrypted [handshake](../e3x/handshake.md) packet the [router](../routing.md) should determine the [ROUTING TOKEN](../e3x/handshake.md#token) value of the handshake and create a mapping of that token to the network path that the peer request arrived via.  Any subsequent encrypted channel packets received with this token should be re-delivered to that network path, providing automatic bridging.
 
 ## URIs / Sessions
 
