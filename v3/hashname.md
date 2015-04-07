@@ -32,40 +32,4 @@ hash = sha256(hash + 0x97d8...7101)
 final = hash
 ```
 
-Here is a working example in node.js to do the calculation, results in `27ywx5e5ylzxfzxrhptowvwntqrd3jhksyxrfkzi6jfn64d3lwxa`
 
-```js
-var crypto = require("crypto");
-var base32 = require("rfc-3548-b32");
-var keys = {
-  "3a": "eg3f...6nia",
-  "1a": "an7lbl5e6vk4ql6nblznjicn5rmf3lmzlm"
-};
-
-var rollup = new Buffer(0);
-Object.keys(keys).sort().forEach(function(id) {
-  rollup = crypto.createHash("sha256")
-    .update(Buffer.concat([
-      rollup,
-      new Buffer(id, "hex")])
-    ).digest();
-  var intermediate = crypto.createHash("sha256")
-    .update(new Buffer(
-      base32.decode(keys[id]),
-      "binary")
-    ).digest();
-  rollup = crypto.createHash("sha256")
-    .update(Buffer.concat([
-      rollup,
-      intermediate])
-    ).digest();
-});
-
-// normalize to lower case and remove padding
-var hashname = base32.encode(rollup)
-  .toLowerCase()
-  .split("=").join("");
-
-// prints 27yw...lwxa
-console.log(hashname);
-```
