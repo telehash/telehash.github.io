@@ -1,21 +1,43 @@
 # Glossary
 
-* _channel_ : a virtual socket that allows two _endpoints_ to exchange data reliably (like [TCP](http://en.wikipedia.org/wiki/Transmission_Control_Protocol)) or unreliably (like [UDP](http://en.wikipedia.org/wiki/User_Datagram_Protocol))
-* _cloaking_ : method used to hides telehash traffic on the wire by randomizing all data sent
-* _Cipher Set (CS)_ : a collection of crypto algorithms with a given _cipher set id (CSID)_
-* _Cipher Set ID (CSID)_ : predefined hex number identifying a _cipher set (CS)_
-* _endpoint_ : a participant in the telehash network identified by a single _hashname_
-* _EVEN_ : the _endpoint_ with the numerically lower public key
-* _e3x_ : End-to-End Encrypted eXchange is a flexible encrypted exchange protocol
-* _exchange_ : **TODO: find good description for exchange**
-* _handshake_ : _message_ type used to establish an encrypted _session_ for _channels_
-* _hashname_ : an identifier for a participant of telehash, it is calculated from all public keys of the participants _cipher set (CS)_
-* _LOB_ : Lenght-Oobject-Binary encoding format that allows combining JSON and binary data
-* _link_ : connection between two _endpoints_ either directly or via a _router_
-* _mesh_ : a number of _links_ with active encrypted _sessions_ over any _transport_, participants in the mesh are called _endpoints_
-* _message_ : an asynchronous encrypted packet between two endpoints
-* _ODD_ : the _endpoint_ with the numerically higher public key
-* _packet_ : an encapsulation format for JSON and binary data using _length object binary (LOB)_ encoding
-* _router_ : **TODO: find good description for router**
-* _transport_ : underlying layer responsible for _packet_ transfer
-* _URI_ : is a special [Uniform rescource identifier](http://en.wikipedia.org/wiki/Uniform_resource_identifier) format that enables endpoints to share enough information (_hashname_, _transport_) for out-of-band connection setup and references
+|                 |        |
+|-----------------|--------|
+| [channel][]              | a virtual stream that allows two _endpoints_ to exchange data reliably or unreliably
+| [chunking][]             | a packet is _chunked_ into smaller pieces for low-MTU or streaming transports
+| [cloaking][]             | method used to hide telehash traffic on the wire by randomizing all data sent
+| [CS][]                   | *Cipher Set*, a collection of crypto algorithms with a given _CSID_
+| [CSID][]                 | *Cipher Set ID*, predefined hex number identifying a _CS_
+| [CSK][]                  | *Cipher Set Key*, the public key bytes for a given _CSID_
+| [endpoint][]             | a participant in the telehash network identified by a single _hashname_
+| [E3X][]                  | *End-to-End Encrypted eXchange*, a flexible encrypted exchange wire protocol
+| [exchange][]             | the current encrypted session state between two endpoints
+| [handshake][]            | _message_ type used to establish an encrypted _session_ for _channels_
+| [hashname][]             | an _endpoint_ identifier, calculated from all of its _CSKs_
+| [LOB][]                  | *Length-Object-Binary*, an encoding format that allows combining JSON and binary data
+| [link][]                 | a connection between two _endpoints_ either directly or via a _router_
+| [mesh][]                 | a number of _links_ with active encrypted _sessions_ over any _transport_; participants in the mesh are called _endpoints_
+| [message][]              | an asynchronous encrypted packet between two _endpoints_
+| [packet][]               | an encapsulation format for JSON and binary data using _length object binary (LOB)_ encoding
+| [router][]               | an _endpoint_ that will facilitate link setup between two other endpoints
+| [transport][]            | underlying network responsible for _packet_ transfer
+| [URI][]                  | *Uniform Rescource Identifier*, to enable endpoints to share enough information (_hashname_, _transport_) for out-of-band connection setup and references
+
+[channel]: channels/
+[chunking]: chunking.md
+[cloaking]: e3x/cloaking.md
+[CS]: e3x/cs/
+[CSID]: e3x/cs/
+[CSK]: e3x/cs/
+[endpoint]: link.md
+[E3X]: e3x/intro.md
+[exchange]: e3x/exchange.md
+[handshake]: e3x/handshake.md
+[hashname]: hashname.md
+[LOB]: lob.md
+[link]: link.md
+[mesh]: mesh.md
+[message]: e3x/messages.md
+[packet]: lob.md
+[router]: routing.md
+[transport]: transports/
+[URI]: uri.md

@@ -1,0 +1,224 @@
+/* Very basic structural stylesheet for HTMLBook in conjunction
+   with a PDF formatter such as AntennaHouse or PrinceXML. 
+   Assumes the existence of a user agent stylesheet. */
+
+@charset "UTF-8";
+
+@page {
+  size: 7in 9in;
+  margin: 0.5in 0.5in;
+}
+
+body[data-type="book"] {
+  color: cmyk(0%,0%,0%,100%);
+  hyphens: auto;
+  font-family:"Times New Roman";
+}
+
+/* page counters are tricky */
+
+body[data-type="book"] > div[data-type="part"]:first-of-type,
+body[data-type="book"] > section[data-type="chapter"]:first-of-type { counter-reset: page 1 }
+
+body[data-type="book"] > section[data-type="chapter"]+div[data-type="part"] { counter-reset: none }
+
+/* (((((((((((((( TITLEPAGE )))))))))))))) */
+
+section[data-type="titlepage"] { page: titlepage }
+
+section[data-type="titlepage"] * { text-align: center }
+
+h2.author { font-style: italic }
+
+/* (((((((((((((( COPYRIGHT )))))))))))))) */
+
+section[data-type="titlepage"] { page: copyright }
+
+/* (((((((((((((( DEDICATION )))))))))))))) */
+
+section[data-type="dedication"] { page: dedication }
+
+section[data-type="dedication"] p { font-style: italic }
+
+section[data-type="dedication"] * { text-align: center }
+
+/* (((((((((((((( TOC )))))))))))))) */
+
+nav[data-type="toc"] { page: toc }
+
+@page toc:right {
+  @bottom-right-corner { content: counter(page, lower-roman) }
+}
+
+@page toc:left {
+  @bottom-left-corner { content: counter(page, lower-roman) }
+}
+
+nav[data-type="toc"] ol { 
+  list-style-type: none;
+  margin-left:0.25in;
+}
+
+nav[data-type="toc"] a::after {
+  content: leader('.') target-counter(attr(href), page);
+}
+
+/* (((((((((((((( FOREWORD )))))))))))))) */
+
+section[data-type="foreword"] { page: foreword }
+
+@page foreword:right {
+  @bottom-right-corner { content: counter(page, lower-roman) }
+}
+
+@page foreword:left {
+  @bottom-left-corner { content: counter(page, lower-roman) }
+}
+
+/* (((((((((((((( PREFACE )))))))))))))) */
+
+section[data-type="preface"] { page: preface }
+
+@page preface:right {
+  @bottom-right-corner { content: counter(page, lower-roman) }
+}
+
+@page preface:left {
+  @bottom-left-corner { content: counter(page, lower-roman) }
+}
+
+/* (((((((((((((( PART )))))))))))))) */
+
+div[data-type="part"] { page: part }
+
+/* (((((((((((((( CHAPTER )))))))))))))) */
+
+section[data-type="chapter"] {
+  page: chapter;
+  page-break-before: always;
+}
+
+@page chapter:right {
+  @bottom-right-corner { content: counter(page) }
+}
+
+@page chapter:left {
+  @bottom-left-corner { content: counter(page) }
+}
+
+/* (((((((((((((( APPENDIX )))))))))))))) */
+
+section[data-type="appendix"] {
+  page: appendix;
+  page-break-before: always;
+}
+
+@page appendix:right {
+  @bottom-right-corner { content: counter(page) }
+}
+
+@page appendix:left {
+  @bottom-left-corner { content: counter(page) }
+}
+
+/* (((((((((((((( GLOSSARY )))))))))))))) */
+
+section[data-type="glossary"] { page: glossary }
+
+@page glossary:right {
+  @bottom-right-corner { content: counter(page) }
+}
+
+@page glossary:left {
+  @bottom-left-corner { content: counter(page) }
+}
+
+/* (((((((((((((( BIBLIOGRAPHY )))))))))))))) */
+
+section[data-type="bibliography"] { page: bibliography }
+
+@page bibliography:right {
+  @bottom-right-corner { content: counter(page) }
+}
+
+@page bibliography:left {
+  @bottom-left-corner { content: counter(page) }
+}
+
+/* (((((((((((((( INDEX )))))))))))))) */
+
+section[data-type="index"] { page: index }
+
+@page index:right {
+  @bottom-right-corner { content: counter(page) }
+}
+
+@page index:left {
+  @bottom-left-corner { content: counter(page) }
+}
+
+/* (((((((((((((( COLOPHON )))))))))))))) */
+
+section[data-type="colophon"] { page: colophon }
+
+/* (((((((((((((( BLOCKS )))))))))))))) */
+
+h1, h2, h3, h4, h5 {
+  hyphens: none;
+  text-align: left;
+}
+
+img { max-width: 100% }
+
+/* (((((((((((((( INLINES )))))))))))))) */
+
+div.syntaxhighlighter {
+  margin-left:0;
+  padding:0;
+  margin-right:0;
+}
+
+code { 
+    font-family: monospace;
+    white-space: pre-wrap;       /* css-3 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+    margin-left:0;
+}
+
+a {
+  text-decoration: none;
+}
+
+h1 {
+    background-color:#2a7e60;
+    color:white;
+    width:100%;
+    padding:0.2em;
+}
+
+h2 {
+    border-bottom:1px solid #2a7e60;
+}
+
+div.spec-title
+{
+  margin:0;
+  margin-top:1in;
+  padding:0;
+  font-size:72pt;
+  font-family:"Helvetica Neue";
+  letter-spacing: -7.200719833374023px;
+  font-weight:bold;
+}
+
+section[data-type="titlepage"] > img {
+  padding:0;
+  width:80%;
+  margin-left:0.65in;
+  margin-bottom:-1in;
+  margin-top:0.5in;
+}
+
+img {
+  
+}

@@ -76,7 +76,7 @@ The response is:
   "last":"k46demhj7b6ii"
 }
 
-Once open, chat channels are a normal [stream](stream.md) using `lob` encoding to carry individual synchronous messages bi-directionally and chunked as needed.
+Once open, chat channels are a normal [stream](stream.md) using `lob` encoding to carry individual synchronous messages bi-directionally and fragmented as needed.
 
 Any messages newer than the given `last` values from either side are then streamed sequentially so that their IDs can be verified.
 
