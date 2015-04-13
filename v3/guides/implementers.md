@@ -440,3 +440,42 @@ var cbody = outer.slice(24);
 var body = sodium.crypto_secretbox_open(cbody,nonce,decKey);
 ```
 
+# JSON-RPC
+
+A simple [JSON-RPC](http://www.jsonrpc.org) interface where the `Server` is the local endpoint and the `Client` is the app using it.  Any `{LINK}` refers to a standard [link JSON](../link.md#json) object.
+
+```json
+--> data sent to Server
+<-- data sent to Client
+
+--> {"jsonrpc": "2.0", "method": "meshGenerate", "params": [], "id": 1}
+<-- {"jsonrpc": "2.0", "result": {LINK}, "id": 1}
+
+--> {"jsonrpc": "2.0", "method": "meshLoad", "params": [{SECRETS}], "id": 1}
+<-- {"jsonrpc": "2.0", "result": {LINK}, "id": 1}
+
+--> {"jsonrpc": "2.0", "method": "meshLink", "params": ["mesh-hn", {LINK}], "id": 1}
+<-- {"jsonrpc": "2.0", "result": {LINK}, "id": 1}
+
+--> {"jsonrpc": "2.0", "method": "meshWait", "params": ["mesh-hn"], "id": 1}
+<-- {"jsonrpc": "2.0", "result": {"event":"link","link":{LINK}}, "id": 1}
+
+--> {"jsonrpc": "2.0", "method": "meshWait", "params": ["mesh-hn"], "id": 1}
+<-- {"jsonrpc": "2.0", "result": {"event":"up","link":{LINK}}, "id": 1}
+
+--> {"jsonrpc": "2.0", "method": "meshWait", "params": ["mesh-hn"], "id": 1}
+<-- {"jsonrpc": "2.0", "result": {"event":"down","link":{LINK}}, "id": 1}
+
+--> {"jsonrpc": "2.0", "method": "meshWait", "params": ["mesh-hn"], "id": 1}
+<-- {"jsonrpc": "2.0", "result": {"event":"chan","link":{LINK},"chan":"base64"}, "id": 1}
+
+--> {"jsonrpc": "2.0", "method": "linkChan", "params": ["mesh-hn","link-hn","c":1], "id": 1}
+<-- {"jsonrpc": "2.0", "result": {"chan":"base64"}, "id": 1}
+
+--> {"jsonrpc": "2.0", "method": "linkSend", "params": ["mesh-hn","link-hn","send":"base64"], "id": 1}
+<-- {"jsonrpc": "2.0", "result": {}, "id": 1}
+
+--> {"jsonrpc": "2.0", "method": "linkRecv", "params": ["mesh-hn","link-hn","c":1], "id": 1}
+<-- {"jsonrpc": "2.0", "result": {"chan":"base64"}, "id": 1}
+
+```
