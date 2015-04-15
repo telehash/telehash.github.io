@@ -1,31 +1,200 @@
 <!DOCTYPE html>
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>telehash</title><meta charset="utf-8"><meta content="IE edge" httpequiv="X-UA-Compatible"><meta content="width=device-width, initial-scale=1" name="viewport"><meta content="haskell,functional,pure,programming,lazy" name="keywords"><meta content="Telehash encrypted mesh protocol home page." name="description"><link href="favicon.ico" rel="shortcut icon"><link href="static/css" type="text/css" rel="stylesheet"><link href="static/bootstrap.min.css" type="text/css" rel="stylesheet"><link href="static/haskell.font.css" type="text/css" rel="stylesheet"><link href="static/hscolour.css" type="text/css" rel="stylesheet"><link href="static/hl.css" type="text/css" rel="stylesheet"><link href="static/css(1)" type="text/css" rel="stylesheet"></head><body class="page-home"><div class="wrap"><nav class="navbar navbar-default"><div class="container"><div class="navbar-header"><a href="static/Haskell Language.html" class="navbar-brand"><span class="logo"></span>telehash</a></div><div class="collapse navbar-collapse"><ul class="nav navbar-nav"><li><a href="https://github.com/telehash/telehash.org/tree/master/v3">Protocol</a></li><li><a href="https://github.com/telehash/">Code</a></li><li><a href="http://6.telehash.org:3000">Chat</a></li><li><a href="http://twitter.com/search?q=telehash">News</a></li></ul></div></div></nav><div class="header"><div class=" container "><div class=" row "><div class=" span6 col-md-6"><div class="branding"><span style="background-image: url(v3/logo/mesh-logo-128.png)" class="name">telehash</span><span class="summary">an encrypted mesh protocol</span></div></div><div class=" span6 col-md-6"><div class="branding"><span class="tag">Declarative, statically typed code.</span><div title="This example is contrived in order to demonstrate what Haskell looks like, including: (1) where syntax, (2) enumeration syntax, (3) pattern matching, (4) consing as an operator, (5) list comprehensions, (6) infix functions. Don&#39;t take it seriously as an efficient prime number generator." class="code-sample"><pre><span class="hs-definition">primes</span> <span class="hs-keyglyph">=</span> <span class="hs-varid">sieve</span> <span class="hs-keyglyph">[</span><span class="hs-num">2</span><span class="hs-keyglyph">..</span><span class="hs-keyglyph">]</span> 
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>telehash</title>
+    <meta charset="utf-8">
+    <meta content="IE edge" httpequiv="X-UA-Compatible">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="haskell,functional,pure,programming,lazy" name="keywords">
+    <meta content="Telehash encrypted mesh protocol home page." name="description">
+    <link href="favicon.ico" rel="shortcut icon">
+    <link href="static/css" type="text/css" rel="stylesheet">
+    <link href="static/bootstrap.min.css" type="text/css" rel="stylesheet">
+    <link href="static/haskell.font.css" type="text/css" rel="stylesheet">
+    <link href="static/hscolour.css" type="text/css" rel="stylesheet">
+    <link href="static/hl.css" type="text/css" rel="stylesheet">
+    <link href="static/css(1)" type="text/css" rel="stylesheet">
+</head>
+
+<body class="page-home">
+    <div class="wrap">
+        <nav class="navbar navbar-default">
+            <div class="container">
+                <div class="navbar-header"><a href="static/Haskell Language.html" class="navbar-brand"><span class="logo"></span>telehash</a></div>
+                <div class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                        <li><a href="https://github.com/telehash/telehash.org/tree/master/v3">Protocol</a></li>
+                        <li><a href="https://github.com/telehash/">Code</a></li>
+                        <li><a href="http://6.telehash.org:3000">Chat</a></li>
+                        <li><a href="http://twitter.com/search?q=telehash">News</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="header">
+            <div class=" container ">
+                <div class=" row ">
+                    <div class=" span6 col-md-6">
+                        <div class="branding"><span style="background-image: url(v3/logo/mesh-logo-128.png)" class="name">telehash</span><span class="summary">an encrypted mesh protocol</span></div>
+                    </div>
+                    <div class=" span6 col-md-6">
+                        <div class="branding"><span class="tag">Declarative, statically typed code.</span>
+                            <div title="This example is contrived in order to demonstrate what Haskell looks like, including: (1) where syntax, (2) enumeration syntax, (3) pattern matching, (4) consing as an operator, (5) list comprehensions, (6) infix functions. Don&#39;t take it seriously as an efficient prime number generator." class="code-sample"><pre><span class="hs-definition">primes</span> <span class="hs-keyglyph">=</span> <span class="hs-varid">sieve</span> <span class="hs-keyglyph">[</span><span class="hs-num">2</span><span class="hs-keyglyph">..</span><span class="hs-keyglyph">]</span> 
   <span class="hs-keyword">where</span> <span class="hs-varid">sieve</span> <span class="hs-layout">(</span><span class="hs-varid">p</span><span class="hs-conop">:</span><span class="hs-varid">xs</span><span class="hs-layout">)</span> <span class="hs-keyglyph">=</span> 
-          <span class="hs-varid">p</span> <span class="hs-conop">:</span> <span class="hs-varid">sieve</span> <span class="hs-keyglyph">[</span><span class="hs-varid">x</span> <span class="hs-keyglyph">|</span> <span class="hs-varid">x</span> <span class="hs-keyglyph">&lt;-</span> <span class="hs-varid">xs</span><span class="hs-layout">,</span> <span class="hs-varid">x</span> <span class="hs-varop">`mod`</span> <span class="hs-varid">p</span> <span class="hs-varop">/=</span> <span class="hs-num">0</span><span class="hs-keyglyph">]</span></pre></div></div></div></div></div></div><div onclick="tryhaskell.controller.inner.click()" class="try"><div class=" container "><div class=" row "><div class=" span6 col-md-6"><h2>Try it</h2><div id="console"><div class="jquery-console-inner"><textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="jquery-console-typer" style="position: absolute; top: 0px; left: -9999px;"></textarea><div class="jquery-console-message jquery-console-welcome" style="">Type Haskell expressions in here.</div><div class="jquery-console-prompt-box"><span class="jquery-console-prompt-label" style="display: inline;">λ&nbsp;</span><span class="jquery-console-prompt"><span class="jquery-console-cursor">&nbsp;</span></span></div></div></div></div><div id="guide" class=" span6 col-md-6"><div class="indent"><h3>Got 5 minutes?</h3><p>Type <code title="Click me to insert &quot;help&quot; into the console." style="cursor: pointer;">help</code> to start the tutorial.</p><p>Or try typing these out and see what happens <small class="note">(click to insert)</small>:</p><p><code title="Click me to insert &quot;23 * 36&quot; into the console." style="cursor: pointer;">23 * 36</code> or <code title="Click me to insert &quot;reverse &quot;hello&quot;&quot; into the console." style="cursor: pointer;">reverse "hello"</code> or <code title="Click me to insert &quot;foldr (:) [] [1,2,3]&quot; into the console." style="cursor: pointer;">foldr (:) [] [1,2,3]</code> or <code title="Click me to insert &quot;do line &lt;- getLine; putStrLn line&quot; into the console." style="cursor: pointer;">do line &lt;- getLine; putStrLn line</code> or <code title="Click me to insert &quot;readFile &quot;/welcome&quot;&quot; into the console." style="cursor: pointer;">readFile "/welcome"</code></p><p><a href="https://hackage.haskell.org/package/pure-io-0.2.0/docs/PureIO.html#g:2">These</a> IO actions are supported in this sandbox.</p><p></p></div></div></div></div></div><div id="community-wrapper"><div style="background-image: url(/static/img/community.jpg?etag=xFvGm5tr)" class="community"><div id="tagline" class=" container "><div class=" row "><div class=" span8 col-md-8"><h1>An open source community effort for over 20 years</h1><p class="learn-more"><a href="https://www.haskell.org/community">Learn more</a></p></div></div></div><div id="video-description" class=" container " style="display: none; height: 223px;"><div class=" row "><div class=" span8 col-md-8"><h1><a id="video-anchor">&lt;title here&gt;</a></h1><p><a id="video-view">View the video now →</a></p></div></div></div></div><div class="videos"><div class=" container "><div class=" row "><div class=" span12 col-md-12"><ul><li><a href="https://vimeo.com/96744621" title="Functional Reactive Programming for Musical User Interfaces by Paul Hudak" class="vid-thumbnail"><img src="static/476988542_150x84.jpg"></a></li><li><a href="http://vimeo.com/90189610" title="Conquering Hadoop with Haskell and Ozgun Ataman" class="vid-thumbnail"><img src="static/469235326_150x84.jpg"></a></li><li><a href="http://vimeo.com/90184695" title="Using Lenses to Structure State with Nathan Bouscal" class="vid-thumbnail"><img src="static/469227196_150x84.jpg"></a></li><li><a href="http://vimeo.com/80895330" title="GHCJS: Bringing Haskell to the Browser, by Luite Stegeman" class="vid-thumbnail"><img src="static/456929997_150x84.jpg"></a></li><li><a href="http://vimeo.com/80863583" title="Jürgen Cito presents todo-example, a lightweight webapp in Haskell" class="vid-thumbnail"><img src="static/456929840_150x84.jpg"></a></li><li><a href="http://vimeo.com/77164337" title="Abstractions for the Functional Roboticist with Anthony Cowley" class="vid-thumbnail"><img src="static/452269027_150x84.jpg"></a></li></ul></div></div></div></div></div><div class="features"><div class=" container "><h1>Features</h1><div class=" row "><div class=" span6 col-md-6"><h2>Statically typed</h2><p>Every expression in Haskell has a type which is determined at compile time. All the types composed together by function application have to match up. If they don't, the program will be rejected by the compiler. Types become not only a form of guarantee, but a language for expressing the construction of programs.</p><p class="expand"><a>Click to expand</a></p><div class="expandable"><p>All Haskell values have a type:</p><pre><span class="hs-definition">char</span> <span class="hs-keyglyph">=</span> <span class="hs-chr">'a'</span>    <span class="hs-keyglyph">::</span> <span class="hs-conid">Char</span>
+          <span class="hs-varid">p</span> <span class="hs-conop">:</span> <span class="hs-varid">sieve</span> <span class="hs-keyglyph">[</span><span class="hs-varid">x</span> <span class="hs-keyglyph">|</span> <span class="hs-varid">x</span> <span class="hs-keyglyph">&lt;-</span> <span class="hs-varid">xs</span><span class="hs-layout">,</span> <span class="hs-varid">x</span> <span class="hs-varop">`mod`</span> <span class="hs-varid">p</span> <span class="hs-varop">/=</span> <span class="hs-num">0</span><span class="hs-keyglyph">]</span></pre></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div onclick="tryhaskell.controller.inner.click()" class="try">
+            <div class=" container ">
+                <div class=" row ">
+                    <div class=" span6 col-md-6">
+                        <h2>Try it</h2>
+                        <div id="console">
+                            <div class="jquery-console-inner">
+                                <textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="jquery-console-typer" style="position: absolute; top: 0px; left: -9999px;"></textarea>
+                                <div class="jquery-console-message jquery-console-welcome" style="">Type Haskell expressions in here.</div>
+                                <div class="jquery-console-prompt-box"><span class="jquery-console-prompt-label" style="display: inline;">λ&nbsp;</span><span class="jquery-console-prompt"><span class="jquery-console-cursor">&nbsp;</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="guide" class=" span6 col-md-6">
+                        <div class="indent">
+                            <h3>Got 5 minutes?</h3>
+                            <p>Type <code title="Click me to insert &quot;help&quot; into the console." style="cursor: pointer;">help</code> to start the tutorial.</p>
+                            <p>Or try typing these out and see what happens <small class="note">(click to insert)</small>:</p>
+                            <p><code title="Click me to insert &quot;23 * 36&quot; into the console." style="cursor: pointer;">23 * 36</code> or <code title="Click me to insert &quot;reverse &quot;hello&quot;&quot; into the console." style="cursor: pointer;">reverse "hello"</code> or <code title="Click me to insert &quot;foldr (:) [] [1,2,3]&quot; into the console." style="cursor: pointer;">foldr (:) [] [1,2,3]</code> or <code title="Click me to insert &quot;do line &lt;- getLine; putStrLn line&quot; into the console." style="cursor: pointer;">do line &lt;- getLine; putStrLn line</code> or <code title="Click me to insert &quot;readFile &quot;/welcome&quot;&quot; into the console." style="cursor: pointer;">readFile "/welcome"</code></p>
+                            <p><a href="https://hackage.haskell.org/package/pure-io-0.2.0/docs/PureIO.html#g:2">These</a> IO actions are supported in this sandbox.</p>
+                            <p></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="community-wrapper">
+            <div style="background-image: url(/static/img/community.jpg?etag=xFvGm5tr)" class="community">
+                <div id="tagline" class=" container ">
+                    <div class=" row ">
+                        <div class=" span8 col-md-8">
+                            <h1>An open source community effort for over 20 years</h1>
+                            <p class="learn-more"><a href="https://www.haskell.org/community">Learn more</a></p>
+                        </div>
+                    </div>
+                </div>
+                <div id="video-description" class=" container " style="display: none; height: 223px;">
+                    <div class=" row ">
+                        <div class=" span8 col-md-8">
+                            <h1><a id="video-anchor">&lt;title here&gt;</a></h1>
+                            <p><a id="video-view">View the video now →</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="videos">
+                <div class=" container ">
+                    <div class=" row ">
+                        <div class=" span12 col-md-12">
+                            <ul>
+                                <li>
+                                    <a href="https://vimeo.com/96744621" title="Functional Reactive Programming for Musical User Interfaces by Paul Hudak" class="vid-thumbnail"><img src="static/476988542_150x84.jpg"></a>
+                                </li>
+                                <li>
+                                    <a href="http://vimeo.com/90189610" title="Conquering Hadoop with Haskell and Ozgun Ataman" class="vid-thumbnail"><img src="static/469235326_150x84.jpg"></a>
+                                </li>
+                                <li>
+                                    <a href="http://vimeo.com/90184695" title="Using Lenses to Structure State with Nathan Bouscal" class="vid-thumbnail"><img src="static/469227196_150x84.jpg"></a>
+                                </li>
+                                <li>
+                                    <a href="http://vimeo.com/80895330" title="GHCJS: Bringing Haskell to the Browser, by Luite Stegeman" class="vid-thumbnail"><img src="static/456929997_150x84.jpg"></a>
+                                </li>
+                                <li>
+                                    <a href="http://vimeo.com/80863583" title="Jürgen Cito presents todo-example, a lightweight webapp in Haskell" class="vid-thumbnail"><img src="static/456929840_150x84.jpg"></a>
+                                </li>
+                                <li>
+                                    <a href="http://vimeo.com/77164337" title="Abstractions for the Functional Roboticist with Anthony Cowley" class="vid-thumbnail"><img src="static/452269027_150x84.jpg"></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="features">
+            <div class=" container ">
+                <h1>Features</h1>
+                <div class=" row ">
+                    <div class=" span6 col-md-6">
+                        <h2>Statically typed</h2>
+                        <p>Every expression in Haskell has a type which is determined at compile time. All the types composed together by function application have to match up. If they don't, the program will be rejected by the compiler. Types become not only a form of guarantee, but a language for expressing the construction of programs.</p>
+                        <p class="expand"><a>Click to expand</a></p>
+                        <div class="expandable">
+                            <p>All Haskell values have a type:</p><pre><span class="hs-definition">char</span> <span class="hs-keyglyph">=</span> <span class="hs-chr">'a'</span>    <span class="hs-keyglyph">::</span> <span class="hs-conid">Char</span>
 <span class="hs-definition">int</span> <span class="hs-keyglyph">=</span> <span class="hs-num">123</span>     <span class="hs-keyglyph">::</span> <span class="hs-conid">Int</span>
 <span class="hs-definition">fun</span> <span class="hs-keyglyph">=</span> <span class="hs-varid">isDigit</span> <span class="hs-keyglyph">::</span> <span class="hs-conid">Char</span> <span class="hs-keyglyph">-&gt;</span> <span class="hs-conid">Bool</span>
-</pre><p>You have to pass the right type of values to functions, or the compiler will reject the program:</p><div class="rejected-code"><span class="rejected-note">Type error</span><pre><span class="hs-definition">isDigit</span> <span class="hs-num">1</span></pre></div><p>You can decode bytes into text:</p><pre><span class="hs-definition">bytes</span> <span class="hs-keyglyph">=</span> <span class="hs-conid">Crypto</span><span class="hs-varop">.</span><span class="hs-conid">Hash</span><span class="hs-varop">.</span><span class="hs-conid">SHA1</span><span class="hs-varop">.</span><span class="hs-varid">hash</span> <span class="hs-str">"hello"</span> <span class="hs-keyglyph">::</span> <span class="hs-conid">ByteString</span>
+</pre>
+                            <p>You have to pass the right type of values to functions, or the compiler will reject the program:</p>
+                            <div class="rejected-code"><span class="rejected-note">Type error</span><pre><span class="hs-definition">isDigit</span> <span class="hs-num">1</span></pre></div>
+                            <p>You can decode bytes into text:</p><pre><span class="hs-definition">bytes</span> <span class="hs-keyglyph">=</span> <span class="hs-conid">Crypto</span><span class="hs-varop">.</span><span class="hs-conid">Hash</span><span class="hs-varop">.</span><span class="hs-conid">SHA1</span><span class="hs-varop">.</span><span class="hs-varid">hash</span> <span class="hs-str">"hello"</span> <span class="hs-keyglyph">::</span> <span class="hs-conid">ByteString</span>
 <span class="hs-definition">text</span> <span class="hs-keyglyph">=</span> <span class="hs-varid">decodeUtf8</span> <span class="hs-varid">bytes</span>               <span class="hs-keyglyph">::</span> <span class="hs-conid">Text</span>
-</pre><p>But you cannot decode Text, which is already a vector of Unicode points:</p><div class="rejected-code"><span class="rejected-note">Type error</span><pre><span class="hs-definition">doubleDecode</span> <span class="hs-keyglyph">=</span> <span class="hs-varid">decodeUtf8</span> <span class="hs-layout">(</span><span class="hs-varid">decodeUtf8</span> <span class="hs-varid">bytes</span><span class="hs-layout">)</span></pre></div></div></div><div class=" span6 col-md-6"><h2>Purely functional</h2><p>Every function in Haskell is a function in the mathematical sense (i.e., "pure"). Even side-effecting IO operations are but a description of what to do, produced by pure code. There are no statements or instructions, only expressions which cannot mutate variables (local or global) nor access state like time or random numbers.</p><p class="expand"><a>Click to expand</a></p><div class="expandable"><p>The following function takes an integer and returns an integer. By the type it cannot do any side-effects whatsoever, it cannot mutate any of its arguments.</p><pre><span class="hs-definition">square</span> <span class="hs-keyglyph">::</span> <span class="hs-conid">Int</span> <span class="hs-keyglyph">-&gt;</span> <span class="hs-conid">Int</span>
-<span class="hs-definition">square</span> <span class="hs-varid">x</span> <span class="hs-keyglyph">=</span> <span class="hs-varid">x</span> <span class="hs-varop">*</span> <span class="hs-varid">x</span></pre><p>The following string concatenation is okay:</p><pre><span class="hs-str">"Hello: "</span> <span class="hs-varop">++</span> <span class="hs-str">"World!"</span> </pre><p>The following string concatenation is a type error:</p><div class="rejected-code"><span class="rejected-note">Type error</span><pre><span class="hs-str">"Name: "</span> <span class="hs-varop">++</span> <span class="hs-varid">getLine</span></pre></div><p>Because <code>getLine</code> has type <code>IO String</code> and not <code>String</code>, like <code>"Name: "</code> is. So by the type system you cannot mix and match purity with impurity.</p></div></div></div><div class=" row "><div class=" span6 col-md-6"><h2>Type inference</h2><p>You don't have to explicitly write out every type in a Haskell program. Types will be inferred by unifying every type bidirectionally. However, you can write out types if you choose, or ask the compiler to write them for you for handy documentation.</p><p class="expand"><a>Click to expand</a></p><div class="expandable"><p>This example has a type signature for every binding:</p><pre><span class="hs-definition">main</span> <span class="hs-keyglyph">::</span> <span class="hs-conid">IO</span> <span class="hs-conid">()</span>
+</pre>
+                            <p>But you cannot decode Text, which is already a vector of Unicode points:</p>
+                            <div class="rejected-code"><span class="rejected-note">Type error</span><pre><span class="hs-definition">doubleDecode</span> <span class="hs-keyglyph">=</span> <span class="hs-varid">decodeUtf8</span> <span class="hs-layout">(</span><span class="hs-varid">decodeUtf8</span> <span class="hs-varid">bytes</span><span class="hs-layout">)</span></pre></div>
+                        </div>
+                    </div>
+                    <div class=" span6 col-md-6">
+                        <h2>Purely functional</h2>
+                        <p>Every function in Haskell is a function in the mathematical sense (i.e., "pure"). Even side-effecting IO operations are but a description of what to do, produced by pure code. There are no statements or instructions, only expressions which cannot mutate variables (local or global) nor access state like time or random numbers.</p>
+                        <p class="expand"><a>Click to expand</a></p>
+                        <div class="expandable">
+                            <p>The following function takes an integer and returns an integer. By the type it cannot do any side-effects whatsoever, it cannot mutate any of its arguments.</p><pre><span class="hs-definition">square</span> <span class="hs-keyglyph">::</span> <span class="hs-conid">Int</span> <span class="hs-keyglyph">-&gt;</span> <span class="hs-conid">Int</span>
+<span class="hs-definition">square</span> <span class="hs-varid">x</span> <span class="hs-keyglyph">=</span> <span class="hs-varid">x</span> <span class="hs-varop">*</span> <span class="hs-varid">x</span></pre>
+                            <p>The following string concatenation is okay:</p><pre><span class="hs-str">"Hello: "</span> <span class="hs-varop">++</span> <span class="hs-str">"World!"</span> </pre>
+                            <p>The following string concatenation is a type error:</p>
+                            <div class="rejected-code"><span class="rejected-note">Type error</span><pre><span class="hs-str">"Name: "</span> <span class="hs-varop">++</span> <span class="hs-varid">getLine</span></pre></div>
+                            <p>Because <code>getLine</code> has type <code>IO String</code> and not <code>String</code>, like <code>"Name: "</code> is. So by the type system you cannot mix and match purity with impurity.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class=" row ">
+                    <div class=" span6 col-md-6">
+                        <h2>Type inference</h2>
+                        <p>You don't have to explicitly write out every type in a Haskell program. Types will be inferred by unifying every type bidirectionally. However, you can write out types if you choose, or ask the compiler to write them for you for handy documentation.</p>
+                        <p class="expand"><a>Click to expand</a></p>
+                        <div class="expandable">
+                            <p>This example has a type signature for every binding:</p><pre><span class="hs-definition">main</span> <span class="hs-keyglyph">::</span> <span class="hs-conid">IO</span> <span class="hs-conid">()</span>
 <span class="hs-definition">main</span> <span class="hs-keyglyph">=</span> <span class="hs-keyword">do</span> <span class="hs-varid">line</span> <span class="hs-keyglyph">::</span> <span class="hs-conid">String</span> <span class="hs-keyglyph">&lt;-</span> <span class="hs-varid">getLine</span>
           <span class="hs-varid">print</span> <span class="hs-layout">(</span><span class="hs-varid">parseDigit</span> <span class="hs-varid">line</span><span class="hs-layout">)</span>
   <span class="hs-keyword">where</span> <span class="hs-varid">parseDigit</span> <span class="hs-keyglyph">::</span> <span class="hs-conid">String</span> <span class="hs-keyglyph">-&gt;</span> <span class="hs-conid">Maybe</span> <span class="hs-conid">Int</span>
         <span class="hs-varid">parseDigit</span> <span class="hs-layout">(</span><span class="hs-layout">(</span><span class="hs-varid">c</span> <span class="hs-keyglyph">::</span> <span class="hs-conid">Char</span><span class="hs-layout">)</span> <span class="hs-conop">:</span> <span class="hs-keyword">_</span><span class="hs-layout">)</span> <span class="hs-keyglyph">=</span>
           <span class="hs-keyword">if</span> <span class="hs-varid">isDigit</span> <span class="hs-varid">c</span>
              <span class="hs-keyword">then</span> <span class="hs-conid">Just</span> <span class="hs-layout">(</span><span class="hs-varid">ord</span> <span class="hs-varid">c</span> <span class="hs-comment">-</span> <span class="hs-varid">ord</span> <span class="hs-chr">'0'</span><span class="hs-layout">)</span>
-             <span class="hs-keyword">else</span> <span class="hs-conid">Nothing</span></pre><p>But you can just write:</p><pre><span class="hs-definition">main</span> <span class="hs-keyglyph">=</span> <span class="hs-keyword">do</span> <span class="hs-varid">line</span> <span class="hs-keyglyph">&lt;-</span> <span class="hs-varid">getLine</span>
+             <span class="hs-keyword">else</span> <span class="hs-conid">Nothing</span></pre>
+                            <p>But you can just write:</p><pre><span class="hs-definition">main</span> <span class="hs-keyglyph">=</span> <span class="hs-keyword">do</span> <span class="hs-varid">line</span> <span class="hs-keyglyph">&lt;-</span> <span class="hs-varid">getLine</span>
           <span class="hs-varid">print</span> <span class="hs-layout">(</span><span class="hs-varid">parseDigit</span> <span class="hs-varid">line</span><span class="hs-layout">)</span>
   <span class="hs-keyword">where</span> <span class="hs-varid">parseDigit</span> <span class="hs-layout">(</span><span class="hs-varid">c</span> <span class="hs-conop">:</span> <span class="hs-keyword">_</span><span class="hs-layout">)</span> <span class="hs-keyglyph">=</span>
           <span class="hs-keyword">if</span> <span class="hs-varid">isDigit</span> <span class="hs-varid">c</span>
              <span class="hs-keyword">then</span> <span class="hs-conid">Just</span> <span class="hs-layout">(</span><span class="hs-varid">ord</span> <span class="hs-varid">c</span> <span class="hs-comment">-</span> <span class="hs-varid">ord</span> <span class="hs-chr">'0'</span><span class="hs-layout">)</span>
-             <span class="hs-keyword">else</span> <span class="hs-conid">Nothing</span></pre><p>You can also use inference to avoid wasting time explaining what you want:</p><pre><span class="hs-keyword">do</span> <span class="hs-varid">ss</span> <span class="hs-keyglyph">&lt;-</span> <span class="hs-varid">decode</span> <span class="hs-str">"[\"Hello!\",\"World!\"]"</span>
+             <span class="hs-keyword">else</span> <span class="hs-conid">Nothing</span></pre>
+                            <p>You can also use inference to avoid wasting time explaining what you want:</p><pre><span class="hs-keyword">do</span> <span class="hs-varid">ss</span> <span class="hs-keyglyph">&lt;-</span> <span class="hs-varid">decode</span> <span class="hs-str">"[\"Hello!\",\"World!\"]"</span>
    <span class="hs-varid">is</span> <span class="hs-keyglyph">&lt;-</span> <span class="hs-varid">decode</span> <span class="hs-str">"[1,2,3]"</span>
    <span class="hs-varid">return</span> <span class="hs-layout">(</span><span class="hs-varid">zipWith</span> <span class="hs-layout">(</span><span class="hs-keyglyph">\</span><span class="hs-varid">s</span> <span class="hs-varid">i</span> <span class="hs-keyglyph">-&gt;</span> <span class="hs-varid">s</span> <span class="hs-varop">++</span> <span class="hs-str">" "</span> <span class="hs-varop">++</span> <span class="hs-varid">show</span> <span class="hs-layout">(</span><span class="hs-varid">i</span> <span class="hs-varop">+</span> <span class="hs-num">5</span><span class="hs-layout">)</span><span class="hs-layout">)</span> <span class="hs-varid">ss</span> <span class="hs-varid">is</span><span class="hs-layout">)</span>
- <span class="hs-keyglyph">=&gt;</span> <span class="hs-conid">Just</span> <span class="hs-keyglyph">[</span><span class="hs-str">"Hello! 6"</span><span class="hs-layout">,</span><span class="hs-str">"World! 7"</span><span class="hs-keyglyph">]</span></pre><p>Types give a parser specification for free, the following input is not accepted:</p><pre><span class="hs-keyword">do</span> <span class="hs-varid">ss</span> <span class="hs-keyglyph">&lt;-</span> <span class="hs-varid">decode</span> <span class="hs-str">"[1,2,3]"</span>
+ <span class="hs-keyglyph">=&gt;</span> <span class="hs-conid">Just</span> <span class="hs-keyglyph">[</span><span class="hs-str">"Hello! 6"</span><span class="hs-layout">,</span><span class="hs-str">"World! 7"</span><span class="hs-keyglyph">]</span></pre>
+                            <p>Types give a parser specification for free, the following input is not accepted:</p><pre><span class="hs-keyword">do</span> <span class="hs-varid">ss</span> <span class="hs-keyglyph">&lt;-</span> <span class="hs-varid">decode</span> <span class="hs-str">"[1,2,3]"</span>
    <span class="hs-varid">is</span> <span class="hs-keyglyph">&lt;-</span> <span class="hs-varid">decode</span> <span class="hs-str">"[null,null,null]"</span>
    <span class="hs-varid">return</span> <span class="hs-layout">(</span><span class="hs-varid">zipWith</span> <span class="hs-layout">(</span><span class="hs-keyglyph">\</span><span class="hs-varid">s</span> <span class="hs-varid">i</span> <span class="hs-keyglyph">-&gt;</span> <span class="hs-varid">s</span> <span class="hs-varop">++</span> <span class="hs-str">" "</span> <span class="hs-varop">++</span> <span class="hs-varid">show</span> <span class="hs-layout">(</span><span class="hs-varid">i</span> <span class="hs-varop">+</span> <span class="hs-num">5</span><span class="hs-layout">)</span><span class="hs-layout">)</span> <span class="hs-varid">ss</span> <span class="hs-varid">is</span><span class="hs-layout">)</span>
- <span class="hs-keyglyph">=&gt;</span> <span class="hs-conid">Nothing</span></pre></div></div><div class=" span6 col-md-6"><h2>Concurrent</h2><p>Haskell lends itself well to concurrent programming due to its explicit handling of effects. Its flagship compiler, GHC, comes with a high-performance parallel garbage collector and light-weight concurrency library containing a number of useful concurrency primitives and abstractions.</p><p class="expand"><a>Click to expand</a></p><div class="expandable"><p>Easily launch threads and communicate with the standard library:</p><pre><span class="hs-definition">main</span> <span class="hs-keyglyph">=</span> <span class="hs-keyword">do</span>
+ <span class="hs-keyglyph">=&gt;</span> <span class="hs-conid">Nothing</span></pre></div>
+                    </div>
+                    <div class=" span6 col-md-6">
+                        <h2>Concurrent</h2>
+                        <p>Haskell lends itself well to concurrent programming due to its explicit handling of effects. Its flagship compiler, GHC, comes with a high-performance parallel garbage collector and light-weight concurrency library containing a number of useful concurrency primitives and abstractions.</p>
+                        <p class="expand"><a>Click to expand</a></p>
+                        <div class="expandable">
+                            <p>Easily launch threads and communicate with the standard library:</p><pre><span class="hs-definition">main</span> <span class="hs-keyglyph">=</span> <span class="hs-keyword">do</span>
   <span class="hs-varid">done</span> <span class="hs-keyglyph">&lt;-</span> <span class="hs-varid">newEmptyMVar</span>
   <span class="hs-varid">forkIO</span> <span class="hs-layout">(</span><span class="hs-keyword">do</span> <span class="hs-varid">putStrLn</span> <span class="hs-str">"I'm one thread!"</span>
              <span class="hs-varid">putMVar</span> <span class="hs-varid">done</span> <span class="hs-str">"Done!"</span><span class="hs-layout">)</span>
@@ -33,23 +202,314 @@
                        <span class="hs-varid">putStrLn</span> <span class="hs-str">"I'm another thread!"</span><span class="hs-layout">)</span>
   <span class="hs-varid">killThread</span> <span class="hs-varid">second</span>
   <span class="hs-varid">msg</span> <span class="hs-keyglyph">&lt;-</span> <span class="hs-varid">takeMVar</span> <span class="hs-varid">done</span>
-  <span class="hs-varid">putStrLn</span> <span class="hs-varid">msg</span></pre><p>Use an asynchronous API for threads:</p><pre><span class="hs-keyword">do</span> <span class="hs-varid">a1</span> <span class="hs-keyglyph">&lt;-</span> <span class="hs-varid">async</span> <span class="hs-layout">(</span><span class="hs-varid">getURL</span> <span class="hs-varid">url1</span><span class="hs-layout">)</span>
+  <span class="hs-varid">putStrLn</span> <span class="hs-varid">msg</span></pre>
+                            <p>Use an asynchronous API for threads:</p><pre><span class="hs-keyword">do</span> <span class="hs-varid">a1</span> <span class="hs-keyglyph">&lt;-</span> <span class="hs-varid">async</span> <span class="hs-layout">(</span><span class="hs-varid">getURL</span> <span class="hs-varid">url1</span><span class="hs-layout">)</span>
   <span class="hs-varid">a2</span> <span class="hs-keyglyph">&lt;-</span> <span class="hs-varid">async</span> <span class="hs-layout">(</span><span class="hs-varid">getURL</span> <span class="hs-varid">url2</span><span class="hs-layout">)</span>
   <span class="hs-varid">page1</span> <span class="hs-keyglyph">&lt;-</span> <span class="hs-varid">wait</span> <span class="hs-varid">a1</span>
   <span class="hs-varid">page2</span> <span class="hs-keyglyph">&lt;-</span> <span class="hs-varid">wait</span> <span class="hs-varid">a2</span>
-  <span class="hs-varop">...</span></pre><p>Atomic threading with software transactional memory:</p><pre><span class="hs-definition">transfer</span> <span class="hs-keyglyph">::</span> <span class="hs-conid">Account</span> <span class="hs-keyglyph">-&gt;</span> <span class="hs-conid">Account</span> <span class="hs-keyglyph">-&gt;</span> <span class="hs-conid">Int</span> <span class="hs-keyglyph">-&gt;</span> <span class="hs-conid">IO</span> <span class="hs-conid">()</span>
+  <span class="hs-varop">...</span></pre>
+                            <p>Atomic threading with software transactional memory:</p><pre><span class="hs-definition">transfer</span> <span class="hs-keyglyph">::</span> <span class="hs-conid">Account</span> <span class="hs-keyglyph">-&gt;</span> <span class="hs-conid">Account</span> <span class="hs-keyglyph">-&gt;</span> <span class="hs-conid">Int</span> <span class="hs-keyglyph">-&gt;</span> <span class="hs-conid">IO</span> <span class="hs-conid">()</span>
 <span class="hs-definition">transfer</span> <span class="hs-varid">from</span> <span class="hs-varid">to</span> <span class="hs-varid">amount</span> <span class="hs-keyglyph">=</span>
   <span class="hs-varid">atomically</span> <span class="hs-layout">(</span><span class="hs-keyword">do</span> <span class="hs-varid">deposit</span> <span class="hs-varid">to</span> <span class="hs-varid">amount</span>
-                 <span class="hs-varid">withdraw</span> <span class="hs-varid">from</span> <span class="hs-varid">amount</span><span class="hs-layout">)</span></pre><p>Atomic transactions must be repeatable, so arbitrary IO is disabled in the type system:</p><div class="rejected-code"><span class="rejected-note">Type error</span><pre><span class="hs-definition">main</span> <span class="hs-keyglyph">=</span> <span class="hs-varid">atomically</span> <span class="hs-layout">(</span><span class="hs-varid">putStrLn</span> <span class="hs-str">"Hello!"</span><span class="hs-layout">)</span></pre></div></div></div></div><div class=" row "><div class=" span6 col-md-6"><h2>Lazy</h2><p>Functions don't evaluate their arguments. This means that programs can compose together very well, with the ability to write control constructs (such as if/else) just by writing normal functions. The purity of Haskell code makes it easy to fuse chains of functions together, allowing for performance benefits.</p><p class="expand"><a>Click to expand</a></p><div class="expandable"><p>Define control structures easily:</p><pre><span class="hs-definition">when</span> <span class="hs-varid">p</span> <span class="hs-varid">m</span> <span class="hs-keyglyph">=</span> <span class="hs-keyword">if</span> <span class="hs-varid">p</span> <span class="hs-keyword">then</span> <span class="hs-varid">m</span> <span class="hs-keyword">else</span> <span class="hs-varid">return</span> <span class="hs-conid">()</span>
+                 <span class="hs-varid">withdraw</span> <span class="hs-varid">from</span> <span class="hs-varid">amount</span><span class="hs-layout">)</span></pre>
+                            <p>Atomic transactions must be repeatable, so arbitrary IO is disabled in the type system:</p>
+                            <div class="rejected-code"><span class="rejected-note">Type error</span><pre><span class="hs-definition">main</span> <span class="hs-keyglyph">=</span> <span class="hs-varid">atomically</span> <span class="hs-layout">(</span><span class="hs-varid">putStrLn</span> <span class="hs-str">"Hello!"</span><span class="hs-layout">)</span></pre></div>
+                        </div>
+                    </div>
+                </div>
+                <div class=" row ">
+                    <div class=" span6 col-md-6">
+                        <h2>Lazy</h2>
+                        <p>Functions don't evaluate their arguments. This means that programs can compose together very well, with the ability to write control constructs (such as if/else) just by writing normal functions. The purity of Haskell code makes it easy to fuse chains of functions together, allowing for performance benefits.</p>
+                        <p class="expand"><a>Click to expand</a></p>
+                        <div class="expandable">
+                            <p>Define control structures easily:</p><pre><span class="hs-definition">when</span> <span class="hs-varid">p</span> <span class="hs-varid">m</span> <span class="hs-keyglyph">=</span> <span class="hs-keyword">if</span> <span class="hs-varid">p</span> <span class="hs-keyword">then</span> <span class="hs-varid">m</span> <span class="hs-keyword">else</span> <span class="hs-varid">return</span> <span class="hs-conid">()</span>
 <span class="hs-definition">main</span> <span class="hs-keyglyph">=</span> <span class="hs-keyword">do</span> <span class="hs-varid">args</span> <span class="hs-keyglyph">&lt;-</span> <span class="hs-varid">getArgs</span>
           <span class="hs-varid">when</span> <span class="hs-layout">(</span><span class="hs-varid">null</span> <span class="hs-varid">args</span><span class="hs-layout">)</span>
-               <span class="hs-layout">(</span><span class="hs-varid">putStrLn</span> <span class="hs-str">"No args specified!"</span><span class="hs-layout">)</span> </pre><p>If you notice a repeated expression pattern, like </p><pre><span class="hs-keyword">if</span> <span class="hs-varid">c</span> <span class="hs-keyword">then</span> <span class="hs-varid">t</span> <span class="hs-keyword">else</span> <span class="hs-conid">False</span></pre><p>you can give this a name, like </p><pre><span class="hs-definition">and</span> <span class="hs-varid">c</span> <span class="hs-varid">t</span> <span class="hs-keyglyph">=</span> <span class="hs-keyword">if</span> <span class="hs-varid">c</span> <span class="hs-keyword">then</span> <span class="hs-varid">t</span> <span class="hs-keyword">else</span> <span class="hs-conid">False</span></pre><p>and then use it with the same effect as the orginal expression.</p><p>Get code re-use by composing lazy functions. It's quite natural to express the <code>any</code> function by reusing the <code>map</code> and <code>or</code> functions:</p><pre><span class="hs-definition">any</span> <span class="hs-keyglyph">::</span> <span class="hs-layout">(</span><span class="hs-varid">a</span> <span class="hs-keyglyph">-&gt;</span> <span class="hs-conid">Bool</span><span class="hs-layout">)</span> <span class="hs-keyglyph">-&gt;</span> <span class="hs-keyglyph">[</span><span class="hs-varid">a</span><span class="hs-keyglyph">]</span> <span class="hs-keyglyph">-&gt;</span> <span class="hs-conid">Bool</span>
-<span class="hs-definition">any</span> <span class="hs-varid">p</span> <span class="hs-keyglyph">=</span> <span class="hs-varid">or</span> <span class="hs-varop">.</span> <span class="hs-varid">map</span> <span class="hs-varid">p</span></pre><p>Reuse the recursion patterns in <code>map</code>, <code>filter</code>, <code>foldr</code>, etc.</p></div></div><div class=" span6 col-md-6"><h2>Packages</h2><p>Open source contribution to Haskell is very active with a wide range of packages available on the public package servers.</p><p class="expand"><a>Click to expand</a></p><div class="expandable"><p>There are 6,954 packages freely available. Here is a sample of the most common ones:</p><table class="packages"><tbody><tr><td><a href="https://hackage.haskell.org/package/bytestring">bytestring</a></td><td>Binary data</td><td class="rhs"><a href="https://hackage.haskell.org/package/base">base</a></td><td class="rhs">Prelude, IO, threads</td></tr><tr><td><a href="https://hackage.haskell.org/package/network">network</a></td><td>Networking</td><td class="rhs"><a href="https://hackage.haskell.org/package/text">text</a></td><td class="rhs">Unicode text</td></tr><tr><td><a href="https://hackage.haskell.org/package/parsec">parsec</a></td><td>Parser library</td><td class="rhs"><a href="https://hackage.haskell.org/package/directory">directory</a></td><td class="rhs">File/directory</td></tr><tr><td><a href="https://hackage.haskell.org/package/hspec">hspec</a></td><td>RSpec-like tests</td><td class="rhs"><a href="https://hackage.haskell.org/package/attoparsec">attoparsec</a></td><td class="rhs">Fast parser</td></tr><tr><td><a href="https://hackage.haskell.org/package/monad-logger">monad-logger</a></td><td>Logging</td><td class="rhs"><a href="https://hackage.haskell.org/package/persistent">persistent</a></td><td class="rhs">Database ORM</td></tr><tr><td><a href="https://hackage.haskell.org/package/template-haskell">template-haskell</a></td><td>Meta-programming</td><td class="rhs"><a href="https://hackage.haskell.org/package/tar">tar</a></td><td class="rhs">Tar archives</td></tr><tr><td><a href="https://hackage.haskell.org/package/snap">snap</a></td><td>Web framework</td><td class="rhs"><a href="https://hackage.haskell.org/package/time">time</a></td><td class="rhs">Date, time, etc.</td></tr><tr><td><a href="https://hackage.haskell.org/package/happstack">happstack</a></td><td>Web framework</td><td class="rhs"><a href="https://hackage.haskell.org/package/yesod">yesod</a></td><td class="rhs">Web framework</td></tr><tr><td><a href="https://hackage.haskell.org/package/containers">containers</a></td><td>Maps, graphs, sets</td><td class="rhs"><a href="https://hackage.haskell.org/package/fsnotify">fsnotify</a></td><td class="rhs">Watch filesystem</td></tr><tr><td><a href="https://hackage.haskell.org/package/hint">hint</a></td><td>Interpret Haskell</td><td class="rhs"><a href="https://hackage.haskell.org/package/unix">unix</a></td><td class="rhs">UNIX bindings</td></tr><tr><td><a href="https://hackage.haskell.org/package/SDL">SDL</a></td><td>SDL binding</td><td class="rhs"><a href="https://hackage.haskell.org/package/OpenGL">OpenGL</a></td><td class="rhs">OpenGL graphics system</td></tr><tr><td><a href="https://hackage.haskell.org/package/criterion">criterion</a></td><td>Benchmarking</td><td class="rhs"><a href="https://hackage.haskell.org/package/pango">pango</a></td><td class="rhs">Text rendering</td></tr><tr><td><a href="https://hackage.haskell.org/package/cairo">cairo</a></td><td>Cairo graphics</td><td class="rhs"><a href="https://hackage.haskell.org/package/statistics">statistics</a></td><td class="rhs">Statistical analysis</td></tr><tr><td><a href="https://hackage.haskell.org/package/gtk">gtk</a></td><td>Gtk+ library</td><td class="rhs"><a href="https://hackage.haskell.org/package/glib">glib</a></td><td class="rhs">GLib library</td></tr><tr><td><a href="https://hackage.haskell.org/package/test-framework">test-framework</a></td><td>Testing framework</td><td class="rhs"><a href="https://hackage.haskell.org/package/resource-pool">resource-pool</a></td><td class="rhs">Resource pooling</td></tr><tr><td><a href="https://hackage.haskell.org/package/conduit">conduit</a></td><td>Streaming I/O</td><td class="rhs"><a href="https://hackage.haskell.org/package/mwc-random">mwc-random</a></td><td class="rhs">High-quality randoms</td></tr><tr><td><a href="https://hackage.haskell.org/package/QuickCheck">QuickCheck</a></td><td>Property testing</td><td class="rhs"><a href="https://hackage.haskell.org/package/stm">stm</a></td><td class="rhs">Atomic threading</td></tr><tr><td><a href="https://hackage.haskell.org/package/blaze-html">blaze-html</a></td><td>Markup generation</td><td class="rhs"><a href="https://hackage.haskell.org/package/cereal">cereal</a></td><td class="rhs">Binary parsing/printing</td></tr><tr><td><a href="https://hackage.haskell.org/package/xml">xml</a></td><td>XML parser/printer</td><td class="rhs"><a href="https://hackage.haskell.org/package/http-client">http-client</a></td><td class="rhs">HTTP client engine</td></tr><tr><td><a href="https://hackage.haskell.org/package/zlib">zlib</a></td><td>zlib/gzip/raw</td><td class="rhs"><a href="https://hackage.haskell.org/package/yaml">yaml</a></td><td class="rhs">YAML parser/printer</td></tr><tr><td><a href="https://hackage.haskell.org/package/pandoc">pandoc</a></td><td>Markup conversion</td><td class="rhs"><a href="https://hackage.haskell.org/package/binary">binary</a></td><td class="rhs">Serialization</td></tr><tr><td><a href="https://hackage.haskell.org/package/tls">tls</a></td><td>TLS/SSL</td><td class="rhs"><a href="https://hackage.haskell.org/package/zip-archive">zip-archive</a></td><td class="rhs">Zip compression</td></tr><tr><td><a href="https://hackage.haskell.org/package/warp">warp</a></td><td>Web server</td><td class="rhs"><a href="https://hackage.haskell.org/package/text-icu">text-icu</a></td><td class="rhs">Text encodings</td></tr><tr><td><a href="https://hackage.haskell.org/package/vector">vector</a></td><td>Vectors</td><td class="rhs"><a href="https://hackage.haskell.org/package/async">async</a></td><td class="rhs">Asyn concurrency</td></tr><tr><td><a href="https://hackage.haskell.org/package/pipes">pipes</a></td><td>Streaming IO</td><td class="rhs"><a href="https://hackage.haskell.org/package/scientific">scientific</a></td><td class="rhs">Arbitrary-prec. nums</td></tr><tr><td><a href="https://hackage.haskell.org/package/process">process</a></td><td>Launch processes</td><td class="rhs"><a href="https://hackage.haskell.org/package/aeson">aeson</a></td><td class="rhs">JSON parser/printer</td></tr><tr><td><a href="https://hackage.haskell.org/package/dlist">dlist</a></td><td>Difflists</td><td class="rhs"><a href="https://hackage.haskell.org/package/syb">syb</a></td><td class="rhs">Generic prog.</td></tr></tbody></table></div></div></div></div></div><div class="sponsors"><div class=" container "><div class=" row "><div class=" span6 col-md-6"><h1>Sponsors</h1></div></div><div class=" row "><div class=" span6 col-md-6"><p><strong><a href="https://www.datadoghq.com/">DataDog</a></strong> provides powerful, customizable 24/7 metrics and monitoring integration for all of Haskell.org, and complains loudly for us when things go wrong.</p></div><div class=" span6 col-md-6"><p><strong><a href="https://www.fastly.com/">Fastly</a></strong>'s Next Generation CDN provides low latency access for all of Haskell.org's downloads and highest traffic services, including the primary Hackage server, Haskell Platform downloads, and more.</p></div></div><div class=" row "><div class=" span6 col-md-6"><p><strong><a href="https://www.rackspace.com/">Rackspace</a></strong> provides compute, storage, and networking resources, powering almost all of Haskell.org in several regions around the world.</p></div><div class=" span6 col-md-6"><p><strong><a href="https://www.status.io/">Status.io</a></strong> powers <a href="https://status.haskell.org/">https://status.haskell.org</a>, and lets us easily tell you when we broke something.</p></div></div><div class=" row "><div class=" span6 col-md-6"><p><strong><a href="http://www.galois.com/">Galois</a></strong> provides infrastructure, funds, administrative resources and has historically hosted critical Haskell.org infrastructure, as well as helping the Haskell community at large with their work.</p></div><div class=" span6 col-md-6"><p><strong><a href="https://www.dreamhost.com/">DreamHost</a></strong> has teamed up to provide Haskell.org with redundant, scalable object-storage through their Dream Objects service.</p></div></div></div></div><div class="transition"><div class=" container "><div class=" row "><div class=" span6 col-md-6"><h1>Psst! Looking for the wiki?</h1><p>This is the new Haskell home page! The wiki has moved to <a href="https://wiki.haskell.org/">wiki.haskell.org.</a></p></div></div></div></div><div class="mobile"><nav class="navbar navbar-default"><div class="container"><div class="collapse navbar-collapse"><ul class="nav navbar-nav"><li><a href="https://www.haskell.org/downloads">Downloads</a></li><li><a href="https://www.haskell.org/community">Community</a></li><li><a href="https://www.haskell.org/documentation">Documentation</a></li><li><a href="https://www.haskell.org/news">News</a></li></ul></div></div></nav></div></div><div class="footer"><div class="container"><p><span class="item">© 2014–2015 haskell.org</span><span class="item footer-contribute">Got changes to contribute? <a href="https://github.com/haskell-infra/hl">Fork or comment on Github</a></span><span class="pull-right"><span>Proudly hosted by </span><a href="https://www.rackspace.com/"><img height="20" width="20" src="static/rackspace.svg" alt="rackspace"></a></span></p></div></div><script type="text/javascript" async="" src="static/ga.js"></script><script src="static/jquery.js"></script><script src="static/bootstrap.min.js"></script><script src="static/home.js"></script><script src="static/jquery.console.js"></script><script src="static/tryhaskell.js"></script><script src="static/tryhaskell.pages.js"></script><script>var _gaq = _gaq || [];
-_gaq.push(['_setAccount', 'UA-51440536-1']);
-_gaq.push(['_trackPageview']);
-(function() {
- var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
- ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
- var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-})();
-</script></body><style type="text/css">embed[type*="application/x-shockwave-flash"],embed[src*=".swf"],object[type*="application/x-shockwave-flash"],object[codetype*="application/x-shockwave-flash"],object[src*=".swf"],object[codebase*="swflash.cab"],object[classid*="D27CDB6E-AE6D-11cf-96B8-444553540000"],object[classid*="d27cdb6e-ae6d-11cf-96b8-444553540000"],object[classid*="D27CDB6E-AE6D-11cf-96B8-444553540000"]{	display: none !important;}</style></html>
+               <span class="hs-layout">(</span><span class="hs-varid">putStrLn</span> <span class="hs-str">"No args specified!"</span><span class="hs-layout">)</span> </pre>
+                            <p>If you notice a repeated expression pattern, like </p><pre><span class="hs-keyword">if</span> <span class="hs-varid">c</span> <span class="hs-keyword">then</span> <span class="hs-varid">t</span> <span class="hs-keyword">else</span> <span class="hs-conid">False</span></pre>
+                            <p>you can give this a name, like </p><pre><span class="hs-definition">and</span> <span class="hs-varid">c</span> <span class="hs-varid">t</span> <span class="hs-keyglyph">=</span> <span class="hs-keyword">if</span> <span class="hs-varid">c</span> <span class="hs-keyword">then</span> <span class="hs-varid">t</span> <span class="hs-keyword">else</span> <span class="hs-conid">False</span></pre>
+                            <p>and then use it with the same effect as the orginal expression.</p>
+                            <p>Get code re-use by composing lazy functions. It's quite natural to express the <code>any</code> function by reusing the <code>map</code> and <code>or</code> functions:</p><pre><span class="hs-definition">any</span> <span class="hs-keyglyph">::</span> <span class="hs-layout">(</span><span class="hs-varid">a</span> <span class="hs-keyglyph">-&gt;</span> <span class="hs-conid">Bool</span><span class="hs-layout">)</span> <span class="hs-keyglyph">-&gt;</span> <span class="hs-keyglyph">[</span><span class="hs-varid">a</span><span class="hs-keyglyph">]</span> <span class="hs-keyglyph">-&gt;</span> <span class="hs-conid">Bool</span>
+<span class="hs-definition">any</span> <span class="hs-varid">p</span> <span class="hs-keyglyph">=</span> <span class="hs-varid">or</span> <span class="hs-varop">.</span> <span class="hs-varid">map</span> <span class="hs-varid">p</span></pre>
+                            <p>Reuse the recursion patterns in <code>map</code>, <code>filter</code>, <code>foldr</code>, etc.</p>
+                        </div>
+                    </div>
+                    <div class=" span6 col-md-6">
+                        <h2>Packages</h2>
+                        <p>Open source contribution to Haskell is very active with a wide range of packages available on the public package servers.</p>
+                        <p class="expand"><a>Click to expand</a></p>
+                        <div class="expandable">
+                            <p>There are 6,954 packages freely available. Here is a sample of the most common ones:</p>
+                            <table class="packages">
+                                <tbody>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/bytestring">bytestring</a></td>
+                                        <td>Binary data</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/base">base</a></td>
+                                        <td class="rhs">Prelude, IO, threads</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/network">network</a></td>
+                                        <td>Networking</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/text">text</a></td>
+                                        <td class="rhs">Unicode text</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/parsec">parsec</a></td>
+                                        <td>Parser library</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/directory">directory</a></td>
+                                        <td class="rhs">File/directory</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/hspec">hspec</a></td>
+                                        <td>RSpec-like tests</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/attoparsec">attoparsec</a></td>
+                                        <td class="rhs">Fast parser</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/monad-logger">monad-logger</a></td>
+                                        <td>Logging</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/persistent">persistent</a></td>
+                                        <td class="rhs">Database ORM</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/template-haskell">template-haskell</a></td>
+                                        <td>Meta-programming</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/tar">tar</a></td>
+                                        <td class="rhs">Tar archives</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/snap">snap</a></td>
+                                        <td>Web framework</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/time">time</a></td>
+                                        <td class="rhs">Date, time, etc.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/happstack">happstack</a></td>
+                                        <td>Web framework</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/yesod">yesod</a></td>
+                                        <td class="rhs">Web framework</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/containers">containers</a></td>
+                                        <td>Maps, graphs, sets</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/fsnotify">fsnotify</a></td>
+                                        <td class="rhs">Watch filesystem</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/hint">hint</a></td>
+                                        <td>Interpret Haskell</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/unix">unix</a></td>
+                                        <td class="rhs">UNIX bindings</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/SDL">SDL</a></td>
+                                        <td>SDL binding</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/OpenGL">OpenGL</a></td>
+                                        <td class="rhs">OpenGL graphics system</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/criterion">criterion</a></td>
+                                        <td>Benchmarking</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/pango">pango</a></td>
+                                        <td class="rhs">Text rendering</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/cairo">cairo</a></td>
+                                        <td>Cairo graphics</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/statistics">statistics</a></td>
+                                        <td class="rhs">Statistical analysis</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/gtk">gtk</a></td>
+                                        <td>Gtk+ library</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/glib">glib</a></td>
+                                        <td class="rhs">GLib library</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/test-framework">test-framework</a></td>
+                                        <td>Testing framework</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/resource-pool">resource-pool</a></td>
+                                        <td class="rhs">Resource pooling</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/conduit">conduit</a></td>
+                                        <td>Streaming I/O</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/mwc-random">mwc-random</a></td>
+                                        <td class="rhs">High-quality randoms</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/QuickCheck">QuickCheck</a></td>
+                                        <td>Property testing</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/stm">stm</a></td>
+                                        <td class="rhs">Atomic threading</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/blaze-html">blaze-html</a></td>
+                                        <td>Markup generation</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/cereal">cereal</a></td>
+                                        <td class="rhs">Binary parsing/printing</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/xml">xml</a></td>
+                                        <td>XML parser/printer</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/http-client">http-client</a></td>
+                                        <td class="rhs">HTTP client engine</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/zlib">zlib</a></td>
+                                        <td>zlib/gzip/raw</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/yaml">yaml</a></td>
+                                        <td class="rhs">YAML parser/printer</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/pandoc">pandoc</a></td>
+                                        <td>Markup conversion</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/binary">binary</a></td>
+                                        <td class="rhs">Serialization</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/tls">tls</a></td>
+                                        <td>TLS/SSL</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/zip-archive">zip-archive</a></td>
+                                        <td class="rhs">Zip compression</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/warp">warp</a></td>
+                                        <td>Web server</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/text-icu">text-icu</a></td>
+                                        <td class="rhs">Text encodings</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/vector">vector</a></td>
+                                        <td>Vectors</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/async">async</a></td>
+                                        <td class="rhs">Asyn concurrency</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/pipes">pipes</a></td>
+                                        <td>Streaming IO</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/scientific">scientific</a></td>
+                                        <td class="rhs">Arbitrary-prec. nums</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/process">process</a></td>
+                                        <td>Launch processes</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/aeson">aeson</a></td>
+                                        <td class="rhs">JSON parser/printer</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="https://hackage.haskell.org/package/dlist">dlist</a></td>
+                                        <td>Difflists</td>
+                                        <td class="rhs"><a href="https://hackage.haskell.org/package/syb">syb</a></td>
+                                        <td class="rhs">Generic prog.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="sponsors">
+            <div class=" container ">
+                <div class=" row ">
+                    <div class=" span6 col-md-6">
+                        <h1>Sponsors</h1></div>
+                </div>
+                <div class=" row ">
+                    <div class=" span6 col-md-6">
+                        <p><strong><a href="https://www.datadoghq.com/">DataDog</a></strong> provides powerful, customizable 24/7 metrics and monitoring integration for all of Haskell.org, and complains loudly for us when things go wrong.</p>
+                    </div>
+                    <div class=" span6 col-md-6">
+                        <p><strong><a href="https://www.fastly.com/">Fastly</a></strong>'s Next Generation CDN provides low latency access for all of Haskell.org's downloads and highest traffic services, including the primary Hackage server, Haskell Platform downloads, and more.</p>
+                    </div>
+                </div>
+                <div class=" row ">
+                    <div class=" span6 col-md-6">
+                        <p><strong><a href="https://www.rackspace.com/">Rackspace</a></strong> provides compute, storage, and networking resources, powering almost all of Haskell.org in several regions around the world.</p>
+                    </div>
+                    <div class=" span6 col-md-6">
+                        <p><strong><a href="https://www.status.io/">Status.io</a></strong> powers <a href="https://status.haskell.org/">https://status.haskell.org</a>, and lets us easily tell you when we broke something.</p>
+                    </div>
+                </div>
+                <div class=" row ">
+                    <div class=" span6 col-md-6">
+                        <p><strong><a href="http://www.galois.com/">Galois</a></strong> provides infrastructure, funds, administrative resources and has historically hosted critical Haskell.org infrastructure, as well as helping the Haskell community at large with their work.</p>
+                    </div>
+                    <div class=" span6 col-md-6">
+                        <p><strong><a href="https://www.dreamhost.com/">DreamHost</a></strong> has teamed up to provide Haskell.org with redundant, scalable object-storage through their Dream Objects service.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="transition">
+            <div class=" container ">
+                <div class=" row ">
+                    <div class=" span6 col-md-6">
+                        <h1>Psst! Looking for the wiki?</h1>
+                        <p>This is the new Haskell home page! The wiki has moved to <a href="https://wiki.haskell.org/">wiki.haskell.org.</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mobile">
+            <nav class="navbar navbar-default">
+                <div class="container">
+                    <div class="collapse navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            <li><a href="https://www.haskell.org/downloads">Downloads</a></li>
+                            <li><a href="https://www.haskell.org/community">Community</a></li>
+                            <li><a href="https://www.haskell.org/documentation">Documentation</a></li>
+                            <li><a href="https://www.haskell.org/news">News</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <div class="footer">
+        <div class="container">
+            <p><span class="item">© 2014–2015 haskell.org</span><span class="item footer-contribute">Got changes to contribute? <a href="https://github.com/haskell-infra/hl">Fork or comment on Github</a></span><span class="pull-right"><span>Proudly hosted by </span>
+                <a href="https://www.rackspace.com/"><img height="20" width="20" src="static/rackspace.svg" alt="rackspace"></a>
+                </span>
+            </p>
+        </div>
+    </div>
+    <script type="text/javascript" async="" src="static/ga.js"></script>
+    <script src="static/jquery.js"></script>
+    <script src="static/bootstrap.min.js"></script>
+    <script src="static/home.js"></script>
+    <script src="static/jquery.console.js"></script>
+    <script src="static/tryhaskell.js"></script>
+    <script src="static/tryhaskell.pages.js"></script>
+    <script>
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-51440536-1']);
+        _gaq.push(['_trackPageview']);
+        (function() {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</body>
+<style type="text/css">
+    embed[type*="application/x-shockwave-flash"],
+    embed[src*=".swf"],
+    object[type*="application/x-shockwave-flash"],
+    object[codetype*="application/x-shockwave-flash"],
+    object[src*=".swf"],
+    object[codebase*="swflash.cab"],
+    object[classid*="D27CDB6E-AE6D-11cf-96B8-444553540000"],
+    object[classid*="d27cdb6e-ae6d-11cf-96b8-444553540000"],
+    object[classid*="D27CDB6E-AE6D-11cf-96B8-444553540000"] {
+        display: none !important;
+    }
+</style>
+
+</html>
