@@ -1,11 +1,13 @@
-telehash secure mesh protocol (v3)
+telehash secure mesh protocol
 ==================================
-
-> this is a draft (issues and pull requests welcome), planning for release version in 03/2015
 
 ![logo](logo/mesh-logo-128.png)
 
-Telehash is a project to create interoperable private mesh networking, see the [introduction](intro.md) for more background.
+> see the [v3 release specification](v3/spec/v3.0.0-stable.pdf)
+
+An interoperable private mesh networking standard, see the [introduction](intro.md) for more background.
+
+> the primary discussion area is currently via Slack, anyone can join by getting an [automated invite](http://6.telehash.org:3000).
 
 The full protocol suite is a composite of multiple individual specifications:
 
@@ -19,7 +21,6 @@ The full protocol suite is a composite of multiple individual specifications:
 * [transports](transports/) - details (encoding, timeouts, discovery, etc) for mapping/supporting different network transports
 * [logo](logo/) - for use to represent telehash support in apps 
 
-The primary discussion area is currently via Slack, anyone can join by getting an [automated invite](http://6.telehash.org:3000).
 
 <a name="implementations" />
 ### Implementations
@@ -29,7 +30,7 @@ Each implementation provides a library API adapted to its platform or language b
 Experimental implementations are being actively developed at:
 
 * [telehash-js](https://github.com/telehash/telehash-js)
-* [telehash-c](https://github.com/telehash/telehash-c).
+* [telehash-c](https://github.com/telehash/telehash-c)
 * [gogotelehash](https://github.com/telehash/gogotelehash)
 * [python](https://github.com/telehash/e3x-python)
 * [c#](https://github.com/telehash/telehash.net)
