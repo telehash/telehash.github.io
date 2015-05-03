@@ -14,7 +14,7 @@ Telehash is a 100% open, secure mesh networking technology with these design pri
 
 The telehash team includes collaborators from around the world, many of whom were the principal architects of [XMPP](http://en.wikipedia.org/wiki/XMPP). It is intended as a next-generation protocol advancing the original goals of Jabber.
 
-![Basic Network](v3/BasicNetwork.png)
+![Basic Network](BasicNetwork.png)
 
 The basic architecture contains application or device instances that each maintain a logical [mesh](mesh.md) which is just a collection of secure [links](link.md) to other instances.  Every endpoint has its own view of the mesh, a link between two instances is private only to them and not shared across the mesh.
 
@@ -28,7 +28,7 @@ The current v3 protocol has these high-level properties:
 * supports bridging and routing privately by default and optionally via a [public DHT (draft)](https://github.com/telehash/blockname)
 * integrates native support for [JSON Object Signing and Encryption (JOSE)](https://datatracker.ietf.org/wg/jose/charter/) and [OpenID Connect](http://openid.net/connect/)
 
-![Telehash Stack](v3/THStack.png)
+![Telehash Stack](THStack.png)
 
 The protocol stack is separated into two main areas, a lower level [end-to-end encrypted exchange (E3X)](e3x/intro.md) that handles all of the security primitives and encrypted [messages](e3x/messages.md), and higher application-level definitions for managing a [mesh](mesh.md) of [links](link.md) that support standard [channels](channels/), [transports](transports/), and [URIs](uri.md).
 
