@@ -3,7 +3,7 @@ telehash secure mesh protocol
 
 ![logo](logo/mesh-logo-128.png)
 
-> see the [v3 release specification](v3/spec/v3.0.0-stable.pdf)
+> see the [v3 release specification](spec/v3.0.0-stable.pdf)
 
 An interoperable private mesh networking standard, see the [introduction](intro.md) for more background.
 
