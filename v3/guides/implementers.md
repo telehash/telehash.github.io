@@ -210,7 +210,7 @@ When a new unknown hashname is discovered at any point (from transports or a con
 
 ### `link = mesh.link(to)`
 
-Establish a link to the given hashname.  The `to` may be a [URI](uri.md), [JSON link](link.md#json), or just a plain hashname.
+Establish a link to the given hashname.  The `to` may be a [URI](../uri.md), [JSON link](../link.md#json), or just a plain hashname.
 
 ### `link.onLink = function (state) {...}`
 
@@ -218,7 +218,7 @@ When the link state changes to up or down the app must be able to receive these 
 
 ### `link.router(bool)`
 
-Set this link to be a default (trusted) [router](routing.md), which will automatically ask it to assist in connections to any other link and provide assistance in connecting to the local endpoint.
+Set this link to be a default (trusted) [router](../routing.md), which will automatically ask it to assist in connections to any other link and provide assistance in connecting to the local endpoint.
 
 ### `mesh.discover(bool)`
 
