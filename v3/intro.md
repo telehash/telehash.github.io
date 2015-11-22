@@ -1,6 +1,10 @@
 tele·hash
 > n. *Internet*, from **tele**graph and **hash**table
 
+tele·hash pro·to·cols
+> n. *plural*, described herein
+
+
 # Introduction
 
 Telehash is a 100% open, secure mesh networking technology with these design principles:
