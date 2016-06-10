@@ -1,3 +1,6 @@
+Forked for archiving purposes.
+If anyone knows if telehash is still actively developed somewhere please give me a shout out
+
 telehash.org
 ============
 
